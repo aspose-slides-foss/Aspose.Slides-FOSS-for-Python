@@ -11,7 +11,7 @@ license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
 authors = [
-    { name = "Aspose Pty. Ltd." },
+    { name = "Aspose" },
 ]
 keywords = [
     "powerpoint",
@@ -23,7 +23,6 @@ keywords = [
     "openxml",
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
