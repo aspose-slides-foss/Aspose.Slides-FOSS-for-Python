@@ -193,7 +193,6 @@ opening and re-saving a file will never strip content this library does not yet 
 
 - [GitHub Repository](https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python)
 - [Issue Tracker](https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/issues)
-- [Release Notes](https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/blob/main/RELEASE_NOTES.md)
 
 ---
 
