@@ -5,7 +5,6 @@ from .IImageTransformOperation import IImageTransformOperation
 
 if TYPE_CHECKING:
     from ..IColorFormat import IColorFormat
-    from .IOuterShadowEffectiveData import IOuterShadowEffectiveData
     from ..RectangleAlignment import RectangleAlignment
 
 class IOuterShadow(IImageTransformOperation, ABC):

@@ -4,9 +4,6 @@ from typing import TYPE_CHECKING
 from .IBaseSlide import IBaseSlide
 
 if TYPE_CHECKING:
-    from .IDrawingGuidesCollection import IDrawingGuidesCollection
-    from .ILayoutPlaceholderManager import ILayoutPlaceholderManager
-    from .ILayoutSlideHeaderFooterManager import ILayoutSlideHeaderFooterManager
     from .IMasterSlide import IMasterSlide
     from .ISlide import ISlide
     from .SlideLayoutType import SlideLayoutType

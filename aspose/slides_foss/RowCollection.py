@@ -43,19 +43,13 @@ class RowCollection(BaseCollection, IRowCollection):
 
     @property
     def as_i_collection(self) -> list:
-        if hasattr(self, '_rows'):
-            return list(self._rows)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return list(self._rows)
 
     @property
     def as_i_enumerable(self) -> Any:
-        if hasattr(self, '_rows'):
-            return iter(self._rows)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return iter(self._rows)
 
     def add_clone(self, templ, with_attached_rows) -> list[IRow]:
-        if not hasattr(self, '_tbl_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         new_tr = copy.deepcopy(templ._tr_element)
         self._tbl_element.append(new_tr)
         self._rebuild()
@@ -64,8 +58,6 @@ class RowCollection(BaseCollection, IRowCollection):
         return [self._rows[-1]]
 
     def insert_clone(self, index, templ, with_attached_rows) -> list[IRow]:
-        if not hasattr(self, '_tbl_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ._internal.pptx.constants import Elements
         new_tr = copy.deepcopy(templ._tr_element)
         trs = self._tbl_element.findall(Elements.A_TR)
@@ -79,8 +71,6 @@ class RowCollection(BaseCollection, IRowCollection):
         return [self._rows[index]]
 
     def remove_at(self, first_row_index, with_attached_rows) -> None:
-        if not hasattr(self, '_tbl_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ._internal.pptx.constants import Elements
         trs = self._tbl_element.findall(Elements.A_TR)
         if first_row_index < 0 or first_row_index >= len(trs):
@@ -91,9 +81,7 @@ class RowCollection(BaseCollection, IRowCollection):
             self._slide_part.save()
 
     def __getitem__(self, index: int) -> Row:
-        if hasattr(self, '_rows'):
-            return self._rows[index]
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return self._rows[index]
 
     def __len__(self) -> int:
         if hasattr(self, '_rows'):

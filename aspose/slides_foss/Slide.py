@@ -8,8 +8,6 @@ if TYPE_CHECKING:
     from .IImage import IImage
     from .ILayoutSlide import ILayoutSlide
     from .INotesSlideManager import INotesSlideManager
-    from .theme.IOverrideThemeManager import IOverrideThemeManager
-    from .ISlideHeaderFooterManager import ISlideHeaderFooterManager
     from ._internal.pptx.slide_part import SlidePart
     from ._internal.pptx.presentation_part import SlideReference
     from ._internal.opc import OpcPackage
@@ -52,7 +50,7 @@ class Slide(BaseSlide, ISlide):
             for i in range(len(slides)):
                 if slides[i].slide_id == self.slide_id:
                     return i + self._presentation_ref.first_slide_number
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return 0
 
 
     @property
@@ -60,14 +58,12 @@ class Slide(BaseSlide, ISlide):
         """Determines whether the specified slide is hidden during a slide show. Read/write ."""
         if hasattr(self, '_slide_part') and self._slide_part is not None:
             return self._slide_part.hidden
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return False
 
     @hidden.setter
     def hidden(self, value: bool):
         if hasattr(self, '_slide_part') and self._slide_part is not None:
             self._slide_part.hidden = value
-            return
-        raise NotImplementedError("This feature is not yet available in this version.")
 
     @property
     def layout_slide(self) -> ILayoutSlide:
@@ -79,7 +75,7 @@ class Slide(BaseSlide, ISlide):
                     self._layout_slide_cache = self._layout_resolver(layout_part_name)
             if self._layout_slide_cache is not None:
                 return self._layout_slide_cache
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
 
     @property
@@ -113,8 +109,6 @@ class Slide(BaseSlide, ISlide):
     def remove(self) -> None:
         if hasattr(self, '_presentation_ref') and self._presentation_ref is not None:
             self._presentation_ref.slides.remove(self)
-            return
-        raise NotImplementedError("This feature is not yet available in this version.")
 
 
     def get_slide_comments(self, author) -> 'ICommentList':

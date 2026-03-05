@@ -4,33 +4,15 @@ from typing import overload, TYPE_CHECKING, Any
 from .IPresentationComponent import IPresentationComponent
 
 if TYPE_CHECKING:
-    from .IAudioCollection import IAudioCollection
     from .IBaseSlide import IBaseSlide
     from .ICommentAuthorCollection import ICommentAuthorCollection
-    from .ICustomData import ICustomData
-    from .ICustomXmlPart import ICustomXmlPart
-    from .IDigitalSignatureCollection import IDigitalSignatureCollection
     from .IDocumentProperties import IDocumentProperties
-    from .IFontsManager import IFontsManager
     from .IGlobalLayoutSlideCollection import IGlobalLayoutSlideCollection
-    from .IHyperlinkQueries import IHyperlinkQueries
     from .IImage import IImage
     from .IImageCollection import IImageCollection
-    from .IMasterHandoutSlideManager import IMasterHandoutSlideManager
-    from .IMasterNotesSlideManager import IMasterNotesSlideManager
     from .IMasterSlideCollection import IMasterSlideCollection
-    from .theme.IMasterTheme import IMasterTheme
     from .INotesSize import INotesSize
-    from .IPresentationHeaderFooterManager import IPresentationHeaderFooterManager
-    from .IProtectionManager import IProtectionManager
-    from .ISectionCollection import ISectionCollection
-    from .ISensitivityLabelCollection import ISensitivityLabelCollection
     from .ISlideCollection import ISlideCollection
-    from .ISlideSize import ISlideSize
-    from .ITextStyle import ITextStyle
-    from .vba.IVbaProject import IVbaProject
-    from .IVideoCollection import IVideoCollection
-    from .IViewProperties import IViewProperties
     from .SourceFormat import SourceFormat
 
 class IPresentation(IPresentationComponent, ABC):

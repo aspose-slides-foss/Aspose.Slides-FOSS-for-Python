@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 from .IImageTransformOperation import IImageTransformOperation
 
 if TYPE_CHECKING:
-    from .IReflectionEffectiveData import IReflectionEffectiveData
     from ..RectangleAlignment import RectangleAlignment
 
 class IReflection(IImageTransformOperation, ABC):

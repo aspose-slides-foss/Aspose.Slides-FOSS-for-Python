@@ -5,9 +5,6 @@ from .IShape import IShape
 
 if TYPE_CHECKING:
     from .IAdjustValueCollection import IAdjustValueCollection
-    from .IGeometryPath import IGeometryPath
-    from .IShapeElement import IShapeElement
-    from .IShapeStyle import IShapeStyle
     from .ShapeType import ShapeType
 
 class IGeometryShape(IShape, ABC):

@@ -43,8 +43,6 @@ class LightRig(PVIObject, ISlideComponent, IPresentationComponent, ILightRig):
         self._parent_slide = parent_slide
 
     def _get_light_rig(self) -> ET._Element | None:
-        if not hasattr(self, '_scene3d'):
-            return None
         return self._scene3d.find(Elements.A_LIGHT_RIG)
 
     def _ensure_light_rig(self) -> ET._Element:
@@ -60,8 +58,6 @@ class LightRig(PVIObject, ISlideComponent, IPresentationComponent, ILightRig):
     @property
     def direction(self) -> LightingDirection:
         """Light direction. Read/write."""
-        if not hasattr(self, '_scene3d'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LightingDirection import LightingDirection
         lr = self._get_light_rig()
         if lr is None:
@@ -74,8 +70,6 @@ class LightRig(PVIObject, ISlideComponent, IPresentationComponent, ILightRig):
 
     @direction.setter
     def direction(self, value: LightingDirection):
-        if not hasattr(self, '_scene3d'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LightingDirection import LightingDirection
         lr = self._ensure_light_rig()
         if value == LightingDirection.NOT_DEFINED:
@@ -90,8 +84,6 @@ class LightRig(PVIObject, ISlideComponent, IPresentationComponent, ILightRig):
     @property
     def light_type(self) -> LightRigPresetType:
         """Represents a preset light right that can be applied to a shape. Read/write."""
-        if not hasattr(self, '_scene3d'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LightRigPresetType import LightRigPresetType
         lr = self._get_light_rig()
         if lr is None:
@@ -104,8 +96,6 @@ class LightRig(PVIObject, ISlideComponent, IPresentationComponent, ILightRig):
 
     @light_type.setter
     def light_type(self, value: LightRigPresetType):
-        if not hasattr(self, '_scene3d'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LightRigPresetType import LightRigPresetType
         lr = self._ensure_light_rig()
         if value == LightRigPresetType.NOT_DEFINED:
@@ -118,8 +108,6 @@ class LightRig(PVIObject, ISlideComponent, IPresentationComponent, ILightRig):
         self._save()
 
     def set_rotation(self, latitude, longitude, revolution) -> None:
-        if not hasattr(self, '_scene3d'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         lr = self._ensure_light_rig()
         rot = lr.find(Elements.A_ROT)
         if rot is None:
@@ -130,8 +118,6 @@ class LightRig(PVIObject, ISlideComponent, IPresentationComponent, ILightRig):
         self._save()
 
     def get_rotation(self) -> list[float]:
-        if not hasattr(self, '_scene3d'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         lr = self._get_light_rig()
         if lr is None:
             return [0.0, 0.0, 0.0]

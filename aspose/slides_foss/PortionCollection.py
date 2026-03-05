@@ -19,7 +19,7 @@ class PortionCollection(BaseCollection, IPortionCollection):
     def _get_portions(self):
         from .Portion import Portion
         from ._internal.pptx.constants import Elements
-        if not hasattr(self, '_p_element') or self._p_element is None:
+        if self._p_element is None:
             return []
         portions = []
         for r_elem in self._p_element.findall(Elements.A_R):
@@ -48,7 +48,7 @@ class PortionCollection(BaseCollection, IPortionCollection):
     def add(self, value) -> None:
         from .Portion import Portion
         from ._internal.pptx.constants import Elements
-        if not hasattr(self, '_p_element') or self._p_element is None:
+        if self._p_element is None:
             return
         r_elem = value._r_element
         # Insert before endParaRPr if present
@@ -70,7 +70,7 @@ class PortionCollection(BaseCollection, IPortionCollection):
 
     def insert(self, index, value) -> None:
         from ._internal.pptx.constants import Elements
-        if not hasattr(self, '_p_element') or self._p_element is None:
+        if self._p_element is None:
             return
         r_elements = self._p_element.findall(Elements.A_R)
         r_elem = value._r_element
@@ -88,7 +88,7 @@ class PortionCollection(BaseCollection, IPortionCollection):
 
     def clear(self) -> None:
         from ._internal.pptx.constants import Elements
-        if not hasattr(self, '_p_element') or self._p_element is None:
+        if self._p_element is None:
             return
         for r_elem in self._p_element.findall(Elements.A_R):
             self._p_element.remove(r_elem)
@@ -101,7 +101,7 @@ class PortionCollection(BaseCollection, IPortionCollection):
 
     def remove(self, item) -> bool:
         from ._internal.pptx.constants import Elements
-        if not hasattr(self, '_p_element') or self._p_element is None:
+        if self._p_element is None:
             return False
         for r_elem in self._p_element.findall(Elements.A_R):
             if r_elem is item._r_element:
@@ -113,7 +113,7 @@ class PortionCollection(BaseCollection, IPortionCollection):
 
     def remove_at(self, index) -> None:
         from ._internal.pptx.constants import Elements
-        if not hasattr(self, '_p_element') or self._p_element is None:
+        if self._p_element is None:
             return
         r_elements = self._p_element.findall(Elements.A_R)
         if 0 <= index < len(r_elements):

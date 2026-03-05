@@ -46,7 +46,10 @@ Repository = "https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Pytho
 Issues = "https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/issues"
 
 [tool.setuptools.packages.find]
+include = ["aspose.*"]
+exclude = ["tests*", "examples*"]
 namespaces = true
 
 [tool.setuptools.package-data]
 "*" = ["py.typed"]
+"aspose.slides_foss._internal.pptx" = ["*.pptx"]

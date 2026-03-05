@@ -4,7 +4,6 @@ from .ITableFormat import ITableFormat
 
 if TYPE_CHECKING:
     from .IFillFormat import IFillFormat
-    from .ITableFormatEffectiveData import ITableFormatEffectiveData
 
 class TableFormat(ITableFormat):
     """Represents format of a table."""
@@ -18,8 +17,6 @@ class TableFormat(ITableFormat):
     @property
     def fill_format(self) -> IFillFormat:
         """Returns a table fill properties object. Read-only ."""
-        if not hasattr(self, '_tbl_pr_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .FillFormat import FillFormat
         ff = FillFormat()
         ff._init_internal(self._tbl_pr_element, self._slide_part, self._parent_slide)

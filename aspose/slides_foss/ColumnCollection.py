@@ -44,19 +44,13 @@ class ColumnCollection(BaseCollection, IColumnCollection):
 
     @property
     def as_i_collection(self) -> list:
-        if hasattr(self, '_columns'):
-            return list(self._columns)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return list(self._columns)
 
     @property
     def as_i_enumerable(self) -> Any:
-        if hasattr(self, '_columns'):
-            return iter(self._columns)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return iter(self._columns)
 
     def add_clone(self, templ, with_attached_columns) -> list[IColumn]:
-        if not hasattr(self, '_tbl_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ._internal.pptx.constants import Elements
 
         # Clone the gridCol
@@ -79,8 +73,6 @@ class ColumnCollection(BaseCollection, IColumnCollection):
         return [self._columns[-1]]
 
     def insert_clone(self, index, templ, with_attached_columns) -> list[IColumn]:
-        if not hasattr(self, '_tbl_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ._internal.pptx.constants import Elements
 
         # Clone and insert gridCol
@@ -110,8 +102,6 @@ class ColumnCollection(BaseCollection, IColumnCollection):
         return [self._columns[index]]
 
     def remove_at(self, first_column_index, with_attached_rows) -> None:
-        if not hasattr(self, '_tbl_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ._internal.pptx.constants import Elements
 
         # Remove gridCol
@@ -144,9 +134,7 @@ class ColumnCollection(BaseCollection, IColumnCollection):
         return tc
 
     def __getitem__(self, index: int) -> Column:
-        if hasattr(self, '_columns'):
-            return self._columns[index]
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return self._columns[index]
 
     def __len__(self) -> int:
         if hasattr(self, '_columns'):

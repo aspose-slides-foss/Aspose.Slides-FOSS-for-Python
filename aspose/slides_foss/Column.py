@@ -6,7 +6,6 @@ from .IColumn import IColumn
 if TYPE_CHECKING:
     from .IBulkTextFormattable import IBulkTextFormattable
     from .ICellCollection import ICellCollection
-    from .IColumnFormat import IColumnFormat
 
 class Column(CellCollection, IColumn):
     """Represents a column in a table."""
@@ -71,7 +70,7 @@ class Column(CellCollection, IColumn):
 
     def set_text_format(self, *args, **kwargs) -> None:
         if len(args) < 1:
-            raise NotImplementedError("This feature is not yet available in this version.")
+            raise ValueError("set_text_format requires at least 1 argument")
         source = args[0]
         from ._internal.pptx.bulk_text_format import apply_text_format
         apply_text_format(list(self), source, self._slide_part)

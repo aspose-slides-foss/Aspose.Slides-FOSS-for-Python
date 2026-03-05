@@ -5,7 +5,6 @@ from .ISlideComponent import ISlideComponent
 from .IPresentationComponent import IPresentationComponent
 
 if TYPE_CHECKING:
-    from .IField import IField
     from .IPortionFormat import IPortionFormat
 
 class IPortion(ISlideComponent, IPresentationComponent, ABC):

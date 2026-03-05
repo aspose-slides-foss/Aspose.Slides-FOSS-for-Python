@@ -6,7 +6,6 @@ from datetime import timedelta
 
 if TYPE_CHECKING:
     from .IHeadingPair import IHeadingPair
-    from .ISensitivityLabel import ISensitivityLabel
 
 class IDocumentProperties(ABC):
     """Represents properties of a presentation."""

@@ -8,7 +8,6 @@ if TYPE_CHECKING:
     from .IImage import IImage
     from .ILayoutSlide import ILayoutSlide
     from .INotesSlideManager import INotesSlideManager
-    from .ISlideHeaderFooterManager import ISlideHeaderFooterManager
 
 class ISlide(IBaseSlide, ABC):
     """Represents a slide in a presentation."""

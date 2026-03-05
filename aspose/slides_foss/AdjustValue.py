@@ -4,7 +4,6 @@ import lxml.etree as ET
 from .IAdjustValue import IAdjustValue
 
 if TYPE_CHECKING:
-    from .ShapeAdjustmentType import ShapeAdjustmentType
     from ._internal.pptx.slide_part import SlidePart
 
 class AdjustValue(IAdjustValue):

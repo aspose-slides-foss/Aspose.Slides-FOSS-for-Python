@@ -36,14 +36,10 @@ class ImageCollection(IImageCollection):
 
     @property
     def as_i_collection(self) -> list:
-        if not hasattr(self, '_images'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return list(self._images)
 
     @property
     def as_i_enumerable(self) -> Any:
-        if not hasattr(self, '_images'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return iter(self._images)
 
 
@@ -53,8 +49,6 @@ class ImageCollection(IImageCollection):
 
 
     def add_image(self, *args, **kwargs) -> IPPImage:
-        if not hasattr(self, '_package'):
-            raise NotImplementedError("This feature is not yet available in this version.")
 
         if len(args) < 1:
             raise TypeError("add_image() requires at least 1 argument")
@@ -137,8 +131,6 @@ class ImageCollection(IImageCollection):
         return num
 
     def __getitem__(self, index: int) -> Image:
-        if not hasattr(self, '_images'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self._images[index]
 
     def __len__(self) -> int:

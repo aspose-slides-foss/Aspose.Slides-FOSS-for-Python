@@ -10,7 +10,6 @@ from ._internal.pptx.constants import NS, Elements, EMU_PER_POINT
 
 if TYPE_CHECKING:
     from .effects.IBlur import IBlur
-    from .IEffectFormatEffectiveData import IEffectFormatEffectiveData
     from .effects.IFillOverlay import IFillOverlay
     from .effects.IGlow import IGlow
     from .effects.IInnerShadow import IInnerShadow
@@ -52,8 +51,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
 
     def _get_effect_lst(self) -> ET._Element | None:
         """Get the <a:effectLst> element if it exists."""
-        if not hasattr(self, '_parent_element'):
-            return None
         return self._parent_element.find(Elements.A_EFFECT_LST)
 
     def _ensure_effect_lst(self) -> ET._Element:
@@ -127,8 +124,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
     @property
     def is_no_effects(self) -> bool:
         """Returns true if all effects are disabled (as just created, default EffectFormat object). Read-only ."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         effect_lst = self._get_effect_lst()
         if effect_lst is None:
             return True
@@ -137,8 +132,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
     @property
     def blur_effect(self) -> IBlur:
         """Blur effect. Read/write ."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .effects.Blur import Blur
         blur_el = self._get_effect_child(Elements.A_BLUR)
         if blur_el is None:
@@ -149,8 +142,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
 
     @blur_effect.setter
     def blur_effect(self, value: IBlur):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         if value is None:
             self._remove_effect_child(Elements.A_BLUR)
         else:
@@ -162,8 +153,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
     @property
     def fill_overlay_effect(self) -> IFillOverlay:
         """Fill overlay effect. Read/write ."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .effects.FillOverlay import FillOverlay
         el = self._get_effect_child(Elements.A_FILL_OVERLAY)
         if el is None:
@@ -174,8 +163,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
 
     @fill_overlay_effect.setter
     def fill_overlay_effect(self, value: IFillOverlay):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         if value is None:
             self._remove_effect_child(Elements.A_FILL_OVERLAY)
         else:
@@ -189,8 +176,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
     @property
     def glow_effect(self) -> IGlow:
         """Glow effect. Read/write ."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .effects.Glow import Glow
         el = self._get_effect_child(Elements.A_GLOW)
         if el is None:
@@ -201,8 +186,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
 
     @glow_effect.setter
     def glow_effect(self, value: IGlow):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         if value is None:
             self._remove_effect_child(Elements.A_GLOW)
         else:
@@ -213,8 +196,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
     @property
     def inner_shadow_effect(self) -> IInnerShadow:
         """Inner shadow. Read/write ."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .effects.InnerShadow import InnerShadow
         el = self._get_effect_child(Elements.A_INNER_SHDW)
         if el is None:
@@ -225,8 +206,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
 
     @inner_shadow_effect.setter
     def inner_shadow_effect(self, value: IInnerShadow):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         if value is None:
             self._remove_effect_child(Elements.A_INNER_SHDW)
         else:
@@ -239,8 +218,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
     @property
     def outer_shadow_effect(self) -> IOuterShadow:
         """Outer shadow. Read/write ."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .effects.OuterShadow import OuterShadow
         el = self._get_effect_child(Elements.A_OUTER_SHDW)
         if el is None:
@@ -251,8 +228,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
 
     @outer_shadow_effect.setter
     def outer_shadow_effect(self, value: IOuterShadow):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         if value is None:
             self._remove_effect_child(Elements.A_OUTER_SHDW)
         else:
@@ -265,8 +240,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
     @property
     def preset_shadow_effect(self) -> IPresetShadow:
         """Preset shadow. Read/write ."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .effects.PresetShadow import PresetShadow
         el = self._get_effect_child(Elements.A_PRST_SHDW)
         if el is None:
@@ -277,8 +250,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
 
     @preset_shadow_effect.setter
     def preset_shadow_effect(self, value: IPresetShadow):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         if value is None:
             self._remove_effect_child(Elements.A_PRST_SHDW)
         else:
@@ -291,8 +262,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
     @property
     def reflection_effect(self) -> IReflection:
         """Reflection. Read/write ."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .effects.Reflection import Reflection
         el = self._get_effect_child(Elements.A_REFLECTION)
         if el is None:
@@ -303,8 +272,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
 
     @reflection_effect.setter
     def reflection_effect(self, value: IReflection):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         if value is None:
             self._remove_effect_child(Elements.A_REFLECTION)
         else:
@@ -314,8 +281,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
     @property
     def soft_edge_effect(self) -> ISoftEdge:
         """Soft edge. Read/write ."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .effects.SoftEdge import SoftEdge
         el = self._get_effect_child(Elements.A_SOFT_EDGE)
         if el is None:
@@ -326,8 +291,6 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
 
     @soft_edge_effect.setter
     def soft_edge_effect(self, value: ISoftEdge):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         if value is None:
             self._remove_effect_child(Elements.A_SOFT_EDGE)
         else:
@@ -340,100 +303,68 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
         return self
 
     def set_blur_effect(self, radius, grow) -> None:
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         blur_el = self._ensure_effect_child(Elements.A_BLUR)
         blur_el.set('rad', str(int(round(radius * EMU_PER_POINT))))
         blur_el.set('grow', '1' if grow else '0')
         self._save()
 
     def enable_fill_overlay_effect(self) -> None:
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._ensure_effect_child(Elements.A_FILL_OVERLAY)
         self._save()
 
     def enable_glow_effect(self) -> None:
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._ensure_effect_child(Elements.A_GLOW)
         self._save()
 
     def enable_inner_shadow_effect(self) -> None:
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._ensure_effect_child(Elements.A_INNER_SHDW)
         self._save()
 
     def enable_outer_shadow_effect(self) -> None:
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._ensure_effect_child(Elements.A_OUTER_SHDW)
         self._save()
 
     def enable_preset_shadow_effect(self) -> None:
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._ensure_effect_child(Elements.A_PRST_SHDW)
         self._save()
 
     def enable_reflection_effect(self) -> None:
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._ensure_effect_child(Elements.A_REFLECTION)
         self._save()
 
     def enable_soft_edge_effect(self) -> None:
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._ensure_effect_child(Elements.A_SOFT_EDGE)
         self._save()
 
     def disable_blur_effect(self) -> None:
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._remove_effect_child(Elements.A_BLUR)
         self._save()
 
     def disable_fill_overlay_effect(self) -> None:
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._remove_effect_child(Elements.A_FILL_OVERLAY)
         self._save()
 
     def disable_glow_effect(self) -> None:
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._remove_effect_child(Elements.A_GLOW)
         self._save()
 
     def disable_inner_shadow_effect(self) -> None:
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._remove_effect_child(Elements.A_INNER_SHDW)
         self._save()
 
     def disable_outer_shadow_effect(self) -> None:
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._remove_effect_child(Elements.A_OUTER_SHDW)
         self._save()
 
     def disable_preset_shadow_effect(self) -> None:
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._remove_effect_child(Elements.A_PRST_SHDW)
         self._save()
 
     def disable_reflection_effect(self) -> None:
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._remove_effect_child(Elements.A_REFLECTION)
         self._save()
 
     def disable_soft_edge_effect(self) -> None:
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._remove_effect_child(Elements.A_SOFT_EDGE)
         self._save()
 

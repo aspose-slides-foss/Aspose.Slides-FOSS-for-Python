@@ -69,13 +69,13 @@ class SlideCollection(BaseCollection, ISlideCollection):
     def as_i_collection(self) -> list:
         if hasattr(self, '_slides'):
             return list(self._slides)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        raise ValueError("Unsupported arguments for this method.")
 
     @property
     def as_i_enumerable(self) -> Any:
         if hasattr(self, '_slides'):
             return iter(self._slides)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        raise ValueError("Unsupported arguments for this method.")
 
 
 
@@ -92,7 +92,7 @@ class SlideCollection(BaseCollection, ISlideCollection):
             add_clone(source_slide, dest_master, allow_clone_missing_layout) -> ISlide
         """
         if not hasattr(self, '_slides'):
-            raise NotImplementedError("This feature is not yet available in this version.")
+            raise ValueError("Unsupported arguments for this method.")
 
         from .ISection import ISection
         from .ILayoutSlide import ILayoutSlide
@@ -129,7 +129,7 @@ class SlideCollection(BaseCollection, ISlideCollection):
                 allow_clone_missing_layout=allow_clone_missing_layout
             )
 
-        raise NotImplementedError("This feature is not yet available in this version.")
+        raise ValueError("Unsupported arguments for this method.")
 
 
 
@@ -144,7 +144,7 @@ class SlideCollection(BaseCollection, ISlideCollection):
             insert_clone(index, source_slide, dest_master, allow_clone_missing_layout) -> ISlide
         """
         if not hasattr(self, '_slides'):
-            raise NotImplementedError("This feature is not yet available in this version.")
+            raise ValueError("Unsupported arguments for this method.")
 
         if len(args) == 2:
             # insert_clone(index, source_slide)
@@ -173,19 +173,19 @@ class SlideCollection(BaseCollection, ISlideCollection):
                 allow_clone_missing_layout=allow_clone_missing_layout
             )
 
-        raise NotImplementedError("This feature is not yet available in this version.")
+        raise ValueError("Unsupported arguments for this method.")
 
 
 
     def to_array(self, *args, **kwargs) -> list[ISlide]:
         if not hasattr(self, '_slides'):
-            raise NotImplementedError("This feature is not yet available in this version.")
+            raise ValueError("Unsupported arguments for this method.")
         if len(args) == 0:
             return list(self._slides)
         elif len(args) == 2:
             start_index, count = args
             return list(self._slides[start_index:start_index + count])
-        raise NotImplementedError("This feature is not yet available in this version.")
+        raise ValueError("Unsupported arguments for this method.")
 
 
 
@@ -211,12 +211,12 @@ class SlideCollection(BaseCollection, ISlideCollection):
 
     def add_empty_slide(self, layout) -> ISlide:
         if not hasattr(self, '_slides'):
-            raise NotImplementedError("This feature is not yet available in this version.")
+            raise ValueError("Unsupported arguments for this method.")
         return self._add_empty_slide_internal(layout, index=-1)
 
     def insert_empty_slide(self, index, layout) -> ISlide:
         if not hasattr(self, '_slides'):
-            raise NotImplementedError("This feature is not yet available in this version.")
+            raise ValueError("Unsupported arguments for this method.")
         return self._add_empty_slide_internal(layout, index=index)
 
     def _add_empty_slide_internal(self, layout, index: int = -1) -> ISlide:
@@ -544,14 +544,14 @@ class SlideCollection(BaseCollection, ISlideCollection):
 
     def remove(self, value) -> None:
         if not hasattr(self, '_slides'):
-            raise NotImplementedError("This feature is not yet available in this version.")
+            raise ValueError("Unsupported arguments for this method.")
         idx = self.index_of(value)
         if idx >= 0:
             self.remove_at(idx)
 
     def remove_at(self, index) -> None:
         if not hasattr(self, '_slides'):
-            raise NotImplementedError("This feature is not yet available in this version.")
+            raise ValueError("Unsupported arguments for this method.")
 
         from ._internal.pptx.slide_part import SlidePart
         from ._internal.opc import RelationshipsManager
@@ -577,7 +577,7 @@ class SlideCollection(BaseCollection, ISlideCollection):
 
     def index_of(self, slide) -> int:
         if not hasattr(self, '_slides'):
-            raise NotImplementedError("This feature is not yet available in this version.")
+            raise ValueError("Unsupported arguments for this method.")
         for i, s in enumerate(self._slides):
             if s.slide_id == slide.slide_id:
                 return i
@@ -586,15 +586,15 @@ class SlideCollection(BaseCollection, ISlideCollection):
     def __getitem__(self, index: int) -> Slide:
         if hasattr(self, '_slides'):
             return self._slides[index]
-        raise NotImplementedError("This feature is not yet available in this version.")
+        raise ValueError("Unsupported arguments for this method.")
 
     def __len__(self) -> int:
         if hasattr(self, '_slides'):
             return len(self._slides)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        raise ValueError("Unsupported arguments for this method.")
 
     def __iter__(self):
         if hasattr(self, '_slides'):
             return iter(self._slides)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        raise ValueError("Unsupported arguments for this method.")
 

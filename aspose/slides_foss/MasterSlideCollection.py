@@ -33,15 +33,11 @@ class MasterSlideCollection(BaseCollection, IMasterSlideCollection):
 
     @property
     def as_i_collection(self) -> list:
-        if hasattr(self, '_masters'):
-            return list(self._masters)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return list(self._masters)
 
     @property
     def as_i_enumerable(self) -> Any:
-        if hasattr(self, '_masters'):
-            return iter(self._masters)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return iter(self._masters)
 
 
 
@@ -56,8 +52,6 @@ class MasterSlideCollection(BaseCollection, IMasterSlideCollection):
         Returns:
             The cloned MasterSlide.
         """
-        if not hasattr(self, '_masters'):
-            raise NotImplementedError("This feature is not yet available in this version.")
 
         from .MasterSlide import MasterSlide
         from .LayoutSlide import LayoutSlide
@@ -399,17 +393,11 @@ class MasterSlideCollection(BaseCollection, IMasterSlideCollection):
 
 
     def __getitem__(self, index: int) -> MasterSlide:
-        if hasattr(self, '_masters'):
-            return self._masters[index]
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return self._masters[index]
 
     def __len__(self) -> int:
-        if hasattr(self, '_masters'):
-            return len(self._masters)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return len(self._masters)
 
     def __iter__(self):
-        if hasattr(self, '_masters'):
-            return iter(self._masters)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return iter(self._masters)
 

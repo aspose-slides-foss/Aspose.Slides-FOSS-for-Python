@@ -4,7 +4,6 @@ from .IPPImage import IPPImage
 
 if TYPE_CHECKING:
     from .IImage import IImage
-    from .ISvgImage import ISvgImage
     from ._internal.opc import OpcPackage
 
 class PPImage(IPPImage):
@@ -31,15 +30,11 @@ class PPImage(IPPImage):
     @property
     def binary_data(self) -> list[int]:
         """Returns the copy of an image's data. Read-only []."""
-        if not hasattr(self, '_image_data'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return list(self._image_data)
 
     @property
     def image(self) -> IImage:
         """Returns the copy of an image. Read-only ."""
-        if not hasattr(self, '_image_data'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .Image import Image
         img = Image()
         img._init_internal(self._image_data, self._content_type)
@@ -50,44 +45,32 @@ class PPImage(IPPImage):
     @property
     def content_type(self) -> str:
         """Returns a MIME type of an image, encoded in . Read-only ."""
-        if not hasattr(self, '_content_type'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self._content_type
 
     @property
     def width(self) -> int:
         """Returns a width of an image. Read-only ."""
-        if not hasattr(self, '_image_data'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self._width
 
     @property
     def height(self) -> int:
         """Returns a height of an image. Read-only ."""
-        if not hasattr(self, '_image_data'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self._height
 
     @property
     def x(self) -> int:
         """Returns a X-offset of an image. Read-only ."""
-        if not hasattr(self, '_image_data'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return 0
 
     @property
     def y(self) -> int:
         """Returns a Y-offset of an image. Read-only ."""
-        if not hasattr(self, '_image_data'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return 0
 
 
 
 
     def replace_image(self, *args, **kwargs) -> None:
-        if not hasattr(self, '_package'):
-            raise NotImplementedError("This feature is not yet available in this version.")
 
         if len(args) < 1:
             raise TypeError("replace_image() requires at least 1 argument")

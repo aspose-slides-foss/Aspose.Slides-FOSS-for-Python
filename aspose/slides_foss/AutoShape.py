@@ -5,9 +5,7 @@ from .IAutoShape import IAutoShape
 
 if TYPE_CHECKING:
     from .IAdjustValueCollection import IAdjustValueCollection
-    from .IAutoShapeLock import IAutoShapeLock
     from .IGeometryShape import IGeometryShape
-    from .IShapeStyle import IShapeStyle
     from .ITextFrame import ITextFrame
     from .ShapeType import ShapeType
 

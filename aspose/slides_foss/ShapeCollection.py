@@ -5,20 +5,11 @@ from .IShapeCollection import IShapeCollection
 from ._internal.pptx.constants import NS, Elements
 
 if TYPE_CHECKING:
-    from .IAudioFrame import IAudioFrame
     from .IAutoShape import IAutoShape
-    from .charts.IChart import IChart
     from .IConnector import IConnector
-    from .IGroupShape import IGroupShape
-    from .IOleObjectFrame import IOleObjectFrame
     from .IPictureFrame import IPictureFrame
-    from .ISectionZoomFrame import ISectionZoomFrame
     from .IShape import IShape
-    from .smartart.ISmartArt import ISmartArt
-    from .ISummaryZoomFrame import ISummaryZoomFrame
     from .ITable import ITable
-    from .IVideoFrame import IVideoFrame
-    from .IZoomFrame import IZoomFrame
     from .Shape import Shape
     from ._internal.pptx.slide_part import SlidePart
 
@@ -390,14 +381,14 @@ class ShapeCollection(BaseCollection, IShapeCollection):
             count = args[1]
             return list(shapes[start_index:start_index + count])
         else:
-            raise NotImplementedError("This feature is not yet available in this version.")
+            raise ValueError("Unsupported arguments for this method.")
 
 
 
     def reorder(self, *args, **kwargs) -> None:
         """Reorder shapes in the collection."""
         if len(args) != 2:
-            raise NotImplementedError("This feature is not yet available in this version.")
+            raise ValueError("Unsupported arguments for this method.")
 
         new_index = args[0]
         shape_or_shapes = args[1]
@@ -456,7 +447,7 @@ class ShapeCollection(BaseCollection, IShapeCollection):
             x, y, width, height = args[1], args[2], args[3], args[4]
             create_from_template = args[5] if len(args) > 5 else True
             return self._add_auto_shape_impl(None, shape_type, x, y, width, height, create_from_template)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        raise ValueError("Unsupported arguments for this method.")
 
 
 
@@ -467,7 +458,7 @@ class ShapeCollection(BaseCollection, IShapeCollection):
             x, y, width, height = args[2], args[3], args[4], args[5]
             create_from_template = args[6] if len(args) > 6 else True
             return self._add_auto_shape_impl(index, shape_type, x, y, width, height, create_from_template)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        raise ValueError("Unsupported arguments for this method.")
 
 
 
@@ -480,7 +471,7 @@ class ShapeCollection(BaseCollection, IShapeCollection):
             x, y, width, height = args[1], args[2], args[3], args[4]
             create_from_template = args[5] if len(args) > 5 else True
             return self._add_connector_impl(None, shape_type, x, y, width, height, create_from_template)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        raise ValueError("Unsupported arguments for this method.")
 
 
 
@@ -491,7 +482,7 @@ class ShapeCollection(BaseCollection, IShapeCollection):
             x, y, width, height = args[2], args[3], args[4], args[5]
             create_from_template = args[6] if len(args) > 6 else True
             return self._add_connector_impl(index, shape_type, x, y, width, height, create_from_template)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        raise ValueError("Unsupported arguments for this method.")
 
 
 

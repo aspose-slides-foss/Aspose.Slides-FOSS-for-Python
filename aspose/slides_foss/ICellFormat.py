@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .ICellFormatEffectiveData import ICellFormatEffectiveData
     from .IFillFormat import IFillFormat
     from .ILineFormat import ILineFormat
 

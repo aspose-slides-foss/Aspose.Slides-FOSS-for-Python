@@ -3,20 +3,11 @@ from abc import ABC, abstractmethod
 from typing import overload, TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from .IAudioFrame import IAudioFrame
     from .IAutoShape import IAutoShape
-    from .charts.IChart import IChart
     from .IConnector import IConnector
-    from .IGroupShape import IGroupShape
-    from .IOleObjectFrame import IOleObjectFrame
     from .IPictureFrame import IPictureFrame
-    from .ISectionZoomFrame import ISectionZoomFrame
     from .IShape import IShape
-    from .smartart.ISmartArt import ISmartArt
-    from .ISummaryZoomFrame import ISummaryZoomFrame
     from .ITable import ITable
-    from .IVideoFrame import IVideoFrame
-    from .IZoomFrame import IZoomFrame
 
 class IShapeCollection(ABC):
     """Represents a collection of shapes."""

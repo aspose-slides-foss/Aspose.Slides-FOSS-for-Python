@@ -4,7 +4,6 @@ from typing import overload, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .IImage import IImage
-    from .ISvgImage import ISvgImage
 
 class IPPImage(ABC):
     """Represents an image in a presentation."""

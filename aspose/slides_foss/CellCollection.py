@@ -20,16 +20,14 @@ class CellCollection(BaseCollection, ICellCollection):
     @property
     def slide(self) -> IBaseSlide:
         """Returns the parent slide of a CellCollection. Read-only ."""
-        if hasattr(self, '_parent_slide'):
-            return self._parent_slide
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return getattr(self, '_parent_slide', None)
 
     @property
     def presentation(self) -> IPresentation:
         """Returns the parent presentation of a CellCollection. Read-only ."""
         if hasattr(self, '_parent_slide') and self._parent_slide is not None:
             return self._parent_slide.presentation
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
     @property
     def as_i_slide_component(self) -> ISlideComponent:
@@ -41,20 +39,14 @@ class CellCollection(BaseCollection, ICellCollection):
 
     @property
     def as_i_collection(self) -> list:
-        if hasattr(self, '_cells'):
-            return list(self._cells)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return list(self._cells)
 
     @property
     def as_i_enumerable(self) -> Any:
-        if hasattr(self, '_cells'):
-            return iter(self._cells)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return iter(self._cells)
 
     def __getitem__(self, index: int) -> Cell:
-        if hasattr(self, '_cells'):
-            return self._cells[index]
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return self._cells[index]
 
     def __len__(self) -> int:
         if hasattr(self, '_cells'):

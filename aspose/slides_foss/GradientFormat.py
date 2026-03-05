@@ -47,8 +47,6 @@ class GradientFormat(PVIObject, ISlideComponent, IPresentationComponent, IGradie
     @property
     def tile_flip(self) -> TileFlip:
         """Returns or sets the flipping mode for a gradient. Read/write."""
-        if not hasattr(self, '_grad_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .TileFlip import TileFlip
         val = self._grad_fill.get('flip')
         if val is None:
@@ -58,8 +56,6 @@ class GradientFormat(PVIObject, ISlideComponent, IPresentationComponent, IGradie
 
     @tile_flip.setter
     def tile_flip(self, value: TileFlip):
-        if not hasattr(self, '_grad_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .TileFlip import TileFlip
         if value == TileFlip.NOT_DEFINED:
             if 'flip' in self._grad_fill.attrib:
@@ -73,8 +69,6 @@ class GradientFormat(PVIObject, ISlideComponent, IPresentationComponent, IGradie
     @property
     def gradient_direction(self) -> GradientDirection:
         """Returns or sets the style of a gradient. Read/write."""
-        if not hasattr(self, '_grad_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .GradientDirection import GradientDirection
         lin = self._grad_fill.find(Elements.A_LIN)
         if lin is not None:
@@ -89,8 +83,6 @@ class GradientFormat(PVIObject, ISlideComponent, IPresentationComponent, IGradie
 
     @gradient_direction.setter
     def gradient_direction(self, value: GradientDirection):
-        if not hasattr(self, '_grad_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .GradientDirection import GradientDirection
         if value == GradientDirection.NOT_DEFINED:
             return
@@ -117,8 +109,6 @@ class GradientFormat(PVIObject, ISlideComponent, IPresentationComponent, IGradie
     @property
     def linear_gradient_angle(self) -> float:
         """Returns or sets the angle of a gradient. Read/write."""
-        if not hasattr(self, '_grad_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         lin = self._grad_fill.find(Elements.A_LIN)
         if lin is not None:
             return int(lin.get('ang', '0')) / 60000.0
@@ -126,8 +116,6 @@ class GradientFormat(PVIObject, ISlideComponent, IPresentationComponent, IGradie
 
     @linear_gradient_angle.setter
     def linear_gradient_angle(self, value: float):
-        if not hasattr(self, '_grad_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         lin = self._grad_fill.find(Elements.A_LIN)
         if lin is None:
             lin = ET.SubElement(self._grad_fill, Elements.A_LIN)
@@ -137,8 +125,6 @@ class GradientFormat(PVIObject, ISlideComponent, IPresentationComponent, IGradie
     @property
     def linear_gradient_scaled(self) -> NullableBool:
         """Determines whether a gradient is scaled. Read/write."""
-        if not hasattr(self, '_grad_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .NullableBool import NullableBool
         lin = self._grad_fill.find(Elements.A_LIN)
         if lin is None:
@@ -150,8 +136,6 @@ class GradientFormat(PVIObject, ISlideComponent, IPresentationComponent, IGradie
 
     @linear_gradient_scaled.setter
     def linear_gradient_scaled(self, value: NullableBool):
-        if not hasattr(self, '_grad_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .NullableBool import NullableBool
         lin = self._grad_fill.find(Elements.A_LIN)
         if lin is None:
@@ -166,8 +150,6 @@ class GradientFormat(PVIObject, ISlideComponent, IPresentationComponent, IGradie
     @property
     def gradient_shape(self) -> GradientShape:
         """Returns or sets the shape of a gradient. Read/write."""
-        if not hasattr(self, '_grad_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .GradientShape import GradientShape
         lin = self._grad_fill.find(Elements.A_LIN)
         if lin is not None:
@@ -185,8 +167,6 @@ class GradientFormat(PVIObject, ISlideComponent, IPresentationComponent, IGradie
 
     @gradient_shape.setter
     def gradient_shape(self, value: GradientShape):
-        if not hasattr(self, '_grad_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .GradientShape import GradientShape
         if value == GradientShape.NOT_DEFINED:
             return
@@ -209,8 +189,6 @@ class GradientFormat(PVIObject, ISlideComponent, IPresentationComponent, IGradie
     @property
     def gradient_stops(self) -> IGradientStopCollection:
         """Returns the collection of gradient stops. Read-only."""
-        if not hasattr(self, '_grad_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .GradientStopCollection import GradientStopCollection
         gs_lst = self._grad_fill.find(Elements.A_GS_LST)
         if gs_lst is None:

@@ -39,7 +39,7 @@ with slides.Presentation() as prs:
 - **Presentation I/O** — Open, create, and save `.pptx` files with full round-trip fidelity
 - **Slides** — Add, remove, clone, reorder, and iterate slides
 - **Shapes** — AutoShapes, PictureFrames, Tables, Connectors
-- **Text** — TextFrame, Paragraph, Portion with full character formatting
+- **Text** — TextFrame, Paragraph, Portion with character, paragraph, and text frame formatting (including bullets)
 - **Fill** — Solid, gradient, pattern, and picture fills
 - **Lines** — Width, dash style, arrows, join and alignment
 - **Effects** — Outer shadow, glow, soft edge, blur, reflection, inner shadow
@@ -168,7 +168,7 @@ from aspose.slides_foss.export import SaveFormat
 with slides.Presentation("deck.pptx") as prs:
     prs.document_properties.title = "Q1 Results"
     prs.document_properties.author = "Finance Team"
-    prs.document_properties.add_custom_property("Version", 3)
+    prs.document_properties.set_custom_property_value("Version", 3)
     prs.save("deck.pptx", SaveFormat.PPTX)
 ```
 

@@ -4,12 +4,8 @@ from .BaseSlide import BaseSlide
 from .IMasterSlide import IMasterSlide
 
 if TYPE_CHECKING:
-    from .IDrawingGuidesCollection import IDrawingGuidesCollection
     from .IMasterLayoutSlideCollection import IMasterLayoutSlideCollection
-    from .IMasterSlideHeaderFooterManager import IMasterSlideHeaderFooterManager
-    from .theme.IMasterThemeManager import IMasterThemeManager
     from .ISlide import ISlide
-    from .ITextStyle import ITextStyle
     from ._internal.pptx.master_slide_part import MasterSlidePart
     from ._internal.opc import OpcPackage
 
@@ -48,7 +44,7 @@ class MasterSlide(BaseSlide, IMasterSlide):
             collection = MasterLayoutSlideCollection()
             collection._init_internal(self._layout_slides_list)
             return collection
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
 
 

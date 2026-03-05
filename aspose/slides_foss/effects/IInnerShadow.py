@@ -5,7 +5,6 @@ from .IImageTransformOperation import IImageTransformOperation
 
 if TYPE_CHECKING:
     from ..IColorFormat import IColorFormat
-    from .IInnerShadowEffectiveData import IInnerShadowEffectiveData
 
 class IInnerShadow(IImageTransformOperation, ABC):
     """Represents a inner shadow effect."""

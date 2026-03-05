@@ -39,13 +39,13 @@ class PictureFrameLock(BaseShapeLock, IPictureFrameLock):
 
     def _get_lock(self, attr_name: str) -> bool:
         """Read a lock attribute from the picLocks element."""
-        if not hasattr(self, '_pic_locks') or self._pic_locks is None:
+        if self._pic_locks is None:
             return False
         return self._pic_locks.get(attr_name, '0') == '1'
 
     def _set_lock(self, attr_name: str, value: bool) -> None:
         """Write a lock attribute to the picLocks element."""
-        if not hasattr(self, '_pic_locks') or self._pic_locks is None:
+        if self._pic_locks is None:
             return
         if value:
             self._pic_locks.set(attr_name, '1')
@@ -155,7 +155,7 @@ class PictureFrameLock(BaseShapeLock, IPictureFrameLock):
     @property
     def no_locks(self) -> bool:
         """Return True if all lock attributes are absent or '0'."""
-        if not hasattr(self, '_pic_locks') or self._pic_locks is None:
+        if self._pic_locks is None:
             return True
         for attr_name in _LOCK_ATTR_MAP.values():
             if self._pic_locks.get(attr_name, '0') == '1':

@@ -5,7 +5,6 @@ from .IImageTransformOperation import IImageTransformOperation
 
 if TYPE_CHECKING:
     from ..IColorFormat import IColorFormat
-    from .IPresetShadowEffectiveData import IPresetShadowEffectiveData
     from ..PresetShadowType import PresetShadowType
 
 class IPresetShadow(IImageTransformOperation, ABC):

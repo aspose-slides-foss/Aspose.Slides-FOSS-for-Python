@@ -22,7 +22,7 @@ class ParagraphCollection(BaseCollection, IParagraphCollection, ISlideComponent,
     def _get_paragraphs(self):
         from .Paragraph import Paragraph
         from ._internal.pptx.constants import Elements
-        if not hasattr(self, '_txbody_element') or self._txbody_element is None:
+        if self._txbody_element is None:
             return []
         paragraphs = []
         for p_elem in self._txbody_element.findall(Elements.A_P):
@@ -56,7 +56,7 @@ class ParagraphCollection(BaseCollection, IParagraphCollection, ISlideComponent,
     def slide(self) -> IBaseSlide:
         if hasattr(self, '_parent_slide') and self._parent_slide is not None:
             return self._parent_slide
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
     @property
     def as_i_presentation_component(self) -> IPresentationComponent:
@@ -66,12 +66,12 @@ class ParagraphCollection(BaseCollection, IParagraphCollection, ISlideComponent,
     def presentation(self) -> IPresentation:
         if hasattr(self, '_parent_slide') and self._parent_slide is not None:
             return self._parent_slide.presentation
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
 
 
     def add(self, *args, **kwargs) -> None:
-        if not hasattr(self, '_txbody_element') or self._txbody_element is None:
+        if self._txbody_element is None:
             return
         value = args[0]
         p_elem = value._p_element
@@ -84,7 +84,7 @@ class ParagraphCollection(BaseCollection, IParagraphCollection, ISlideComponent,
 
     def insert(self, *args, **kwargs) -> None:
         from ._internal.pptx.constants import Elements
-        if not hasattr(self, '_txbody_element') or self._txbody_element is None:
+        if self._txbody_element is None:
             return
         index = args[0]
         value = args[1]
@@ -110,7 +110,7 @@ class ParagraphCollection(BaseCollection, IParagraphCollection, ISlideComponent,
 
     def clear(self) -> None:
         from ._internal.pptx.constants import Elements
-        if not hasattr(self, '_txbody_element') or self._txbody_element is None:
+        if self._txbody_element is None:
             return
         for p_elem in self._txbody_element.findall(Elements.A_P):
             self._txbody_element.remove(p_elem)
@@ -123,7 +123,7 @@ class ParagraphCollection(BaseCollection, IParagraphCollection, ISlideComponent,
 
     def remove_at(self, index) -> None:
         from ._internal.pptx.constants import Elements
-        if not hasattr(self, '_txbody_element') or self._txbody_element is None:
+        if self._txbody_element is None:
             return
         p_elements = self._txbody_element.findall(Elements.A_P)
         if 0 <= index < len(p_elements):
@@ -133,7 +133,7 @@ class ParagraphCollection(BaseCollection, IParagraphCollection, ISlideComponent,
 
     def remove(self, item) -> bool:
         from ._internal.pptx.constants import Elements
-        if not hasattr(self, '_txbody_element') or self._txbody_element is None:
+        if self._txbody_element is None:
             return False
         for p_elem in self._txbody_element.findall(Elements.A_P):
             if p_elem is item._p_element:

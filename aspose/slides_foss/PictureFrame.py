@@ -10,7 +10,6 @@ if TYPE_CHECKING:
     from .IGeometryShape import IGeometryShape
     from .IPictureFillFormat import IPictureFillFormat
     from .IPictureFrameLock import IPictureFrameLock
-    from .IShapeStyle import IShapeStyle
     from .ShapeType import ShapeType
 
 class PictureFrame(GeometryShape, IPictureFrame):
@@ -20,8 +19,8 @@ class PictureFrame(GeometryShape, IPictureFrame):
     @property
     def shape_type(self) -> ShapeType:
         """Returns or sets the AutoShape type for a PictureFrame. There are allowable all items of the set , except all sorts of lines: ShapeType.Line, ShapeType.StraightConnector1, ShapeType.BentConnector2, ShapeType.BentConnector3, ShapeType.BentConnector4, ShapeType.BentConnector5, ShapeType.CurvedConnector2, ShapeType.CurvedConnector3, ShapeType.CurvedConnector4, ShapeType.CurvedConnector5. Read/write ."""
-        if not hasattr(self, '_xml_element') or self._xml_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._xml_element is None:
+            return None
         from .ShapeType import ShapeType
         from ._internal.pptx.shape_type_mapping import ooxml_prst_to_shape_type_name
         sp_pr = self._xml_element.find(f'{NS.P}spPr')
@@ -38,8 +37,8 @@ class PictureFrame(GeometryShape, IPictureFrame):
 
     @shape_type.setter
     def shape_type(self, value: ShapeType):
-        if not hasattr(self, '_xml_element') or self._xml_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._xml_element is None:
+            return
         from ._internal.pptx.shape_type_mapping import shape_type_name_to_ooxml_prst
         prst = shape_type_name_to_ooxml_prst(value.name)
         if prst is None:
@@ -56,8 +55,8 @@ class PictureFrame(GeometryShape, IPictureFrame):
     @property
     def picture_frame_lock(self) -> IPictureFrameLock:
         """Returns shape's locks. Read-only ."""
-        if not hasattr(self, '_xml_element') or self._xml_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._xml_element is None:
+            return None
         from .PictureFrameLock import PictureFrameLock
         # Find a:picLocks inside p:nvPicPr/p:cNvPicPr
         nv_pic_pr = self._xml_element.find(f'{NS.P}nvPicPr')
@@ -75,12 +74,12 @@ class PictureFrame(GeometryShape, IPictureFrame):
     @property
     def picture_format(self) -> IPictureFillFormat:
         """Returns the PictureFillFormat object for a picture frame. Read-only ."""
-        if not hasattr(self, '_xml_element') or self._xml_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._xml_element is None:
+            return None
         from .PictureFillFormat import PictureFillFormat
         blip_fill = self._xml_element.find(f'{NS.P}blipFill')
         if blip_fill is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+            return None
         fmt = PictureFillFormat()
         fmt._init_internal(blip_fill, self._slide_part, self._parent_slide)
         return fmt

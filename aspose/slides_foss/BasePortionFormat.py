@@ -69,7 +69,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
 
     def _get_nullable_bool_attr(self, attr: str) -> NullableBool:
         from .NullableBool import NullableBool
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return NullableBool.NOT_DEFINED
         val = self._rpr_element.get(attr)
         if val is None:
@@ -78,7 +78,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
 
     def _set_nullable_bool_attr(self, attr: str, value: NullableBool) -> None:
         from .NullableBool import NullableBool
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return
         if value == NullableBool.NOT_DEFINED:
             if attr in self._rpr_element.attrib:
@@ -90,7 +90,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     # --- Helper methods for font elements ---
 
     def _get_font(self, tag: str) -> IFontData:
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return None
         el = self._rpr_element.find(tag)
         if el is None:
@@ -102,7 +102,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
         return FontData(typeface)
 
     def _set_font(self, tag: str, value: IFontData) -> None:
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return
         el = self._rpr_element.find(tag)
         if value is None:
@@ -119,8 +119,8 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @property
     def line_format(self) -> ILineFormat:
         """Returns the LineFormat properties for text outlining. No inheritance applied. Read-only ."""
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._rpr_element is None:
+            return None
         from .LineFormat import LineFormat
         lf = LineFormat()
         lf._init_internal(self._rpr_element, self._slide_part, self._parent_slide)
@@ -129,8 +129,8 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @property
     def fill_format(self) -> IFillFormat:
         """Returns the text FillFormat properties. No inheritance applied. Read-only ."""
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._rpr_element is None:
+            return None
         from .FillFormat import FillFormat
         ff = FillFormat()
         ff._init_internal(self._rpr_element, self._slide_part, self._parent_slide)
@@ -139,8 +139,8 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @property
     def effect_format(self) -> IEffectFormat:
         """Returns the text EffectFormat properties. No inheritance applied. Read-only ."""
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._rpr_element is None:
+            return None
         from .EffectFormat import EffectFormat
         ef = EffectFormat()
         ef._init_internal(self._rpr_element, self._slide_part, self._parent_slide)
@@ -149,8 +149,8 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @property
     def highlight_color(self) -> IColorFormat:
         """Returns the color used to highlight a text. No inheritance applied. Read-only ."""
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._rpr_element is None:
+            return None
         from .ColorFormat import ColorFormat
         highlight_el = self._rpr_element.find(Elements.A_HIGHLIGHT)
         if highlight_el is None:
@@ -162,8 +162,8 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @property
     def underline_line_format(self) -> ILineFormat:
         """Returns the LineFormat properties used to outline underline line. No inheritance applied. Read-only ."""
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._rpr_element is None:
+            return None
         from .LineFormat import LineFormat
         lf = LineFormat()
         lf._init_internal(self._rpr_element, self._slide_part, self._parent_slide, ln_tag=Elements.A_U_LN)
@@ -172,8 +172,8 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @property
     def underline_fill_format(self) -> IFillFormat:
         """Returns the underline line FillFormat properties. No inheritance applied. Read-only ."""
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._rpr_element is None:
+            return None
         from .FillFormat import FillFormat
         # <a:uFill> contains fill children, acts as parent for FillFormat
         u_fill_el = self._rpr_element.find(Elements.A_U_FILL)
@@ -236,7 +236,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     def font_underline(self) -> TextUnderlineType:
         """Returns or sets the text underline type. No inheritance applied. Read/write ."""
         from .TextUnderlineType import TextUnderlineType
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return TextUnderlineType.NOT_DEFINED
         val = self._rpr_element.get('u')
         if val is None:
@@ -247,7 +247,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @font_underline.setter
     def font_underline(self, value: TextUnderlineType):
         from .TextUnderlineType import TextUnderlineType
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return
         if value == TextUnderlineType.NOT_DEFINED:
             if 'u' in self._rpr_element.attrib:
@@ -262,7 +262,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     def text_cap_type(self) -> TextCapType:
         """Returns or sets the type of text capitalization. No inheritance applied. Read/write ."""
         from .TextCapType import TextCapType
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return TextCapType.NOT_DEFINED
         val = self._rpr_element.get('cap')
         if val is None:
@@ -273,7 +273,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @text_cap_type.setter
     def text_cap_type(self, value: TextCapType):
         from .TextCapType import TextCapType
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return
         if value == TextCapType.NOT_DEFINED:
             if 'cap' in self._rpr_element.attrib:
@@ -288,7 +288,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     def strikethrough_type(self) -> TextStrikethroughType:
         """Returns or sets the strikethrough type of a text. No inheritance applied. Read/write ."""
         from .TextStrikethroughType import TextStrikethroughType
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return TextStrikethroughType.NOT_DEFINED
         val = self._rpr_element.get('strike')
         if val is None:
@@ -299,7 +299,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @strikethrough_type.setter
     def strikethrough_type(self, value: TextStrikethroughType):
         from .TextStrikethroughType import TextStrikethroughType
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return
         if value == TextStrikethroughType.NOT_DEFINED:
             if 'strike' in self._rpr_element.attrib:
@@ -316,7 +316,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     def is_hard_underline_line(self) -> NullableBool:
         """Determines whether the underline style has own LineFormat properties or inherits it from the LineFormat properties of the text. Read/write ."""
         from .NullableBool import NullableBool
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return NullableBool.NOT_DEFINED
         if self._rpr_element.find(Elements.A_U_LN) is not None:
             return NullableBool.TRUE
@@ -327,7 +327,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @is_hard_underline_line.setter
     def is_hard_underline_line(self, value: NullableBool):
         from .NullableBool import NullableBool
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return
         # Remove existing underline line elements
         for tag in (Elements.A_U_LN, Elements.A_U_LN_TX):
@@ -344,7 +344,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     def is_hard_underline_fill(self) -> NullableBool:
         """Determines whether the underline style has own FillFormat properties or inherits it from the FillFormat properties of the text. Read/write ."""
         from .NullableBool import NullableBool
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return NullableBool.NOT_DEFINED
         if self._rpr_element.find(Elements.A_U_FILL) is not None:
             return NullableBool.TRUE
@@ -355,7 +355,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @is_hard_underline_fill.setter
     def is_hard_underline_fill(self, value: NullableBool):
         from .NullableBool import NullableBool
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return
         # Remove existing underline fill elements
         for tag in (Elements.A_U_FILL, Elements.A_U_FILL_TX):
@@ -373,7 +373,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @property
     def font_height(self) -> float:
         """Returns or sets the font height of a portion. float.NaN means height is undefined and should be inherited from the Master. Read/write ."""
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return float('nan')
         val = self._rpr_element.get('sz')
         if val is None:
@@ -383,7 +383,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
 
     @font_height.setter
     def font_height(self, value: float):
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return
         if math.isnan(value):
             if 'sz' in self._rpr_element.attrib:
@@ -395,7 +395,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @property
     def escapement(self) -> float:
         """Returns or sets the superscript or subscript text. Value from -100% (subscript) to 100% (superscript). float.NaN means value is undefined and should be inherited from the Master. Read/write ."""
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return float('nan')
         val = self._rpr_element.get('baseline')
         if val is None:
@@ -405,7 +405,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
 
     @escapement.setter
     def escapement(self, value: float):
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return
         if math.isnan(value):
             if 'baseline' in self._rpr_element.attrib:
@@ -417,7 +417,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @property
     def kerning_minimal_size(self) -> float:
         """Returns or sets the minimal font size, for which kerning should be switched on. float.NaN means value is undefined and should be inherited from the Master. Read/write ."""
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return float('nan')
         val = self._rpr_element.get('kern')
         if val is None:
@@ -427,7 +427,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
 
     @kerning_minimal_size.setter
     def kerning_minimal_size(self, value: float):
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return
         if math.isnan(value):
             if 'kern' in self._rpr_element.attrib:
@@ -439,7 +439,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @property
     def spacing(self) -> float:
         """Returns or sets the intercharacter spacing increment. float.NaN means value is undefined and should be inherited from the Master. Read/write ."""
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return float('nan')
         val = self._rpr_element.get('spc')
         if val is None:
@@ -449,7 +449,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
 
     @spacing.setter
     def spacing(self, value: float):
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return
         if math.isnan(value):
             if 'spc' in self._rpr_element.attrib:
@@ -501,13 +501,13 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @property
     def language_id(self) -> str:
         """Returns or sets the Id of a proofing language. Used for checking spelling and grammar. Read/write ."""
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return None
         return self._rpr_element.get('lang')
 
     @language_id.setter
     def language_id(self, value: str):
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return
         if value is None:
             if 'lang' in self._rpr_element.attrib:
@@ -519,13 +519,13 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @property
     def alternative_language_id(self) -> str:
         """Returns or sets the Id of an alternative language. Read/write ."""
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return None
         return self._rpr_element.get('altLang')
 
     @alternative_language_id.setter
     def alternative_language_id(self, value: str):
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return
         if value is None:
             if 'altLang' in self._rpr_element.attrib:
@@ -539,7 +539,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
     @property
     def spell_check(self) -> bool:
         """Gets or sets a value indicating whether spell checking is enabled for the text portion. When this property is set to false, spelling checks for text elements are suppressed. When set to true, spell checking is allowed. Default value is false."""
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return False
         val = self._rpr_element.get('noProof')
         if val == '1':
@@ -549,7 +549,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
 
     @spell_check.setter
     def spell_check(self, value: bool):
-        if not hasattr(self, '_rpr_element') or self._rpr_element is None:
+        if self._rpr_element is None:
             return
         if not value:
             self._rpr_element.set('noProof', '1')

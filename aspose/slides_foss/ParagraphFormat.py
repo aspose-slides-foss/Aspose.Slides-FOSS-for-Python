@@ -11,9 +11,7 @@ from ._internal.pptx.constants import NS, Elements, EMU_PER_POINT
 if TYPE_CHECKING:
     from .FontAlignment import FontAlignment
     from .IBulletFormat import IBulletFormat
-    from .IParagraphFormatEffectiveData import IParagraphFormatEffectiveData
     from .IPortionFormat import IPortionFormat
-    from .ITabCollection import ITabCollection
     from .NullableBool import NullableBool
     from .TextAlignment import TextAlignment
 
@@ -92,7 +90,7 @@ class ParagraphFormat(PVIObject, ISlideComponent, IPresentationComponent, IParag
 
     def _get_nullable_bool_attr(self, attr):
         from .NullableBool import NullableBool
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return NullableBool.NOT_DEFINED
         val = self._ppr_element.get(attr)
         if val is None:
@@ -101,7 +99,7 @@ class ParagraphFormat(PVIObject, ISlideComponent, IPresentationComponent, IParag
 
     def _set_nullable_bool_attr(self, attr, value):
         from .NullableBool import NullableBool
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return
         if value == NullableBool.NOT_DEFINED:
             if attr in self._ppr_element.attrib:
@@ -115,7 +113,7 @@ class ParagraphFormat(PVIObject, ISlideComponent, IPresentationComponent, IParag
     def _get_spacing(self, tag):
         """Read spacing from a child element (lnSpc, spcBef, spcAft).
         Positive return = percentage, negative = points."""
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return float('nan')
         el = self._ppr_element.find(tag)
         if el is None:
@@ -135,7 +133,7 @@ class ParagraphFormat(PVIObject, ISlideComponent, IPresentationComponent, IParag
     def _set_spacing(self, tag, value):
         """Write spacing to a child element.
         Positive value = percentage (spcPct), negative = points (spcPts)."""
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return
         el = self._ppr_element.find(tag)
         if math.isnan(value):
@@ -159,7 +157,7 @@ class ParagraphFormat(PVIObject, ISlideComponent, IPresentationComponent, IParag
     def alignment(self) -> TextAlignment:
         """Returns or sets the text alignment in a paragraph with no inheritance. Read/write ."""
         from .TextAlignment import TextAlignment
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return TextAlignment.NOT_DEFINED
         val = self._ppr_element.get('algn')
         if val is None:
@@ -170,7 +168,7 @@ class ParagraphFormat(PVIObject, ISlideComponent, IPresentationComponent, IParag
     @alignment.setter
     def alignment(self, value: TextAlignment):
         from .TextAlignment import TextAlignment
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return
         if value == TextAlignment.NOT_DEFINED:
             if 'algn' in self._ppr_element.attrib:
@@ -251,7 +249,7 @@ class ParagraphFormat(PVIObject, ISlideComponent, IPresentationComponent, IParag
     # --- EMU-based float properties (NaN = undefined) ---
 
     def _get_emu_attr(self, attr):
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return float('nan')
         val = self._ppr_element.get(attr)
         if val is None:
@@ -259,7 +257,7 @@ class ParagraphFormat(PVIObject, ISlideComponent, IPresentationComponent, IParag
         return int(val) / EMU_PER_POINT
 
     def _set_emu_attr(self, attr, value):
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return
         if math.isnan(value):
             if attr in self._ppr_element.attrib:
@@ -313,7 +311,7 @@ class ParagraphFormat(PVIObject, ISlideComponent, IPresentationComponent, IParag
     def font_alignment(self) -> FontAlignment:
         """Returns or sets a font alignment in a paragraph with no inheritance. Read/write ."""
         from .FontAlignment import FontAlignment
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return FontAlignment.DEFAULT
         val = self._ppr_element.get('fontAlgn')
         if val is None:
@@ -324,7 +322,7 @@ class ParagraphFormat(PVIObject, ISlideComponent, IPresentationComponent, IParag
     @font_alignment.setter
     def font_alignment(self, value: FontAlignment):
         from .FontAlignment import FontAlignment
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return
         if value == FontAlignment.DEFAULT:
             if 'fontAlgn' in self._ppr_element.attrib:
@@ -339,8 +337,8 @@ class ParagraphFormat(PVIObject, ISlideComponent, IPresentationComponent, IParag
 
     @property
     def bullet(self) -> IBulletFormat:
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._ppr_element is None:
+            return None
         from .BulletFormat import BulletFormat
         bf = BulletFormat()
         bf._init_internal(self._ppr_element, self._slide_part, self._parent_slide)
@@ -350,7 +348,7 @@ class ParagraphFormat(PVIObject, ISlideComponent, IPresentationComponent, IParag
 
     @property
     def depth(self) -> int:
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return 0
         val = self._ppr_element.get('lvl')
         if val is None:
@@ -359,7 +357,7 @@ class ParagraphFormat(PVIObject, ISlideComponent, IPresentationComponent, IParag
 
     @depth.setter
     def depth(self, value: int):
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return
         if value == 0:
             if 'lvl' in self._ppr_element.attrib:
@@ -372,8 +370,8 @@ class ParagraphFormat(PVIObject, ISlideComponent, IPresentationComponent, IParag
 
     @property
     def default_portion_format(self) -> IPortionFormat:
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._ppr_element is None:
+            return None
         def_rpr = self._ppr_element.find(Elements.A_DEF_R_PR)
         if def_rpr is None:
             def_rpr = _ppr_insert_child(self._ppr_element, Elements.A_DEF_R_PR)

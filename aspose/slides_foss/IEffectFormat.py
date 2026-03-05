@@ -5,7 +5,6 @@ from .IEffectParamSource import IEffectParamSource
 
 if TYPE_CHECKING:
     from .effects.IBlur import IBlur
-    from .IEffectFormatEffectiveData import IEffectFormatEffectiveData
     from .effects.IFillOverlay import IFillOverlay
     from .effects.IGlow import IGlow
     from .effects.IInnerShadow import IInnerShadow

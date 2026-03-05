@@ -6,14 +6,8 @@ from .ISlideComponent import ISlideComponent
 from .IPresentationComponent import IPresentationComponent
 
 if TYPE_CHECKING:
-    from .IAnimationTimeLine import IAnimationTimeLine
-    from .IBackground import IBackground
-    from .IControlCollection import IControlCollection
-    from .ICustomData import ICustomData
-    from .IHyperlinkQueries import IHyperlinkQueries
     from .IShape import IShape
     from .IShapeCollection import IShapeCollection
-    from .ISlideShowTransition import ISlideShowTransition
 
 class IBaseSlide(IThemeable, ISlideComponent, IPresentationComponent, ABC):
     """Represents common data for all slide types."""

@@ -13,7 +13,6 @@ if TYPE_CHECKING:
     from .IColorFormat import IColorFormat
     from .ILightRig import ILightRig
     from .IShapeBevel import IShapeBevel
-    from .IThreeDFormatEffectiveData import IThreeDFormatEffectiveData
     from .MaterialPresetType import MaterialPresetType
     from ._internal.pptx.slide_part import SlidePart
 
@@ -49,8 +48,6 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
         self._parent_slide = parent_slide
 
     def _get_sp3d(self) -> ET._Element | None:
-        if not hasattr(self, '_parent_element'):
-            return None
         return self._parent_element.find(Elements.A_SP_3D)
 
     def _ensure_sp3d(self) -> ET._Element:
@@ -71,8 +68,6 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
         return el
 
     def _get_scene3d(self) -> ET._Element | None:
-        if not hasattr(self, '_parent_element'):
-            return None
         return self._parent_element.find(Elements.A_SCENE_3D)
 
     def _ensure_scene3d(self) -> ET._Element:
@@ -99,8 +94,6 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
     @property
     def contour_width(self) -> float:
         """Returns or sets the width of a 3D contour. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         sp3d = self._get_sp3d()
         if sp3d is None:
             return 0.0
@@ -111,8 +104,6 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
 
     @contour_width.setter
     def contour_width(self, value: float):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         sp3d = self._ensure_sp3d()
         sp3d.set('contourW', str(int(round(value * EMU_PER_POINT))))
         self._save()
@@ -120,8 +111,6 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
     @property
     def extrusion_height(self) -> float:
         """Returns or sets the height of an extrusion effect. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         sp3d = self._get_sp3d()
         if sp3d is None:
             return 0.0
@@ -132,8 +121,6 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
 
     @extrusion_height.setter
     def extrusion_height(self, value: float):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         sp3d = self._ensure_sp3d()
         sp3d.set('extrusionH', str(int(round(value * EMU_PER_POINT))))
         self._save()
@@ -141,8 +128,6 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
     @property
     def depth(self) -> float:
         """Returns or sets the depth of a 3D shape. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         sp3d = self._get_sp3d()
         if sp3d is None:
             return 0.0
@@ -153,8 +138,6 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
 
     @depth.setter
     def depth(self, value: float):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         sp3d = self._ensure_sp3d()
         sp3d.set('z', str(int(round(value * EMU_PER_POINT))))
         self._save()
@@ -162,8 +145,6 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
     @property
     def bevel_top(self) -> IShapeBevel:
         """Returns or sets the type of a top 3D bevel. Read-only."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .ShapeBevel import ShapeBevel
         sp3d = self._ensure_sp3d()
         bevel_t = sp3d.find(Elements.A_BEVEL_T)
@@ -176,8 +157,6 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
     @property
     def bevel_bottom(self) -> IShapeBevel:
         """Returns or sets the type of a bottom 3D bevel. Read-only."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .ShapeBevel import ShapeBevel
         sp3d = self._ensure_sp3d()
         bevel_b = sp3d.find(Elements.A_BEVEL_B)
@@ -190,8 +169,6 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
     @property
     def contour_color(self) -> IColorFormat:
         """Returns or sets the color of a contour. Read-only."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .ColorFormat import ColorFormat
         sp3d = self._ensure_sp3d()
         contour_clr = sp3d.find(Elements.A_CONTOUR_CLR)
@@ -204,8 +181,6 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
     @property
     def extrusion_color(self) -> IColorFormat:
         """Returns or sets the color of an extrusion. Read-only."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .ColorFormat import ColorFormat
         sp3d = self._ensure_sp3d()
         extrusion_clr = sp3d.find(Elements.A_EXTRUSION_CLR)
@@ -218,8 +193,6 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
     @property
     def camera(self) -> ICamera:
         """Returns or sets the settings of a camera. Read-only."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .Camera import Camera
         scene3d = self._ensure_scene3d()
         cam = Camera()
@@ -229,8 +202,6 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
     @property
     def light_rig(self) -> ILightRig:
         """Returns or sets the type of a light. Read-only."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LightRig import LightRig
         scene3d = self._ensure_scene3d()
         lr = LightRig()
@@ -240,8 +211,6 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
     @property
     def material(self) -> MaterialPresetType:
         """Returns or sets the type of a material. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .MaterialPresetType import MaterialPresetType
         sp3d = self._get_sp3d()
         if sp3d is None:
@@ -254,8 +223,6 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
 
     @material.setter
     def material(self, value: MaterialPresetType):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .MaterialPresetType import MaterialPresetType
         sp3d = self._ensure_sp3d()
         if value == MaterialPresetType.NOT_DEFINED:

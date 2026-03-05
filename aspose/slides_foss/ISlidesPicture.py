@@ -5,7 +5,6 @@ from .ISlideComponent import ISlideComponent
 from .IPresentationComponent import IPresentationComponent
 
 if TYPE_CHECKING:
-    from .effects.IImageTransformOperationCollection import IImageTransformOperationCollection
     from .IPPImage import IPPImage
 
 class ISlidesPicture(ISlideComponent, IPresentationComponent, ABC):

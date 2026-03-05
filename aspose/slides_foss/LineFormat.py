@@ -10,8 +10,6 @@ from ._internal.pptx.constants import NS, Elements, EMU_PER_POINT
 
 if TYPE_CHECKING:
     from .ILineFillFormat import ILineFillFormat
-    from .ILineFormatEffectiveData import ILineFormatEffectiveData
-    from .ISketchFormat import ISketchFormat
     from .LineAlignment import LineAlignment
     from .LineArrowheadLength import LineArrowheadLength
     from .LineArrowheadStyle import LineArrowheadStyle
@@ -85,8 +83,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
 
     def _get_ln(self) -> ET._Element | None:
         """Get the <a:ln> element if it exists."""
-        if not hasattr(self, '_parent_element'):
-            return None
         tag = getattr(self, '_ln_tag', Elements.A_LN)
         return self._parent_element.find(tag)
 
@@ -173,8 +169,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
     @property
     def is_format_not_defined(self) -> bool:
         """Returns true if line format is not defined (as just created, default). Read-only."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         ln = self._get_ln()
         if ln is None:
             return True
@@ -184,8 +178,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
     @property
     def fill_format(self) -> ILineFillFormat:
         """Returns the fill format of a line. Read-only."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineFillFormat import LineFillFormat
         ln = self._ensure_ln()
         lff = LineFillFormat()
@@ -196,8 +188,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
     @property
     def width(self) -> float:
         """Returns or sets the width of a line. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         ln = self._get_ln()
         if ln is None:
             return 0.75  # Default line width in points
@@ -208,8 +198,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
 
     @width.setter
     def width(self, value: float):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         ln = self._ensure_ln()
         ln.set('w', str(int(round(value * EMU_PER_POINT))))
         self._save()
@@ -217,8 +205,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
     @property
     def dash_style(self) -> LineDashStyle:
         """Returns or sets the line dash style. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineDashStyle import LineDashStyle
         ln = self._get_ln()
         if ln is None:
@@ -236,8 +222,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
 
     @dash_style.setter
     def dash_style(self, value: LineDashStyle):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineDashStyle import LineDashStyle
         ln = self._ensure_ln()
         # Remove existing dash elements
@@ -258,8 +242,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
     @property
     def custom_dash_pattern(self) -> list[float]:
         """Returns or sets the custom dash pattern. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         ln = self._get_ln()
         if ln is None:
             return []
@@ -276,8 +258,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
 
     @custom_dash_pattern.setter
     def custom_dash_pattern(self, value: list[float]):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         ln = self._ensure_ln()
         cust_dash = ln.find(Elements.A_CUST_DASH)
         if cust_dash is None:
@@ -298,8 +278,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
     @property
     def cap_style(self) -> LineCapStyle:
         """Returns or sets the line cap style. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineCapStyle import LineCapStyle
         ln = self._get_ln()
         if ln is None:
@@ -312,8 +290,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
 
     @cap_style.setter
     def cap_style(self, value: LineCapStyle):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineCapStyle import LineCapStyle
         ln = self._ensure_ln()
         if value == LineCapStyle.NOT_DEFINED:
@@ -328,8 +304,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
     @property
     def style(self) -> LineStyle:
         """Returns or sets the line style. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineStyle import LineStyle
         ln = self._get_ln()
         if ln is None:
@@ -342,8 +316,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
 
     @style.setter
     def style(self, value: LineStyle):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineStyle import LineStyle
         ln = self._ensure_ln()
         if value == LineStyle.NOT_DEFINED:
@@ -358,8 +330,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
     @property
     def alignment(self) -> LineAlignment:
         """Returns or sets the line alignment. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineAlignment import LineAlignment
         ln = self._get_ln()
         if ln is None:
@@ -372,8 +342,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
 
     @alignment.setter
     def alignment(self, value: LineAlignment):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineAlignment import LineAlignment
         ln = self._ensure_ln()
         if value == LineAlignment.NOT_DEFINED:
@@ -388,8 +356,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
     @property
     def join_style(self) -> LineJoinStyle:
         """Returns or sets the lines join style. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineJoinStyle import LineJoinStyle
         ln = self._get_ln()
         if ln is None:
@@ -404,8 +370,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
 
     @join_style.setter
     def join_style(self, value: LineJoinStyle):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineJoinStyle import LineJoinStyle
         ln = self._ensure_ln()
         # Remove existing join elements
@@ -424,8 +388,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
     @property
     def miter_limit(self) -> float:
         """Returns or sets the miter limit of a line. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         ln = self._get_ln()
         if ln is None:
             return 0.0
@@ -439,8 +401,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
 
     @miter_limit.setter
     def miter_limit(self, value: float):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         ln = self._ensure_ln()
         miter = ln.find(Elements.A_MITER)
         if miter is None:
@@ -479,8 +439,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
     @property
     def begin_arrowhead_style(self) -> LineArrowheadStyle:
         """Returns or sets the arrowhead style at the beginning of a line. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineArrowheadStyle import LineArrowheadStyle
         val = self._get_arrow_attr(Elements.A_HEAD_END, 'type')
         if val is None:
@@ -490,8 +448,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
 
     @begin_arrowhead_style.setter
     def begin_arrowhead_style(self, value: LineArrowheadStyle):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineArrowheadStyle import LineArrowheadStyle
         if value == LineArrowheadStyle.NOT_DEFINED:
             self._set_arrow_attr(Elements.A_HEAD_END, 'type', None)
@@ -502,8 +458,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
     @property
     def end_arrowhead_style(self) -> LineArrowheadStyle:
         """Returns or sets the arrowhead style at the end of a line. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineArrowheadStyle import LineArrowheadStyle
         val = self._get_arrow_attr(Elements.A_TAIL_END, 'type')
         if val is None:
@@ -513,8 +467,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
 
     @end_arrowhead_style.setter
     def end_arrowhead_style(self, value: LineArrowheadStyle):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineArrowheadStyle import LineArrowheadStyle
         if value == LineArrowheadStyle.NOT_DEFINED:
             self._set_arrow_attr(Elements.A_TAIL_END, 'type', None)
@@ -525,8 +477,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
     @property
     def begin_arrowhead_width(self) -> LineArrowheadWidth:
         """Returns or sets the arrowhead width at the beginning of a line. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineArrowheadWidth import LineArrowheadWidth
         val = self._get_arrow_attr(Elements.A_HEAD_END, 'w')
         if val is None:
@@ -536,8 +486,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
 
     @begin_arrowhead_width.setter
     def begin_arrowhead_width(self, value: LineArrowheadWidth):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineArrowheadWidth import LineArrowheadWidth
         if value == LineArrowheadWidth.NOT_DEFINED:
             self._set_arrow_attr(Elements.A_HEAD_END, 'w', None)
@@ -548,8 +496,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
     @property
     def end_arrowhead_width(self) -> LineArrowheadWidth:
         """Returns or sets the arrowhead width at the end of a line. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineArrowheadWidth import LineArrowheadWidth
         val = self._get_arrow_attr(Elements.A_TAIL_END, 'w')
         if val is None:
@@ -559,8 +505,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
 
     @end_arrowhead_width.setter
     def end_arrowhead_width(self, value: LineArrowheadWidth):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineArrowheadWidth import LineArrowheadWidth
         if value == LineArrowheadWidth.NOT_DEFINED:
             self._set_arrow_attr(Elements.A_TAIL_END, 'w', None)
@@ -571,8 +515,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
     @property
     def begin_arrowhead_length(self) -> LineArrowheadLength:
         """Returns or sets the arrowhead length at the beginning of a line. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineArrowheadLength import LineArrowheadLength
         val = self._get_arrow_attr(Elements.A_HEAD_END, 'len')
         if val is None:
@@ -582,8 +524,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
 
     @begin_arrowhead_length.setter
     def begin_arrowhead_length(self, value: LineArrowheadLength):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineArrowheadLength import LineArrowheadLength
         if value == LineArrowheadLength.NOT_DEFINED:
             self._set_arrow_attr(Elements.A_HEAD_END, 'len', None)
@@ -594,8 +534,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
     @property
     def end_arrowhead_length(self) -> LineArrowheadLength:
         """Returns or sets the arrowhead length at the end of a line. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineArrowheadLength import LineArrowheadLength
         val = self._get_arrow_attr(Elements.A_TAIL_END, 'len')
         if val is None:
@@ -605,8 +543,6 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
 
     @end_arrowhead_length.setter
     def end_arrowhead_length(self, value: LineArrowheadLength):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .LineArrowheadLength import LineArrowheadLength
         if value == LineArrowheadLength.NOT_DEFINED:
             self._set_arrow_attr(Elements.A_TAIL_END, 'len', None)

@@ -8,8 +8,6 @@ from .ITextFrameFormat import ITextFrameFormat
 from ._internal.pptx.constants import NS, Elements, EMU_PER_POINT, ROTATION_UNIT
 
 if TYPE_CHECKING:
-    from .ITextFrameFormatEffectiveData import ITextFrameFormatEffectiveData
-    from .ITextStyle import ITextStyle
     from .IThreeDFormat import IThreeDFormat
     from .NullableBool import NullableBool
     from .TextAnchorType import TextAnchorType
@@ -101,13 +99,13 @@ class TextFrameFormat(PVIObject, ISlideComponent, IPresentationComponent, ITextF
     def slide(self) -> IBaseSlide:
         if hasattr(self, '_parent_slide') and self._parent_slide is not None:
             return self._parent_slide
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
     @property
     def presentation(self) -> IPresentation:
         if hasattr(self, '_parent_slide') and self._parent_slide is not None:
             return self._parent_slide.presentation
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
     @property
     def as_i_presentation_component(self) -> IPresentationComponent:

@@ -7,7 +7,6 @@ from .IPresentationComponent import IPresentationComponent
 if TYPE_CHECKING:
     from .IBaseSlide import IBaseSlide
     from .ICell import ICell
-    from .IHyperlinkQueries import IHyperlinkQueries
     from .IParagraphCollection import IParagraphCollection
     from .IPresentation import IPresentation
     from .IShape import IShape
@@ -34,7 +33,7 @@ class TextFrame(ITextFrame, ISlideComponent, IPresentationComponent):
     @property
     def text(self) -> str:
         """Gets or sets the plain text for a TextFrame. Read/write ."""
-        if not hasattr(self, '_txbody_element') or self._txbody_element is None:
+        if self._txbody_element is None:
             return ''
         from ._internal.pptx.constants import Elements
         parts = []
@@ -49,7 +48,7 @@ class TextFrame(ITextFrame, ISlideComponent, IPresentationComponent):
 
     @text.setter
     def text(self, value: str):
-        if not hasattr(self, '_txbody_element') or self._txbody_element is None:
+        if self._txbody_element is None:
             return
         import lxml.etree as ET
         from ._internal.pptx.constants import Elements
@@ -82,14 +81,14 @@ class TextFrame(ITextFrame, ISlideComponent, IPresentationComponent):
         """Returns the parent slide of a TextFrame. Read-only ."""
         if hasattr(self, '_parent_slide') and self._parent_slide is not None:
             return self._parent_slide
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
     @property
     def presentation(self) -> IPresentation:
         """Returns the parent presentation of a TextFrame. Read-only ."""
         if hasattr(self, '_parent_slide') and self._parent_slide is not None:
             return self._parent_slide.presentation
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
     @property
     def parent_shape(self) -> IShape:

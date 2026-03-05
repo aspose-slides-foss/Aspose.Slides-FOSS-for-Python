@@ -7,10 +7,8 @@ from ._internal.pptx.constants import NS, EMU_PER_POINT, Elements
 
 if TYPE_CHECKING:
     from .IAdjustValueCollection import IAdjustValueCollection
-    from .IConnectorLock import IConnectorLock
     from .IGeometryShape import IGeometryShape
     from .IShape import IShape
-    from .IShapeStyle import IShapeStyle
     from .ShapeType import ShapeType
 
 class Connector(GeometryShape, IConnector):

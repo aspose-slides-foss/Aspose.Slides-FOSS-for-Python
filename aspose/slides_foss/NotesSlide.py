@@ -5,11 +5,9 @@ from .INotesSlide import INotesSlide
 
 if TYPE_CHECKING:
     from .INotesSlideHeaderFooterManager import INotesSlideHeaderFooterManager
-    from .theme.IOverrideThemeManager import IOverrideThemeManager
     from .ISlide import ISlide
     from .ITextFrame import ITextFrame
     from .IBaseSlide import IBaseSlide
-    from .IOverrideThemeable import IOverrideThemeable
     from ._internal.pptx.notes_slide_part import NotesSlidePart
     from ._internal.opc import OpcPackage
 
@@ -62,7 +60,7 @@ class NotesSlide(BaseSlide, INotesSlide):
     @property
     def notes_text_frame(self) -> Optional[ITextFrame]:
         """Returns a TextFrame with notes' text if there is one. Read-only."""
-        if not hasattr(self, '_notes_part') or self._notes_part is None:
+        if self._notes_part is None:
             return None
         txbody = self._notes_part.get_notes_txbody()
         if txbody is None:

@@ -25,22 +25,16 @@ class Image(IImage):
     @property
     def size(self):
         """Gets the size of the image."""
-        if not hasattr(self, '_data'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return (self._width, self._height)
 
     @property
     def width(self) -> int:
         """Gets the width of the image in pixels."""
-        if not hasattr(self, '_data'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self._width
 
     @property
     def height(self) -> int:
         """Gets the height of the image in pixels."""
-        if not hasattr(self, '_data'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self._height
 
 
@@ -49,8 +43,6 @@ class Image(IImage):
 
 
     def save(self, *args, **kwargs) -> None:
-        if not hasattr(self, '_data'):
-            raise NotImplementedError("This feature is not yet available in this version.")
 
         if len(args) < 1:
             raise TypeError("save() requires at least 1 argument")

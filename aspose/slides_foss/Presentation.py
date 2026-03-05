@@ -14,34 +14,15 @@ from ._internal.pptx.template import create_minimal_pptx
 from ._internal.export import ExporterRegistry
 
 if TYPE_CHECKING:
-    from .IAudioCollection import IAudioCollection
     from .IBaseSlide import IBaseSlide
     from .ICommentAuthorCollection import ICommentAuthorCollection
-    from .ICustomData import ICustomData
-    from .ICustomXmlPart import ICustomXmlPart
-    from .IDigitalSignatureCollection import IDigitalSignatureCollection
     from .IDocumentProperties import IDocumentProperties
-    from .IFontsManager import IFontsManager
     from .IGlobalLayoutSlideCollection import IGlobalLayoutSlideCollection
-    from .IHyperlinkQueries import IHyperlinkQueries
     from .IImage import IImage
     from .IImageCollection import IImageCollection
-    from .IMasterHandoutSlideManager import IMasterHandoutSlideManager
-    from .IMasterNotesSlideManager import IMasterNotesSlideManager
     from .IMasterSlideCollection import IMasterSlideCollection
-    from .theme.IMasterTheme import IMasterTheme
     from .INotesSize import INotesSize
-    from .IPresentationHeaderFooterManager import IPresentationHeaderFooterManager
-    from .IProtectionManager import IProtectionManager
-    from .ISectionCollection import ISectionCollection
-    from .ISensitivityLabelCollection import ISensitivityLabelCollection
     from .ISlideCollection import ISlideCollection
-    from .ISlideSize import ISlideSize
-    from .ITextStyle import ITextStyle
-    from .vba.IVbaProject import IVbaProject
-    from .IVideoCollection import IVideoCollection
-    from .IViewProperties import IViewProperties
-    from .SlideShowSettings import SlideShowSettings
 
 
 class Presentation(IPresentation, IPresentationComponent):
@@ -420,7 +401,7 @@ class Presentation(IPresentation, IPresentationComponent):
             # save(options)
             options = args[0]
             # TODO: Extract destination and format from options
-            raise NotImplementedError("save(options) overload not yet implemented")
+            raise ValueError("save(options) overload is not supported; use save(fname, format) instead")
         elif len(args) == 2:
             # save(fname/stream, format)
             destination = args[0]
@@ -455,11 +436,11 @@ class Presentation(IPresentation, IPresentationComponent):
         # Get the appropriate exporter from the registry
         exporter = ExporterRegistry.get_exporter(format_value)
         if exporter is None:
-            raise NotImplementedError(f"Export format '{format_value}' is not supported")
+            raise ValueError(f"Export format '{format_value}' is not supported")
 
         # TODO: Handle slides parameter for partial export
         if slides is not None:
-            raise NotImplementedError("Saving specific slides is not yet implemented")
+            raise ValueError("Saving specific slides is not supported; use save(fname, format) instead")
 
         # Perform the export
         exporter.export(self._opc_package, destination, options)

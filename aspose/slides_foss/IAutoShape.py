@@ -4,7 +4,6 @@ from typing import overload, TYPE_CHECKING
 from .IGeometryShape import IGeometryShape
 
 if TYPE_CHECKING:
-    from .IAutoShapeLock import IAutoShapeLock
     from .ITextFrame import ITextFrame
 
 class IAutoShape(IGeometryShape, ABC):

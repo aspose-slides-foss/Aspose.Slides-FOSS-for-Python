@@ -7,7 +7,6 @@ from .._internal.pptx.constants import EMU_PER_POINT
 
 if TYPE_CHECKING:
     from ..IColorFormat import IColorFormat
-    from .IGlowEffectiveData import IGlowEffectiveData
     from .._internal.pptx.slide_part import SlidePart
 
 class Glow(IGlow, IImageTransformOperation):
@@ -25,8 +24,6 @@ class Glow(IGlow, IImageTransformOperation):
     @property
     def radius(self) -> float:
         """Radius. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('rad')
         if val is None:
             return 0.0
@@ -34,16 +31,12 @@ class Glow(IGlow, IImageTransformOperation):
 
     @radius.setter
     def radius(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('rad', str(int(round(value * EMU_PER_POINT))))
         self._save()
 
     @property
     def color(self) -> IColorFormat:
         """Color format. Read-only ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ..ColorFormat import ColorFormat
         cf = ColorFormat()
         cf._init_internal(self._element, self._slide_part, self._parent_slide)

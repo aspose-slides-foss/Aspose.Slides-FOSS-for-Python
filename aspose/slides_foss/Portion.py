@@ -6,7 +6,6 @@ from .IPresentationComponent import IPresentationComponent
 
 if TYPE_CHECKING:
     from .IBaseSlide import IBaseSlide
-    from .IField import IField
     from .IPortionFormat import IPortionFormat
     from .IPresentation import IPresentation
 
@@ -41,8 +40,8 @@ class Portion(IPortion, ISlideComponent, IPresentationComponent):
     @property
     def portion_format(self) -> IPortionFormat:
         """Returns oformatting bject which contains explicitly set formatting properties of the text portion with no inheritance applied. Read-only ."""
-        if not hasattr(self, '_r_element') or self._r_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._r_element is None:
+            return None
         from ._internal.pptx.constants import Elements
         from .PortionFormat import PortionFormat
         rpr = self._r_element.find(Elements.A_R_PR)
@@ -58,7 +57,7 @@ class Portion(IPortion, ISlideComponent, IPresentationComponent):
     @property
     def text(self) -> str:
         """Gets or sets the plain text of a portion. Read/write ."""
-        if not hasattr(self, '_r_element') or self._r_element is None:
+        if self._r_element is None:
             return ''
         from ._internal.pptx.constants import Elements
         t_elem = self._r_element.find(Elements.A_T)
@@ -68,7 +67,7 @@ class Portion(IPortion, ISlideComponent, IPresentationComponent):
 
     @text.setter
     def text(self, value: str):
-        if not hasattr(self, '_r_element') or self._r_element is None:
+        if self._r_element is None:
             return
         from ._internal.pptx.constants import Elements
         import lxml.etree as ET
@@ -88,7 +87,7 @@ class Portion(IPortion, ISlideComponent, IPresentationComponent):
     def slide(self) -> IBaseSlide:
         if hasattr(self, '_parent_slide') and self._parent_slide is not None:
             return self._parent_slide
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
     @property
     def as_i_presentation_component(self) -> IPresentationComponent:
@@ -98,7 +97,7 @@ class Portion(IPortion, ISlideComponent, IPresentationComponent):
     def presentation(self) -> IPresentation:
         if hasattr(self, '_parent_slide') and self._parent_slide is not None:
             return self._parent_slide.presentation
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
 
 

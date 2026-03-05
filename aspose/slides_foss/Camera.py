@@ -61,8 +61,6 @@ class Camera(PVIObject, ISlideComponent, IPresentationComponent, ICamera):
         self._parent_slide = parent_slide
 
     def _get_camera(self) -> ET._Element | None:
-        if not hasattr(self, '_scene3d'):
-            return None
         return self._scene3d.find(Elements.A_CAMERA)
 
     def _ensure_camera(self) -> ET._Element:
@@ -78,8 +76,6 @@ class Camera(PVIObject, ISlideComponent, IPresentationComponent, ICamera):
     @property
     def camera_type(self) -> CameraPresetType:
         """Camera type. Read/write."""
-        if not hasattr(self, '_scene3d'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .CameraPresetType import CameraPresetType
         cam = self._get_camera()
         if cam is None:
@@ -92,8 +88,6 @@ class Camera(PVIObject, ISlideComponent, IPresentationComponent, ICamera):
 
     @camera_type.setter
     def camera_type(self, value: CameraPresetType):
-        if not hasattr(self, '_scene3d'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .CameraPresetType import CameraPresetType
         cam = self._ensure_camera()
         if value == CameraPresetType.NOT_DEFINED:
@@ -108,8 +102,6 @@ class Camera(PVIObject, ISlideComponent, IPresentationComponent, ICamera):
     @property
     def field_of_view_angle(self) -> float:
         """Camera FOV (0-180 deg, field of View). Read/write."""
-        if not hasattr(self, '_scene3d'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         cam = self._get_camera()
         if cam is None:
             return 0.0
@@ -120,8 +112,6 @@ class Camera(PVIObject, ISlideComponent, IPresentationComponent, ICamera):
 
     @field_of_view_angle.setter
     def field_of_view_angle(self, value: float):
-        if not hasattr(self, '_scene3d'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         cam = self._ensure_camera()
         cam.set('fov', str(int(round(value * ROTATION_UNIT))))
         self._save()
@@ -129,8 +119,6 @@ class Camera(PVIObject, ISlideComponent, IPresentationComponent, ICamera):
     @property
     def zoom(self) -> float:
         """Camera zoom (positive value in percentage). Read/write."""
-        if not hasattr(self, '_scene3d'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         cam = self._get_camera()
         if cam is None:
             return 100.0
@@ -141,15 +129,11 @@ class Camera(PVIObject, ISlideComponent, IPresentationComponent, ICamera):
 
     @zoom.setter
     def zoom(self, value: float):
-        if not hasattr(self, '_scene3d'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         cam = self._ensure_camera()
         cam.set('zoom', str(int(round(value * 1000))))
         self._save()
 
     def set_rotation(self, latitude, longitude, revolution) -> None:
-        if not hasattr(self, '_scene3d'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         cam = self._ensure_camera()
         rot = cam.find(Elements.A_ROT)
         if rot is None:
@@ -160,8 +144,6 @@ class Camera(PVIObject, ISlideComponent, IPresentationComponent, ICamera):
         self._save()
 
     def get_rotation(self) -> list[float]:
-        if not hasattr(self, '_scene3d'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         cam = self._get_camera()
         if cam is None:
             return [0.0, 0.0, 0.0]

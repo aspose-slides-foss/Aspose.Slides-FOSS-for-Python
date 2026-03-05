@@ -8,7 +8,6 @@ from ._internal.pptx.constants import NS, Attributes
 
 if TYPE_CHECKING:
     from .IBaseSlide import IBaseSlide
-    from .effects.IImageTransformOperationCollection import IImageTransformOperationCollection
     from .IPPImage import IPPImage
     from .IPresentation import IPresentation
     from ._internal.pptx.slide_part import SlidePart
@@ -37,27 +36,23 @@ class Picture(ISlidesPicture, ISlideComponent, IPresentationComponent):
     @property
     def image(self) -> IPPImage:
         """Returns or sets the embedded image. Read/write ."""
-        if not hasattr(self, '_blip'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         embed_id = self._blip.get(Attributes.R_EMBED)
         if embed_id is None:
             return None
         # Resolve relationship to part name
         rel = self._slide_part._rels_manager.get_relationship(embed_id)
         if rel is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+            return None
         part_name = self._slide_part._resolve_target(rel.target)
         # Find the PPImage in the presentation's images collection
         presentation = self._parent_slide.presentation
         for pp_image in presentation.images:
             if hasattr(pp_image, '_part_name') and pp_image._part_name == part_name:
                 return pp_image
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
     @image.setter
     def image(self, value: IPPImage):
-        if not hasattr(self, '_blip'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         # value should be a PPImage with a _part_name
         if not hasattr(value, '_part_name'):
             raise ValueError("Image must be a PPImage from the presentation's image collection")
@@ -71,8 +66,6 @@ class Picture(ISlidesPicture, ISlideComponent, IPresentationComponent):
     @property
     def link_path_long(self) -> str:
         """Returns of sets linked image's URL. Read/write ."""
-        if not hasattr(self, '_blip'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         link_id = self._blip.get(f'{NS.R}link')
         if link_id is None:
             return ''
@@ -83,8 +76,6 @@ class Picture(ISlidesPicture, ISlideComponent, IPresentationComponent):
 
     @link_path_long.setter
     def link_path_long(self, value: str):
-        if not hasattr(self, '_blip'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ._internal.opc.relationships import REL_TYPES
         existing_link_id = self._blip.get(f'{NS.R}link')
         if existing_link_id:
@@ -103,15 +94,11 @@ class Picture(ISlidesPicture, ISlideComponent, IPresentationComponent):
     @property
     def presentation(self) -> IPresentation:
         """Returns the presentation. Read-only ."""
-        if not hasattr(self, '_parent_slide'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self._parent_slide.presentation
 
     @property
     def slide(self) -> IBaseSlide:
         """Returns the parent slide of a picture. Read-only ."""
-        if not hasattr(self, '_parent_slide'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self._parent_slide
 
     @property

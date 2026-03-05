@@ -7,7 +7,6 @@ from .._internal.pptx.constants import EMU_PER_POINT
 
 if TYPE_CHECKING:
     from ..IColorFormat import IColorFormat
-    from .IPresetShadowEffectiveData import IPresetShadowEffectiveData
     from ..PresetShadowType import PresetShadowType
     from .._internal.pptx.slide_part import SlidePart
 
@@ -52,8 +51,6 @@ class PresetShadow(IPresetShadow, IImageTransformOperation):
     @property
     def direction(self) -> float:
         """Direction of shadow. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('dir')
         if val is None:
             return 0.0
@@ -61,16 +58,12 @@ class PresetShadow(IPresetShadow, IImageTransformOperation):
 
     @direction.setter
     def direction(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('dir', str(int(round(value * 60000))))
         self._save()
 
     @property
     def distance(self) -> float:
         """Distance of shadow. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('dist')
         if val is None:
             return 0.0
@@ -78,16 +71,12 @@ class PresetShadow(IPresetShadow, IImageTransformOperation):
 
     @distance.setter
     def distance(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('dist', str(int(round(value * EMU_PER_POINT))))
         self._save()
 
     @property
     def shadow_color(self) -> IColorFormat:
         """Color of shadow. Read-only ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ..ColorFormat import ColorFormat
         cf = ColorFormat()
         cf._init_internal(self._element, self._slide_part, self._parent_slide)
@@ -96,8 +85,6 @@ class PresetShadow(IPresetShadow, IImageTransformOperation):
     @property
     def preset(self) -> PresetShadowType:
         """Preset. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ..PresetShadowType import PresetShadowType
         val = self._element.get('prst')
         if val is None:
@@ -109,8 +96,6 @@ class PresetShadow(IPresetShadow, IImageTransformOperation):
 
     @preset.setter
     def preset(self, value: PresetShadowType):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         ooxml_val = _PRST_MAP_REV.get(value.name)
         if ooxml_val:
             self._element.set('prst', ooxml_val)

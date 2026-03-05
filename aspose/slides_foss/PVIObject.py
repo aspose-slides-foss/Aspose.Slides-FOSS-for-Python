@@ -18,10 +18,10 @@ class PVIObject(ISlideComponent, IPresentationComponent):
     def slide(self) -> IBaseSlide:
         if hasattr(self, '_parent_slide') and self._parent_slide is not None:
             return self._parent_slide
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
     @property
     def presentation(self) -> IPresentation:
         if hasattr(self, '_parent_slide') and self._parent_slide is not None:
             return self._parent_slide.presentation
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None

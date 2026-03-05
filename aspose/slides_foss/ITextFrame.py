@@ -6,7 +6,6 @@ from .IPresentationComponent import IPresentationComponent
 
 if TYPE_CHECKING:
     from .ICell import ICell
-    from .IHyperlinkQueries import IHyperlinkQueries
     from .IParagraphCollection import IParagraphCollection
     from .IShape import IShape
     from .ITextFrameFormat import ITextFrameFormat

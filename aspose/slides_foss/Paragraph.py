@@ -46,8 +46,8 @@ class Paragraph(IParagraph, ISlideComponent, IPresentationComponent):
     @property
     def paragraph_format(self) -> IParagraphFormat:
         """Returns the formatting object for this paragraph. Read-only ."""
-        if not hasattr(self, '_p_element') or self._p_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._p_element is None:
+            return None
         from ._internal.pptx.constants import Elements
         from .ParagraphFormat import ParagraphFormat
         ppr = self._p_element.find(Elements.A_P_PR)
@@ -63,7 +63,7 @@ class Paragraph(IParagraph, ISlideComponent, IPresentationComponent):
     @property
     def text(self) -> str:
         """Gets or sets the the plain text of a paragraph. Read/write ."""
-        if not hasattr(self, '_p_element') or self._p_element is None:
+        if self._p_element is None:
             return ''
         from ._internal.pptx.constants import Elements
         parts = []
@@ -75,7 +75,7 @@ class Paragraph(IParagraph, ISlideComponent, IPresentationComponent):
 
     @text.setter
     def text(self, value: str):
-        if not hasattr(self, '_p_element') or self._p_element is None:
+        if self._p_element is None:
             return
         import lxml.etree as ET
         from ._internal.pptx.constants import Elements
@@ -103,7 +103,7 @@ class Paragraph(IParagraph, ISlideComponent, IPresentationComponent):
     def slide(self) -> IBaseSlide:
         if hasattr(self, '_parent_slide') and self._parent_slide is not None:
             return self._parent_slide
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
     @property
     def as_i_presentation_component(self) -> IPresentationComponent:
@@ -113,7 +113,7 @@ class Paragraph(IParagraph, ISlideComponent, IPresentationComponent):
     def presentation(self) -> IPresentation:
         if hasattr(self, '_parent_slide') and self._parent_slide is not None:
             return self._parent_slide.presentation
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
 
 

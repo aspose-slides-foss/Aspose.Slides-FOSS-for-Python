@@ -3,8 +3,6 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .ITextFrameFormatEffectiveData import ITextFrameFormatEffectiveData
-    from .ITextStyle import ITextStyle
     from .IThreeDFormat import IThreeDFormat
     from .NullableBool import NullableBool
     from .TextAnchorType import TextAnchorType

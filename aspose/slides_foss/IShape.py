@@ -6,15 +6,10 @@ from .IPresentationComponent import IPresentationComponent
 from .IHyperlinkContainer import IHyperlinkContainer
 
 if TYPE_CHECKING:
-    from .BlackWhiteMode import BlackWhiteMode
-    from .IBaseShapeLock import IBaseShapeLock
-    from .ICustomData import ICustomData
     from .IEffectFormat import IEffectFormat
     from .IFillFormat import IFillFormat
-    from .IGroupShape import IGroupShape
     from .IImage import IImage
     from .ILineFormat import ILineFormat
-    from .IPlaceholder import IPlaceholder
     from .IShapeFrame import IShapeFrame
     from .IThreeDFormat import IThreeDFormat
 

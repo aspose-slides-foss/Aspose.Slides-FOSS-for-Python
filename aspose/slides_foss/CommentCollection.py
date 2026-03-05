@@ -5,7 +5,6 @@ from .ICommentCollection import ICommentCollection
 if TYPE_CHECKING:
     from .Comment import Comment
     from .IComment import IComment
-    from .IModernComment import IModernComment
     from .ISlide import ISlide
     from ._internal.pptx.comments_part import CommentsPart
     from ._internal.pptx.comment_authors_part import CommentAuthorsPart, AuthorData

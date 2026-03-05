@@ -6,7 +6,6 @@ from .IRow import IRow
 if TYPE_CHECKING:
     from .IBulkTextFormattable import IBulkTextFormattable
     from .ICellCollection import ICellCollection
-    from .IRowFormat import IRowFormat
 
 class Row(CellCollection, IRow):
     """Represents a row in a table."""
@@ -78,7 +77,7 @@ class Row(CellCollection, IRow):
 
     def set_text_format(self, *args, **kwargs) -> None:
         if len(args) < 1:
-            raise NotImplementedError("This feature is not yet available in this version.")
+            raise ValueError("set_text_format requires at least 1 argument")
         source = args[0]
         from ._internal.pptx.bulk_text_format import apply_text_format
         apply_text_format(list(self), source, self._slide_part)

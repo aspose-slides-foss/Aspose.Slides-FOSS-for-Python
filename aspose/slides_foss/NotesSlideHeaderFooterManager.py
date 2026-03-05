@@ -5,9 +5,6 @@ from .INotesSlideHeaderFooterManager import INotesSlideHeaderFooterManager
 
 if TYPE_CHECKING:
     from ._internal.pptx.notes_slide_part import NotesSlidePart
-    from .IBaseHandoutNotesSlideHeaderFooterManag import IBaseHandoutNotesSlideHeaderFooterManag
-    from .IBaseSlideHeaderFooterManager import IBaseSlideHeaderFooterManager
-    from .IBaseHeaderFooterManager import IBaseHeaderFooterManager
 
 
 class NotesSlideHeaderFooterManager(BaseHandoutNotesSlideHeaderFooterManager, INotesSlideHeaderFooterManager):

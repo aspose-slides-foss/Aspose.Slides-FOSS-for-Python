@@ -5,9 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .FontAlignment import FontAlignment
     from .IBulletFormat import IBulletFormat
-    from .IParagraphFormatEffectiveData import IParagraphFormatEffectiveData
     from .IPortionFormat import IPortionFormat
-    from .ITabCollection import ITabCollection
     from .NullableBool import NullableBool
     from .TextAlignment import TextAlignment
 

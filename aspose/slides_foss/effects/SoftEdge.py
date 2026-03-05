@@ -6,7 +6,6 @@ from .IImageTransformOperation import IImageTransformOperation
 from .._internal.pptx.constants import EMU_PER_POINT
 
 if TYPE_CHECKING:
-    from .ISoftEdgeEffectiveData import ISoftEdgeEffectiveData
     from .._internal.pptx.slide_part import SlidePart
 
 class SoftEdge(ISoftEdge, IImageTransformOperation):
@@ -24,8 +23,6 @@ class SoftEdge(ISoftEdge, IImageTransformOperation):
     @property
     def radius(self) -> float:
         """Specifies the radius of blur to apply to the edges. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('rad')
         if val is None:
             return 0.0
@@ -33,8 +30,6 @@ class SoftEdge(ISoftEdge, IImageTransformOperation):
 
     @radius.setter
     def radius(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('rad', str(int(round(value * EMU_PER_POINT))))
         self._save()
 

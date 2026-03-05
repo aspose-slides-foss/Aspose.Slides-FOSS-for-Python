@@ -11,7 +11,6 @@ from .ParagraphFormat import _ppr_insert_child
 
 if TYPE_CHECKING:
     from .BulletType import BulletType
-    from .IBulletFormatEffectiveData import IBulletFormatEffectiveData
     from .IColorFormat import IColorFormat
     from .IFontData import IFontData
     from .ISlidesPicture import ISlidesPicture
@@ -99,7 +98,7 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
     def type(self) -> BulletType:
         """Returns or sets the bullet type of a paragraph with no inheritance. Read/write ."""
         from .BulletType import BulletType
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return BulletType.NOT_DEFINED
         if self._ppr_element.find(Elements.A_BU_NONE) is not None:
             return BulletType.NONE
@@ -114,7 +113,7 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
     @type.setter
     def type(self, value: BulletType):
         from .BulletType import BulletType
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return
         self._remove_bullet_type_elements()
         if value == BulletType.NONE:
@@ -132,7 +131,7 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
     @property
     def char(self) -> str:
         """Returns or sets the bullet char of a paragraph with no inheritance. Read/write ."""
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return ''
         el = self._ppr_element.find(Elements.A_BU_CHAR)
         if el is None:
@@ -141,7 +140,7 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
 
     @char.setter
     def char(self, value: str):
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return
         el = self._ppr_element.find(Elements.A_BU_CHAR)
         if el is None:
@@ -155,7 +154,7 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
     @property
     def font(self) -> IFontData:
         """Returns or sets the bullet font of a paragraph with no inheritance. Read/write ."""
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return None
         el = self._ppr_element.find(Elements.A_BU_FONT)
         if el is None:
@@ -168,7 +167,7 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
 
     @font.setter
     def font(self, value: IFontData):
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return
         el = self._ppr_element.find(Elements.A_BU_FONT)
         if value is None:
@@ -185,7 +184,7 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
     @property
     def height(self) -> float:
         """Returns or sets the bullet height of a paragraph with no inheritance. Value float.NaN determines that bullet inherits height from the first portion in the paragraph. Read/write ."""
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return float('nan')
         pct = self._ppr_element.find(Elements.A_BU_SZ_PCT)
         if pct is not None:
@@ -201,7 +200,7 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
 
     @height.setter
     def height(self, value: float):
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return
         # Remove existing size elements
         for tag in (Elements.A_BU_SZ_PCT, Elements.A_BU_SZ_PTS, Elements.A_BU_SZ_TX):
@@ -219,8 +218,8 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
     @property
     def color(self) -> IColorFormat:
         """Returns the color format of a bullet of a paragraph with no inheritance. Read-only ."""
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._ppr_element is None:
+            return None
         bu_clr = self._ppr_element.find(Elements.A_BU_CLR)
         if bu_clr is None:
             bu_clr = _ppr_insert_child(self._ppr_element, Elements.A_BU_CLR)
@@ -234,7 +233,7 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
     @property
     def numbered_bullet_start_with(self) -> int:
         """Returns or sets the first number which is used for group of numbered bullets with no inheritance. Read/write ."""
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return 1
         el = self._ppr_element.find(Elements.A_BU_AUTO_NUM)
         if el is None:
@@ -246,7 +245,7 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
 
     @numbered_bullet_start_with.setter
     def numbered_bullet_start_with(self, value: int):
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return
         el = self._ppr_element.find(Elements.A_BU_AUTO_NUM)
         if el is None:
@@ -266,7 +265,7 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
     def numbered_bullet_style(self) -> NumberedBulletStyle:
         """Returns or sets the style of a numbered bullet with no inheritance. Read/write ."""
         from .NumberedBulletStyle import NumberedBulletStyle
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return NumberedBulletStyle.NOT_DEFINED
         el = self._ppr_element.find(Elements.A_BU_AUTO_NUM)
         if el is None:
@@ -280,7 +279,7 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
     @numbered_bullet_style.setter
     def numbered_bullet_style(self, value: NumberedBulletStyle):
         from .NumberedBulletStyle import NumberedBulletStyle
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return
         el = self._ppr_element.find(Elements.A_BU_AUTO_NUM)
         if value == NumberedBulletStyle.NOT_DEFINED:
@@ -301,7 +300,7 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
     def is_bullet_hard_color(self) -> NullableBool:
         """Determines whether the bullet has own color or inherits it from the first portion in the paragraph. NullableBool.True if bullet has own color and NullableBool.False if bullet inherits color from the first portion in the paragraph. Read/write ."""
         from .NullableBool import NullableBool
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return NullableBool.NOT_DEFINED
         if self._ppr_element.find(Elements.A_BU_CLR) is not None:
             return NullableBool.TRUE
@@ -312,7 +311,7 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
     @is_bullet_hard_color.setter
     def is_bullet_hard_color(self, value: NullableBool):
         from .NullableBool import NullableBool
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return
         if value == NullableBool.TRUE:
             # Remove buClrTx; keep existing buClr (preserves color data)
@@ -340,7 +339,7 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
     def is_bullet_hard_font(self) -> NullableBool:
         """Determines whether the bullet has own font or inherits it from the first portion in the paragraph. NullableBool.True if bullet has own font and NullableBool.False if bullet inherits font from the first portion in the paragraph. Read/write ."""
         from .NullableBool import NullableBool
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return NullableBool.NOT_DEFINED
         if self._ppr_element.find(Elements.A_BU_FONT) is not None:
             return NullableBool.TRUE
@@ -351,7 +350,7 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
     @is_bullet_hard_font.setter
     def is_bullet_hard_font(self, value: NullableBool):
         from .NullableBool import NullableBool
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
+        if self._ppr_element is None:
             return
         if value == NullableBool.TRUE:
             # Remove buFontTx; keep existing buFont (preserves font data)
@@ -378,8 +377,8 @@ class BulletFormat(PVIObject, ISlideComponent, IPresentationComponent, IBulletFo
     @property
     def picture(self) -> ISlidesPicture:
         """Returns the picture used as a bullet in a paragraph with no inheritance. Read-only ."""
-        if not hasattr(self, '_ppr_element') or self._ppr_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._ppr_element is None:
+            return None
         bu_blip = self._ppr_element.find(Elements.A_BU_BLIP)
         if bu_blip is None:
             bu_blip = _ppr_insert_child(self._ppr_element, Elements.A_BU_BLIP)

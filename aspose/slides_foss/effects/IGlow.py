@@ -5,7 +5,6 @@ from .IImageTransformOperation import IImageTransformOperation
 
 if TYPE_CHECKING:
     from ..IColorFormat import IColorFormat
-    from .IGlowEffectiveData import IGlowEffectiveData
 
 class IGlow(IImageTransformOperation, ABC):
     """Represents a Glow effect, in which a color blurred outline is added outside the edges of the object."""

@@ -7,7 +7,6 @@ from .._internal.pptx.constants import EMU_PER_POINT
 
 if TYPE_CHECKING:
     from ..IColorFormat import IColorFormat
-    from .IOuterShadowEffectiveData import IOuterShadowEffectiveData
     from ..RectangleAlignment import RectangleAlignment
     from .._internal.pptx.slide_part import SlidePart
 
@@ -35,8 +34,6 @@ class OuterShadow(IOuterShadow, IImageTransformOperation):
     @property
     def blur_radius(self) -> float:
         """Blur radius, in points. Default value – 0 pt. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('blurRad')
         if val is None:
             return 0.0
@@ -44,16 +41,12 @@ class OuterShadow(IOuterShadow, IImageTransformOperation):
 
     @blur_radius.setter
     def blur_radius(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('blurRad', str(int(round(value * EMU_PER_POINT))))
         self._save()
 
     @property
     def direction(self) -> float:
         """Direction of the shadow, in degrees. Default value – 0 ° (left-to-right). Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('dir')
         if val is None:
             return 0.0
@@ -61,16 +54,12 @@ class OuterShadow(IOuterShadow, IImageTransformOperation):
 
     @direction.setter
     def direction(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('dir', str(int(round(value * 60000))))
         self._save()
 
     @property
     def distance(self) -> float:
         """Distance of the shadow from the object, in points. Default value – 0 pt. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('dist')
         if val is None:
             return 0.0
@@ -78,16 +67,12 @@ class OuterShadow(IOuterShadow, IImageTransformOperation):
 
     @distance.setter
     def distance(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('dist', str(int(round(value * EMU_PER_POINT))))
         self._save()
 
     @property
     def shadow_color(self) -> IColorFormat:
         """Color of the shadow. Default value – automatic black (theme-dependent). Read-only ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ..ColorFormat import ColorFormat
         cf = ColorFormat()
         cf._init_internal(self._element, self._slide_part, self._parent_slide)
@@ -96,8 +81,6 @@ class OuterShadow(IOuterShadow, IImageTransformOperation):
     @property
     def rectangle_align(self) -> RectangleAlignment:
         """Rectangle alignment. Default value – . Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ..RectangleAlignment import RectangleAlignment
         val = self._element.get('algn')
         if val is None:
@@ -107,8 +90,6 @@ class OuterShadow(IOuterShadow, IImageTransformOperation):
 
     @rectangle_align.setter
     def rectangle_align(self, value: RectangleAlignment):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ..RectangleAlignment import RectangleAlignment
         if value == RectangleAlignment.NOT_DEFINED:
             if 'algn' in self._element.attrib:
@@ -122,8 +103,6 @@ class OuterShadow(IOuterShadow, IImageTransformOperation):
     @property
     def skew_horizontal(self) -> float:
         """Horizontal skew angle, in degrees. Default value – 0 °. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('kx')
         if val is None:
             return 0.0
@@ -131,16 +110,12 @@ class OuterShadow(IOuterShadow, IImageTransformOperation):
 
     @skew_horizontal.setter
     def skew_horizontal(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('kx', str(int(round(value * 60000))))
         self._save()
 
     @property
     def skew_vertical(self) -> float:
         """Vertical skew angle, in degrees. Default value – 0 °. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('ky')
         if val is None:
             return 0.0
@@ -148,16 +123,12 @@ class OuterShadow(IOuterShadow, IImageTransformOperation):
 
     @skew_vertical.setter
     def skew_vertical(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('ky', str(int(round(value * 60000))))
         self._save()
 
     @property
     def rotate_shadow_with_shape(self) -> bool:
         """Indicates whether the shadow rotates together with the shape. Default value – true. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('rotWithShape')
         if val is None:
             return True
@@ -165,16 +136,12 @@ class OuterShadow(IOuterShadow, IImageTransformOperation):
 
     @rotate_shadow_with_shape.setter
     def rotate_shadow_with_shape(self, value: bool):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('rotWithShape', '1' if value else '0')
         self._save()
 
     @property
     def scale_horizontal(self) -> float:
         """Horizontal scaling factor, in percent of the original size. Negative scaling causes a flip. Default value – 100 %. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('sx')
         if val is None:
             return 100.0
@@ -182,16 +149,12 @@ class OuterShadow(IOuterShadow, IImageTransformOperation):
 
     @scale_horizontal.setter
     def scale_horizontal(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('sx', str(int(round(value * 1000))))
         self._save()
 
     @property
     def scale_vertical(self) -> float:
         """Vertical scaling factor, in percent of the original size. Negative scaling causes a flip. Default value – 100 %. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('sy')
         if val is None:
             return 100.0
@@ -199,8 +162,6 @@ class OuterShadow(IOuterShadow, IImageTransformOperation):
 
     @scale_vertical.setter
     def scale_vertical(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('sy', str(int(round(value * 1000))))
         self._save()
 

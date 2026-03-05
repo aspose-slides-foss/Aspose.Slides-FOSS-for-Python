@@ -59,8 +59,6 @@ class PatternFormat(PVIObject, ISlideComponent, IPresentationComponent, IPattern
     @property
     def pattern_style(self) -> PatternStyle:
         """Returns or sets the pattern style. Read/write."""
-        if not hasattr(self, '_patt_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .PatternStyle import PatternStyle
         prst = self._patt_fill.get('prst')
         if prst is None:
@@ -72,8 +70,6 @@ class PatternFormat(PVIObject, ISlideComponent, IPresentationComponent, IPattern
 
     @pattern_style.setter
     def pattern_style(self, value: PatternStyle):
-        if not hasattr(self, '_patt_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .PatternStyle import PatternStyle
         if value in (PatternStyle.NOT_DEFINED, PatternStyle.UNKNOWN):
             if 'prst' in self._patt_fill.attrib:
@@ -87,8 +83,6 @@ class PatternFormat(PVIObject, ISlideComponent, IPresentationComponent, IPattern
     @property
     def fore_color(self) -> IColorFormat:
         """Returns the foreground pattern color. Read-only."""
-        if not hasattr(self, '_patt_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .ColorFormat import ColorFormat
         fg_clr = self._patt_fill.find(Elements.A_FG_CLR)
         if fg_clr is None:
@@ -100,8 +94,6 @@ class PatternFormat(PVIObject, ISlideComponent, IPresentationComponent, IPattern
     @property
     def back_color(self) -> IColorFormat:
         """Returns the background pattern color. Read-only."""
-        if not hasattr(self, '_patt_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .ColorFormat import ColorFormat
         bg_clr = self._patt_fill.find(Elements.A_BG_CLR)
         if bg_clr is None:

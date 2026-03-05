@@ -6,7 +6,6 @@ from .IFillParamSource import IFillParamSource
 if TYPE_CHECKING:
     from .FillType import FillType
     from .IColorFormat import IColorFormat
-    from .IFillFormatEffectiveData import IFillFormatEffectiveData
     from .IGradientFormat import IGradientFormat
     from .IPatternFormat import IPatternFormat
     from .IPictureFillFormat import IPictureFillFormat

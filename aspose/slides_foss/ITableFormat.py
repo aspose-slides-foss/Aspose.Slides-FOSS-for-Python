@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .IFillFormat import IFillFormat
-    from .ITableFormatEffectiveData import ITableFormatEffectiveData
 
 class ITableFormat(ABC):
     """Represents format of a table."""

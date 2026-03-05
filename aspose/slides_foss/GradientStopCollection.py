@@ -28,8 +28,6 @@ class GradientStopCollection(PVIObject, ISlideComponent, IPresentationComponent,
 
     @property
     def as_i_collection(self) -> list:
-        if not hasattr(self, '_gs_lst'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return [self[i] for i in range(len(self))]
 
     @property
@@ -49,8 +47,6 @@ class GradientStopCollection(PVIObject, ISlideComponent, IPresentationComponent,
 
 
     def add(self, *args, **kwargs) -> IGradientStop:
-        if not hasattr(self, '_gs_lst'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .GradientStop import GradientStop as GradientStopClass
         from .ColorFormat import ColorFormat
 
@@ -87,8 +83,6 @@ class GradientStopCollection(PVIObject, ISlideComponent, IPresentationComponent,
 
 
     def insert(self, *args, **kwargs) -> None:
-        if not hasattr(self, '_gs_lst'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .ColorFormat import ColorFormat
 
         index = args[0]
@@ -110,23 +104,17 @@ class GradientStopCollection(PVIObject, ISlideComponent, IPresentationComponent,
         self._save()
 
     def remove_at(self, index) -> None:
-        if not hasattr(self, '_gs_lst'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         gs_elements = self._gs_lst.findall(Elements.A_GS)
         if 0 <= index < len(gs_elements):
             self._gs_lst.remove(gs_elements[index])
             self._save()
 
     def clear(self) -> None:
-        if not hasattr(self, '_gs_lst'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         for gs in list(self._gs_lst.findall(Elements.A_GS)):
             self._gs_lst.remove(gs)
         self._save()
 
     def __getitem__(self, index: int) -> GradientStop:
-        if not hasattr(self, '_gs_lst'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .GradientStop import GradientStop as GradientStopClass
         gs_elements = self._gs_lst.findall(Elements.A_GS)
         if index < 0 or index >= len(gs_elements):

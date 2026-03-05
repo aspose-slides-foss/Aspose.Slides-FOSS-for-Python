@@ -8,7 +8,6 @@ if TYPE_CHECKING:
     from .ICell import ICell
     from .IColumnCollection import IColumnCollection
     from .IGraphicalObject import IGraphicalObject
-    from .IGraphicalObjectLock import IGraphicalObjectLock
     from .IRowCollection import IRowCollection
     from .ITableFormat import ITableFormat
     from .TableStylePreset import TableStylePreset
@@ -48,8 +47,8 @@ class Table(GraphicalObject, ITable):
     @property
     def rows(self) -> IRowCollection:
         """Returns the collectoin of rows. Read-only ."""
-        if not hasattr(self, '_tbl') or self._tbl is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._tbl is None:
+            return None
         from .RowCollection import RowCollection
         rc = RowCollection()
         rc._init_internal(self._tbl, self._slide_part, self._parent_slide, self)
@@ -58,8 +57,8 @@ class Table(GraphicalObject, ITable):
     @property
     def columns(self) -> IColumnCollection:
         """Returns the collectoin of columns. Read-only ."""
-        if not hasattr(self, '_tbl') or self._tbl is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._tbl is None:
+            return None
         from .ColumnCollection import ColumnCollection
         cc = ColumnCollection()
         cc._init_internal(self._tbl, self._tbl_grid, self._slide_part, self._parent_slide, self)
@@ -224,7 +223,7 @@ class Table(GraphicalObject, ITable):
 
     def set_text_format(self, *args, **kwargs) -> None:
         if len(args) < 1:
-            raise NotImplementedError("This feature is not yet available in this version.")
+            raise ValueError("set_text_format requires at least 1 argument")
         source = args[0]
         from ._internal.pptx.bulk_text_format import apply_text_format
         cells = []
@@ -234,8 +233,8 @@ class Table(GraphicalObject, ITable):
         apply_text_format(cells, source, self._slide_part)
 
     def merge_cells(self, cell1, cell2, allow_splitting) -> ICell:
-        if not hasattr(self, '_tbl') or self._tbl is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._tbl is None:
+            return None
 
         r1 = cell1.first_row_index
         c1 = cell1.first_column_index

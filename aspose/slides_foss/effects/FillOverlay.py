@@ -11,7 +11,6 @@ if TYPE_CHECKING:
     from ..FillBlendMode import FillBlendMode
     from ..IBaseSlide import IBaseSlide
     from ..IFillFormat import IFillFormat
-    from .IFillOverlayEffectiveData import IFillOverlayEffectiveData
     from ..IPresentation import IPresentation
     from .._internal.pptx.slide_part import SlidePart
 
@@ -42,8 +41,6 @@ class FillOverlay(ImageTransformOperation, ISlideComponent, IPresentationCompone
     @property
     def fill_format(self) -> IFillFormat:
         """Fill format. Read-only ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ..FillFormat import FillFormat
         ff = FillFormat()
         ff._init_internal(self._element, self._slide_part, self._parent_slide)
@@ -52,8 +49,6 @@ class FillOverlay(ImageTransformOperation, ISlideComponent, IPresentationCompone
     @property
     def blend(self) -> FillBlendMode:
         """FillBlendMode. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ..FillBlendMode import FillBlendMode
         val = self._element.get('blend')
         if val is None:
@@ -63,8 +58,6 @@ class FillOverlay(ImageTransformOperation, ISlideComponent, IPresentationCompone
 
     @blend.setter
     def blend(self, value: FillBlendMode):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         ooxml_val = _BLEND_MAP_REV.get(value.name)
         if ooxml_val:
             self._element.set('blend', ooxml_val)
@@ -72,9 +65,7 @@ class FillOverlay(ImageTransformOperation, ISlideComponent, IPresentationCompone
 
     @property
     def slide(self) -> IBaseSlide:
-        if hasattr(self, '_parent_slide'):
-            return self._parent_slide
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return getattr(self, '_parent_slide', None)
 
 
     @property

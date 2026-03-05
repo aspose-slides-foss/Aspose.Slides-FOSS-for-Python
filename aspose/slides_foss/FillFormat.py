@@ -11,7 +11,6 @@ from ._internal.pptx.constants import NS, Elements
 if TYPE_CHECKING:
     from .FillType import FillType
     from .IColorFormat import IColorFormat
-    from .IFillFormatEffectiveData import IFillFormatEffectiveData
     from .IGradientFormat import IGradientFormat
     from .IPatternFormat import IPatternFormat
     from .IPictureFillFormat import IPictureFillFormat
@@ -44,8 +43,6 @@ class FillFormat(PVIObject, ISlideComponent, IPresentationComponent, IFillFormat
 
     def _find_fill_element(self) -> ET._Element | None:
         """Find the first fill child element in the parent."""
-        if not hasattr(self, '_parent_element'):
-            return None
         for child in self._parent_element:
             if child.tag in _FILL_TAGS:
                 return child
@@ -85,8 +82,6 @@ class FillFormat(PVIObject, ISlideComponent, IPresentationComponent, IFillFormat
     @property
     def fill_type(self) -> FillType:
         """Returns or sets the type of filling. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .FillType import FillType
         el = self._find_fill_element()
         if el is None:
@@ -108,8 +103,6 @@ class FillFormat(PVIObject, ISlideComponent, IPresentationComponent, IFillFormat
 
     @fill_type.setter
     def fill_type(self, value: FillType):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .FillType import FillType
         tag_map = {
             FillType.NO_FILL: Elements.A_NO_FILL,
@@ -157,8 +150,6 @@ class FillFormat(PVIObject, ISlideComponent, IPresentationComponent, IFillFormat
     @property
     def solid_fill_color(self) -> IColorFormat:
         """Returns the fill color. Read-only."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .ColorFormat import ColorFormat
         solid_fill = self._get_or_create_fill(Elements.A_SOLID_FILL)
         cf = ColorFormat()
@@ -168,8 +159,6 @@ class FillFormat(PVIObject, ISlideComponent, IPresentationComponent, IFillFormat
     @property
     def gradient_format(self) -> IGradientFormat:
         """Returns the gradient fill format. Read-only."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .GradientFormat import GradientFormat
         grad_fill = self._find_fill_element()
         if grad_fill is None or grad_fill.tag != Elements.A_GRAD_FILL:
@@ -181,8 +170,6 @@ class FillFormat(PVIObject, ISlideComponent, IPresentationComponent, IFillFormat
     @property
     def pattern_format(self) -> IPatternFormat:
         """Returns the pattern fill format. Read-only."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .PatternFormat import PatternFormat
         patt_fill = self._find_fill_element()
         if patt_fill is None or patt_fill.tag != Elements.A_PATT_FILL:
@@ -194,8 +181,6 @@ class FillFormat(PVIObject, ISlideComponent, IPresentationComponent, IFillFormat
     @property
     def picture_fill_format(self) -> IPictureFillFormat:
         """Returns the picture fill format. Read-only."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .PictureFillFormat import PictureFillFormat
         blip_fill = self._find_fill_element()
         if blip_fill is None or blip_fill.tag != Elements.A_BLIP_FILL:
@@ -207,8 +192,6 @@ class FillFormat(PVIObject, ISlideComponent, IPresentationComponent, IFillFormat
     @property
     def rotate_with_shape(self) -> NullableBool:
         """Determines whether the fill should be rotated with shape. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .NullableBool import NullableBool
         el = self._find_fill_element()
         if el is None:
@@ -220,8 +203,6 @@ class FillFormat(PVIObject, ISlideComponent, IPresentationComponent, IFillFormat
 
     @rotate_with_shape.setter
     def rotate_with_shape(self, value: NullableBool):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .NullableBool import NullableBool
         el = self._find_fill_element()
         if el is None:

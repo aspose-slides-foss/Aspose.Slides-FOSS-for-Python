@@ -123,7 +123,7 @@ author.comments.add_comment("Review this", slide, PointF(2.0, 2.0), datetime.now
 ```python
 prs.document_properties.title = "Quarterly Report"
 prs.document_properties.author = "Finance Team"
-prs.document_properties.add_custom_property("Version", 3)
+prs.document_properties.set_custom_property_value("Version", 3)
 ```
 
 ### Slide operations

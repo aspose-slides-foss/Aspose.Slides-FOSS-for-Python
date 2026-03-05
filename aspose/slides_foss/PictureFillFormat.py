@@ -73,8 +73,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def dpi(self) -> int:
         """Returns or sets the dpi which is used to fill a picture. Read/write ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return getattr(self, '_dpi', -1)
 
     @dpi.setter
@@ -84,8 +82,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def picture_fill_mode(self) -> PictureFillMode:
         """Returns or sets the picture fill mode. Read/write ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .PictureFillMode import PictureFillMode
         tile = self._blip_fill.find(f'{NS.A}tile')
         if tile is not None:
@@ -94,8 +90,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
 
     @picture_fill_mode.setter
     def picture_fill_mode(self, value: PictureFillMode):
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .PictureFillMode import PictureFillMode
         if value == PictureFillMode.TILE:
             # Remove stretch, add tile
@@ -116,12 +110,10 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def picture(self) -> ISlidesPicture:
         """Returns the picture. Read-only ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .Picture import Picture
         blip = self._get_blip()
         if blip is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+            return None
         pic = Picture()
         pic._init_internal(blip, self._slide_part, self._parent_slide)
         return pic
@@ -142,8 +134,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def crop_left(self) -> float:
         """Returns or sets the number of percents of real image width that are cropped off the left of the picture. Read/write ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self._get_crop_value('l')
 
     @crop_left.setter
@@ -153,8 +143,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def crop_top(self) -> float:
         """Returns or sets the number of percents of real image height that are cropped off the top of the picture. Read/write ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self._get_crop_value('t')
 
     @crop_top.setter
@@ -164,8 +152,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def crop_right(self) -> float:
         """Returns or sets the number of percents of real image width that are cropped off the right of the picture. Read/write ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self._get_crop_value('r')
 
     @crop_right.setter
@@ -175,8 +161,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def crop_bottom(self) -> float:
         """Returns or sets the number of percents of real image height that are cropped off the bottom of the picture. Read/write ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self._get_crop_value('b')
 
     @crop_bottom.setter
@@ -202,8 +186,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def stretch_offset_left(self) -> float:
         """Returns or sets left edge of the fill rectangle that is defined by a percentage offset from the left edge of the shape's bounding box. A positive percentage specifies an inset, while a negative percentage specifies an outset. Read/write ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self._get_stretch_offset('l')
 
     @stretch_offset_left.setter
@@ -213,8 +195,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def stretch_offset_top(self) -> float:
         """Returns or sets top edge of the fill rectangle that is defined by a percentage offset from the top edge of the shape's bounding box. A positive percentage specifies an inset, while a negative percentage specifies an outset. Read/write ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self._get_stretch_offset('t')
 
     @stretch_offset_top.setter
@@ -224,8 +204,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def stretch_offset_right(self) -> float:
         """Returns or sets right edge of the fill rectangle that is defined by a percentage offset from the right edge of the shape's bounding box. A positive percentage specifies an inset, while a negative percentage specifies an outset. Read/write ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self._get_stretch_offset('r')
 
     @stretch_offset_right.setter
@@ -235,8 +213,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def stretch_offset_bottom(self) -> float:
         """Returns or sets bottom edge of the fill rectangle that is defined by a percentage offset from the bottom edge of the shape's bounding box. A positive percentage specifies an inset, while a negative percentage specifies an outset. Read/write ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self._get_stretch_offset('b')
 
     @stretch_offset_bottom.setter
@@ -245,8 +221,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
 
     def _get_tile(self) -> ET._Element | None:
         """Get the a:tile element."""
-        if not hasattr(self, '_blip_fill'):
-            return None
         return self._blip_fill.find(f'{NS.A}tile')
 
     def _ensure_tile(self) -> ET._Element:
@@ -267,8 +241,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def tile_offset_x(self) -> float:
         """Returns or sets the horizontal offset of the texture from the shape's origin in points. A positive value moves the texture to the right, while a negative value moves it to the left. Read/write ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         tile = self._get_tile()
         if tile is None:
             return 0.0
@@ -277,8 +249,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
 
     @tile_offset_x.setter
     def tile_offset_x(self, value: float):
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         tile = self._ensure_tile()
         tile.set('tx', str(int(round(value * EMU_PER_POINT))))
         self._save()
@@ -286,8 +256,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def tile_offset_y(self) -> float:
         """Returns or sets the vertical offset of the texture from the shape's origin in points. A positive value moves the texture down, while a negative value moves it up. Read/write ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         tile = self._get_tile()
         if tile is None:
             return 0.0
@@ -296,8 +264,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
 
     @tile_offset_y.setter
     def tile_offset_y(self, value: float):
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         tile = self._ensure_tile()
         tile.set('ty', str(int(round(value * EMU_PER_POINT))))
         self._save()
@@ -305,8 +271,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def tile_scale_x(self) -> float:
         """Returns or sets the horizontal scale for the texture fill as a percentage. Read/write ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         tile = self._get_tile()
         if tile is None:
             return 100.0
@@ -315,8 +279,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
 
     @tile_scale_x.setter
     def tile_scale_x(self, value: float):
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         tile = self._ensure_tile()
         tile.set('sx', str(int(round(value * 1000))))
         self._save()
@@ -324,8 +286,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def tile_scale_y(self) -> float:
         """Returns or sets the vertical scale for the texture fill as a percentage. Read/write ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         tile = self._get_tile()
         if tile is None:
             return 100.0
@@ -334,8 +294,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
 
     @tile_scale_y.setter
     def tile_scale_y(self, value: float):
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         tile = self._ensure_tile()
         tile.set('sy', str(int(round(value * 1000))))
         self._save()
@@ -343,8 +301,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def tile_alignment(self) -> RectangleAlignment:
         """Returns or sets how the texture is aligned within the shape. This setting controls the starting point of the texture pattern and how it repeats across the shape. Read/write ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .RectangleAlignment import RectangleAlignment
         tile = self._get_tile()
         if tile is None:
@@ -357,8 +313,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
 
     @tile_alignment.setter
     def tile_alignment(self, value: RectangleAlignment):
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .RectangleAlignment import RectangleAlignment
         tile = self._ensure_tile()
         if value == RectangleAlignment.NOT_DEFINED:
@@ -373,8 +327,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
     @property
     def tile_flip(self) -> TileFlip:
         """Flips the texture tile around its horizontal, vertical or both axis. Read/write ."""
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .TileFlip import TileFlip
         tile = self._get_tile()
         if tile is None:
@@ -387,8 +339,6 @@ class PictureFillFormat(PVIObject, ISlideComponent, IPresentationComponent, IPic
 
     @tile_flip.setter
     def tile_flip(self, value: TileFlip):
-        if not hasattr(self, '_blip_fill'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .TileFlip import TileFlip
         tile = self._ensure_tile()
         if value == TileFlip.NOT_DEFINED:

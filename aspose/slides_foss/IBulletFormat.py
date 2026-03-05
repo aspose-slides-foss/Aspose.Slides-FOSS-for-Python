@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .BulletType import BulletType
-    from .IBulletFormatEffectiveData import IBulletFormatEffectiveData
     from .IColorFormat import IColorFormat
     from .IFontData import IFontData
     from .ISlidesPicture import ISlidesPicture

@@ -6,7 +6,6 @@ from .IImageTransformOperation import IImageTransformOperation
 if TYPE_CHECKING:
     from ..FillBlendMode import FillBlendMode
     from ..IFillFormat import IFillFormat
-    from .IFillOverlayEffectiveData import IFillOverlayEffectiveData
 
 class IFillOverlay(IImageTransformOperation, ABC):
     """Represents a Fill Overlay effect. A fill overlay may be used to specify an additional fill for an object and blend the two fills together."""

@@ -8,7 +8,6 @@ if TYPE_CHECKING:
     from .IColorFormat import IColorFormat
     from .ILightRig import ILightRig
     from .IShapeBevel import IShapeBevel
-    from .IThreeDFormatEffectiveData import IThreeDFormatEffectiveData
     from .MaterialPresetType import MaterialPresetType
 
 class IThreeDFormat(IThreeDParamSource, ABC):

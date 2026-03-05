@@ -4,11 +4,7 @@ from .BaseSlide import BaseSlide
 from .ILayoutSlide import ILayoutSlide
 
 if TYPE_CHECKING:
-    from .IDrawingGuidesCollection import IDrawingGuidesCollection
-    from .ILayoutPlaceholderManager import ILayoutPlaceholderManager
-    from .ILayoutSlideHeaderFooterManager import ILayoutSlideHeaderFooterManager
     from .IMasterSlide import IMasterSlide
-    from .theme.IOverrideThemeManager import IOverrideThemeManager
     from .ISlide import ISlide
     from .SlideLayoutType import SlideLayoutType
     from ._internal.pptx.layout_slide_part import LayoutSlidePart
@@ -50,7 +46,7 @@ class LayoutSlide(BaseSlide, ILayoutSlide):
                     self._master_slide_cache = self._master_resolver(master_part_name)
             if self._master_slide_cache is not None:
                 return self._master_slide_cache
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
 
 
@@ -64,7 +60,7 @@ class LayoutSlide(BaseSlide, ILayoutSlide):
                 return SLT(type_value)
             except ValueError:
                 return SLT.CUSTOM
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
 
 

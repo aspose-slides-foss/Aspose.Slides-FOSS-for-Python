@@ -36,8 +36,6 @@ class ShapeBevel(PVIObject, ISlideComponent, IPresentationComponent, IShapeBevel
     @property
     def width(self) -> float:
         """Bevel width. Read/write."""
-        if not hasattr(self, '_bevel_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._bevel_element.get('w')
         if val is None:
             return 0.0
@@ -45,16 +43,12 @@ class ShapeBevel(PVIObject, ISlideComponent, IPresentationComponent, IShapeBevel
 
     @width.setter
     def width(self, value: float):
-        if not hasattr(self, '_bevel_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._bevel_element.set('w', str(int(round(value * EMU_PER_POINT))))
         self._save()
 
     @property
     def height(self) -> float:
         """Bevel height. Read/write."""
-        if not hasattr(self, '_bevel_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._bevel_element.get('h')
         if val is None:
             return 0.0
@@ -62,16 +56,12 @@ class ShapeBevel(PVIObject, ISlideComponent, IPresentationComponent, IShapeBevel
 
     @height.setter
     def height(self, value: float):
-        if not hasattr(self, '_bevel_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._bevel_element.set('h', str(int(round(value * EMU_PER_POINT))))
         self._save()
 
     @property
     def bevel_type(self) -> BevelPresetType:
         """Bevel type. Read/write."""
-        if not hasattr(self, '_bevel_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .BevelPresetType import BevelPresetType
         val = self._bevel_element.get('prst')
         if val is None:
@@ -81,8 +71,6 @@ class ShapeBevel(PVIObject, ISlideComponent, IPresentationComponent, IShapeBevel
 
     @bevel_type.setter
     def bevel_type(self, value: BevelPresetType):
-        if not hasattr(self, '_bevel_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .BevelPresetType import BevelPresetType
         if value == BevelPresetType.NOT_DEFINED:
             if 'prst' in self._bevel_element.attrib:

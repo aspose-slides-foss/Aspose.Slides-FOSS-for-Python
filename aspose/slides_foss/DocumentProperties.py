@@ -5,7 +5,6 @@ from .IDocumentProperties import IDocumentProperties
 
 if TYPE_CHECKING:
     from .IHeadingPair import IHeadingPair
-    from .ISensitivityLabel import ISensitivityLabel
 
 class DocumentProperties(IDocumentProperties):
     """Represents properties of a presentation."""
@@ -19,19 +18,19 @@ class DocumentProperties(IDocumentProperties):
         self._custom_part = None
 
     def _ensure_core(self):
-        if not hasattr(self, '_core_part') or self._core_part is None:
+        if self._core_part is None:
             from ._internal.pptx.core_properties_part import CorePropertiesPart
             self._core_part = CorePropertiesPart(self._package)
         return self._core_part
 
     def _ensure_app(self):
-        if not hasattr(self, '_app_part') or self._app_part is None:
+        if self._app_part is None:
             from ._internal.pptx.app_properties_part import AppPropertiesPart
             self._app_part = AppPropertiesPart(self._package)
         return self._app_part
 
     def _ensure_custom(self):
-        if not hasattr(self, '_custom_part') or self._custom_part is None:
+        if self._custom_part is None:
             from ._internal.pptx.custom_properties_part import CustomPropertiesPart
             self._custom_part = CustomPropertiesPart(self._package)
         return self._custom_part

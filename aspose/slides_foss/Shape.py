@@ -9,18 +9,11 @@ from .IHyperlinkContainer import IHyperlinkContainer
 from ._internal.pptx.constants import NS, Elements, EMU_PER_POINT, ROTATION_UNIT
 
 if TYPE_CHECKING:
-    from .BlackWhiteMode import BlackWhiteMode
-    from .IBaseShapeLock import IBaseShapeLock
     from .IBaseSlide import IBaseSlide
-    from .ICustomData import ICustomData
     from .IEffectFormat import IEffectFormat
     from .IFillFormat import IFillFormat
-    from .IGroupShape import IGroupShape
-    from .IHyperlink import IHyperlink
-    from .IHyperlinkManager import IHyperlinkManager
     from .IImage import IImage
     from .ILineFormat import ILineFormat
-    from .IPlaceholder import IPlaceholder
     from .IPresentation import IPresentation
     from .IShapeFrame import IShapeFrame
     from .IThreeDFormat import IThreeDFormat
@@ -134,7 +127,7 @@ class Shape(IShape, ISlideComponent, IPresentationComponent, IHyperlinkContainer
     def line_format(self) -> ILineFormat:
         """Returns the LineFormat object that contains line formatting properties for a shape. Note: can return null for certain types of shapes which don't have line properties. Read-only ."""
         if self._xml_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+            return None
         from .LineFormat import LineFormat
         sp_pr = self._ensure_sp_pr()
         lf = LineFormat()
@@ -145,7 +138,7 @@ class Shape(IShape, ISlideComponent, IPresentationComponent, IHyperlinkContainer
     def three_d_format(self) -> IThreeDFormat:
         """Returns the ThreeDFormat object that 3d effect properties for a shape. Note: can return null for certain types of shapes which don't have 3d properties. Read-only ."""
         if self._xml_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+            return None
         from .ThreeDFormat import ThreeDFormat
         sp_pr = self._ensure_sp_pr()
         tdf = ThreeDFormat()
@@ -156,7 +149,7 @@ class Shape(IShape, ISlideComponent, IPresentationComponent, IHyperlinkContainer
     def effect_format(self) -> IEffectFormat:
         """Returns the EffectFormat object which contains pixel effects applied to a shape. Note: can return null for certain types of shapes which don't have effect properties. Read-only ."""
         if self._xml_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+            return None
         from .EffectFormat import EffectFormat
         sp_pr = self._ensure_sp_pr()
         ef = EffectFormat()
@@ -167,7 +160,7 @@ class Shape(IShape, ISlideComponent, IPresentationComponent, IHyperlinkContainer
     def fill_format(self) -> IFillFormat:
         """Returns the FillFormat object that contains fill formatting properties for a shape. Note: can return null for certain types of shapes which don't have fill properties. Read-only ."""
         if self._xml_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+            return None
         from .FillFormat import FillFormat
         sp_pr = self._ensure_sp_pr()
         ff = FillFormat()

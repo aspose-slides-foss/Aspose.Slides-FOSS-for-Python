@@ -6,7 +6,6 @@ from .IImageTransformOperation import IImageTransformOperation
 from .._internal.pptx.constants import EMU_PER_POINT
 
 if TYPE_CHECKING:
-    from .IReflectionEffectiveData import IReflectionEffectiveData
     from ..RectangleAlignment import RectangleAlignment
     from .._internal.pptx.slide_part import SlidePart
 
@@ -34,8 +33,6 @@ class Reflection(IReflection, IImageTransformOperation):
     @property
     def start_pos_alpha(self) -> float:
         """Specifies the start position (along the alpha gradient ramp) of the start alpha value (percents). Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('stPos')
         if val is None:
             return 0.0
@@ -43,16 +40,12 @@ class Reflection(IReflection, IImageTransformOperation):
 
     @start_pos_alpha.setter
     def start_pos_alpha(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('stPos', str(int(round(value * 1000))))
         self._save()
 
     @property
     def end_pos_alpha(self) -> float:
         """Specifies the end position (along the alpha gradient ramp) of the end alpha value (percents). Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('endPos')
         if val is None:
             return 100.0
@@ -60,16 +53,12 @@ class Reflection(IReflection, IImageTransformOperation):
 
     @end_pos_alpha.setter
     def end_pos_alpha(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('endPos', str(int(round(value * 1000))))
         self._save()
 
     @property
     def fade_direction(self) -> float:
         """Specifies the direction to offset the reflection. (angle). Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('fadeDir')
         if val is None:
             return 90.0
@@ -77,16 +66,12 @@ class Reflection(IReflection, IImageTransformOperation):
 
     @fade_direction.setter
     def fade_direction(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('fadeDir', str(int(round(value * 60000))))
         self._save()
 
     @property
     def start_reflection_opacity(self) -> float:
         """Starting reflection opacity. (percents). Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('stA')
         if val is None:
             return 100.0
@@ -94,16 +79,12 @@ class Reflection(IReflection, IImageTransformOperation):
 
     @start_reflection_opacity.setter
     def start_reflection_opacity(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('stA', str(int(round(value * 1000))))
         self._save()
 
     @property
     def end_reflection_opacity(self) -> float:
         """End reflection opacity. (percents). Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('endA')
         if val is None:
             return 0.0
@@ -111,16 +92,12 @@ class Reflection(IReflection, IImageTransformOperation):
 
     @end_reflection_opacity.setter
     def end_reflection_opacity(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('endA', str(int(round(value * 1000))))
         self._save()
 
     @property
     def blur_radius(self) -> float:
         """Blur radius. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('blurRad')
         if val is None:
             return 0.0
@@ -128,16 +105,12 @@ class Reflection(IReflection, IImageTransformOperation):
 
     @blur_radius.setter
     def blur_radius(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('blurRad', str(int(round(value * EMU_PER_POINT))))
         self._save()
 
     @property
     def direction(self) -> float:
         """Direction of reflection. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('dir')
         if val is None:
             return 0.0
@@ -145,16 +118,12 @@ class Reflection(IReflection, IImageTransformOperation):
 
     @direction.setter
     def direction(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('dir', str(int(round(value * 60000))))
         self._save()
 
     @property
     def distance(self) -> float:
         """Distance of reflection. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('dist')
         if val is None:
             return 0.0
@@ -162,16 +131,12 @@ class Reflection(IReflection, IImageTransformOperation):
 
     @distance.setter
     def distance(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('dist', str(int(round(value * EMU_PER_POINT))))
         self._save()
 
     @property
     def rectangle_align(self) -> RectangleAlignment:
         """Rectangle alignment. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ..RectangleAlignment import RectangleAlignment
         val = self._element.get('algn')
         if val is None:
@@ -181,8 +146,6 @@ class Reflection(IReflection, IImageTransformOperation):
 
     @rectangle_align.setter
     def rectangle_align(self, value: RectangleAlignment):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ..RectangleAlignment import RectangleAlignment
         if value == RectangleAlignment.NOT_DEFINED:
             if 'algn' in self._element.attrib:
@@ -196,8 +159,6 @@ class Reflection(IReflection, IImageTransformOperation):
     @property
     def skew_horizontal(self) -> float:
         """Specifies the horizontal skew angle. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('kx')
         if val is None:
             return 0.0
@@ -205,16 +166,12 @@ class Reflection(IReflection, IImageTransformOperation):
 
     @skew_horizontal.setter
     def skew_horizontal(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('kx', str(int(round(value * 60000))))
         self._save()
 
     @property
     def skew_vertical(self) -> float:
         """Specifies the vertical skew angle. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('ky')
         if val is None:
             return 0.0
@@ -222,16 +179,12 @@ class Reflection(IReflection, IImageTransformOperation):
 
     @skew_vertical.setter
     def skew_vertical(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('ky', str(int(round(value * 60000))))
         self._save()
 
     @property
     def rotate_shadow_with_shape(self) -> bool:
         """Specifies whether the reflection should rotate with the shape if the shape is rotated. Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('rotWithShape')
         if val is None:
             return True
@@ -239,16 +192,12 @@ class Reflection(IReflection, IImageTransformOperation):
 
     @rotate_shadow_with_shape.setter
     def rotate_shadow_with_shape(self, value: bool):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('rotWithShape', '1' if value else '0')
         self._save()
 
     @property
     def scale_horizontal(self) -> float:
         """Specifies the horizontal scaling factor, negative scaling causes a flip. (percents) Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('sx')
         if val is None:
             return 100.0
@@ -256,16 +205,12 @@ class Reflection(IReflection, IImageTransformOperation):
 
     @scale_horizontal.setter
     def scale_horizontal(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('sx', str(int(round(value * 1000))))
         self._save()
 
     @property
     def scale_vertical(self) -> float:
         """Specifies the vertical scaling factor, negative scaling causes a flip. (percents) Read/write ."""
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         val = self._element.get('sy')
         if val is None:
             return 100.0
@@ -273,8 +218,6 @@ class Reflection(IReflection, IImageTransformOperation):
 
     @scale_vertical.setter
     def scale_vertical(self, value: float):
-        if not hasattr(self, '_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._element.set('sy', str(int(round(value * 1000))))
         self._save()
 

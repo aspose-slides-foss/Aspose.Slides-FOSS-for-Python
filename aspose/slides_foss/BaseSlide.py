@@ -6,16 +6,9 @@ from .ISlideComponent import ISlideComponent
 from .IPresentationComponent import IPresentationComponent
 
 if TYPE_CHECKING:
-    from .IAnimationTimeLine import IAnimationTimeLine
-    from .IBackground import IBackground
-    from .IControlCollection import IControlCollection
-    from .ICustomData import ICustomData
-    from .IHyperlinkQueries import IHyperlinkQueries
     from .IPresentation import IPresentation
     from .IShape import IShape
     from .IShapeCollection import IShapeCollection
-    from .ISlideShowTransition import ISlideShowTransition
-    from .theme.IThemeEffectiveData import IThemeEffectiveData
 
 class BaseSlide(IBaseSlide, IThemeable, ISlideComponent, IPresentationComponent):
     """Represents common data for all slide types."""
@@ -50,8 +43,6 @@ class BaseSlide(IBaseSlide, IThemeable, ISlideComponent, IPresentationComponent)
                 collection = ShapeCollection()
                 collection._init_internal(slide_part, self)
                 self._shapes_collection = collection
-            else:
-                raise NotImplementedError("This feature is not yet available in this version.")
         return self._shapes_collection
 
 
@@ -61,15 +52,13 @@ class BaseSlide(IBaseSlide, IThemeable, ISlideComponent, IPresentationComponent)
         slide_part = self._get_slide_part()
         if slide_part is not None:
             return slide_part.name
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return ''
 
     @name.setter
     def name(self, value: str):
         slide_part = self._get_slide_part()
         if slide_part is not None:
             slide_part.name = value
-            return
-        raise NotImplementedError("This feature is not yet available in this version.")
 
     @property
     def slide_id(self) -> int:
@@ -83,7 +72,7 @@ class BaseSlide(IBaseSlide, IThemeable, ISlideComponent, IPresentationComponent)
             m = re.search(r'(\d+)', self._part_name.rsplit('/', 1)[-1])
             if m:
                 return int(m.group(1))
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return 0
 
 
 
@@ -97,7 +86,7 @@ class BaseSlide(IBaseSlide, IThemeable, ISlideComponent, IPresentationComponent)
         """Returns IPresentation interface. Read-only ."""
         if hasattr(self, '_presentation_ref') and self._presentation_ref is not None:
             return self._presentation_ref
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
 
 

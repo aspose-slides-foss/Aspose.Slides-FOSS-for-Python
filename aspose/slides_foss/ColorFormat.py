@@ -11,10 +11,8 @@ from ._internal.pptx.constants import NS, Elements
 if TYPE_CHECKING:
     from .drawing import Color
     from .ColorType import ColorType
-    from .IColorOperationCollection import IColorOperationCollection
     from .PresetColor import PresetColor
     from .SchemeColor import SchemeColor
-    from .SystemColor import SystemColor
     from ._internal.pptx.slide_part import SlidePart
 
 # Maps OOXML scheme color values to SchemeColor enum member names
@@ -54,8 +52,6 @@ class ColorFormat(PVIObject, ISlideComponent, IPresentationComponent, IColorForm
 
     def _find_color_element(self) -> ET._Element | None:
         """Find the first color child element in the parent."""
-        if not hasattr(self, '_parent_element'):
-            return None
         for child in self._parent_element:
             if child.tag in _COLOR_ELEMENT_TAGS:
                 return child
@@ -75,8 +71,6 @@ class ColorFormat(PVIObject, ISlideComponent, IPresentationComponent, IColorForm
     @property
     def color_type(self) -> ColorType:
         """Returns or sets the color definition method. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .ColorType import ColorType
         el = self._find_color_element()
         if el is None:
@@ -97,8 +91,6 @@ class ColorFormat(PVIObject, ISlideComponent, IPresentationComponent, IColorForm
 
     @color_type.setter
     def color_type(self, value: ColorType):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .ColorType import ColorType
         if value == self.color_type:
             return
@@ -142,8 +134,6 @@ class ColorFormat(PVIObject, ISlideComponent, IPresentationComponent, IColorForm
     @property
     def color(self) -> Color:
         """Returns resulting color. Sets RGB colors and clears all color transformations. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .drawing import Color
         el = self._find_color_element()
         if el is None:
@@ -159,8 +149,6 @@ class ColorFormat(PVIObject, ISlideComponent, IPresentationComponent, IColorForm
 
     @color.setter
     def color(self, value: Color):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         self._clear_color_elements()
         hex_val = f"{value.r:02X}{value.g:02X}{value.b:02X}"
         clr_el = ET.SubElement(self._parent_element, Elements.A_SRGB_CLR, val=hex_val)
@@ -170,8 +158,6 @@ class ColorFormat(PVIObject, ISlideComponent, IPresentationComponent, IColorForm
     @property
     def preset_color(self) -> PresetColor:
         """Returns or sets the color preset. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .PresetColor import PresetColor
         el = self._find_color_element()
         if el is not None and el.tag == Elements.A_PRST_CLR:
@@ -187,8 +173,6 @@ class ColorFormat(PVIObject, ISlideComponent, IPresentationComponent, IColorForm
 
     @preset_color.setter
     def preset_color(self, value: PresetColor):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .PresetColor import PresetColor
         if value == PresetColor.NOT_DEFINED:
             return
@@ -203,8 +187,6 @@ class ColorFormat(PVIObject, ISlideComponent, IPresentationComponent, IColorForm
     @property
     def scheme_color(self) -> SchemeColor:
         """Returns or sets the color identified by a color scheme. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .SchemeColor import SchemeColor
         el = self._find_color_element()
         if el is not None and el.tag == Elements.A_SCHEME_CLR:
@@ -216,8 +198,6 @@ class ColorFormat(PVIObject, ISlideComponent, IPresentationComponent, IColorForm
 
     @scheme_color.setter
     def scheme_color(self, value: SchemeColor):
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from .SchemeColor import SchemeColor
         if value == SchemeColor.NOT_DEFINED:
             return
@@ -231,8 +211,6 @@ class ColorFormat(PVIObject, ISlideComponent, IPresentationComponent, IColorForm
     @property
     def r(self) -> int:
         """Returns or sets the red component of a color. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self.color.r
 
     @r.setter
@@ -244,8 +222,6 @@ class ColorFormat(PVIObject, ISlideComponent, IPresentationComponent, IColorForm
     @property
     def g(self) -> int:
         """Returns or sets the green component of a color. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self.color.g
 
     @g.setter
@@ -257,8 +233,6 @@ class ColorFormat(PVIObject, ISlideComponent, IPresentationComponent, IColorForm
     @property
     def b(self) -> int:
         """Returns or sets the blue component of a color. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self.color.b
 
     @b.setter
@@ -270,8 +244,6 @@ class ColorFormat(PVIObject, ISlideComponent, IPresentationComponent, IColorForm
     @property
     def float_r(self) -> float:
         """Returns or sets the red component of a color. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self.r / 255.0
 
     @float_r.setter
@@ -281,8 +253,6 @@ class ColorFormat(PVIObject, ISlideComponent, IPresentationComponent, IColorForm
     @property
     def float_g(self) -> float:
         """Returns or sets the green component of a color. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self.g / 255.0
 
     @float_g.setter
@@ -292,8 +262,6 @@ class ColorFormat(PVIObject, ISlideComponent, IPresentationComponent, IColorForm
     @property
     def float_b(self) -> float:
         """Returns or sets the blue component of a color. Read/write."""
-        if not hasattr(self, '_parent_element'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         return self.b / 255.0
 
     @float_b.setter

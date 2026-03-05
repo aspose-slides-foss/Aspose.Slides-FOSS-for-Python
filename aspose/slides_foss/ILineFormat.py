@@ -5,8 +5,6 @@ from .ILineParamSource import ILineParamSource
 
 if TYPE_CHECKING:
     from .ILineFillFormat import ILineFillFormat
-    from .ILineFormatEffectiveData import ILineFormatEffectiveData
-    from .ISketchFormat import ISketchFormat
     from .LineAlignment import LineAlignment
     from .LineArrowheadLength import LineArrowheadLength
     from .LineArrowheadStyle import LineArrowheadStyle

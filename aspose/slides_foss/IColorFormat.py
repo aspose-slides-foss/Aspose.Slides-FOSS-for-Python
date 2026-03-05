@@ -6,10 +6,8 @@ from .IFillParamSource import IFillParamSource
 if TYPE_CHECKING:
     from .drawing import Color
     from .ColorType import ColorType
-    from .IColorOperationCollection import IColorOperationCollection
     from .PresetColor import PresetColor
     from .SchemeColor import SchemeColor
-    from .SystemColor import SystemColor
 
 class IColorFormat(IFillParamSource, ABC):
     """Represents a color used in a presentation."""

@@ -22,12 +22,8 @@ class MasterLayoutSlideCollection(LayoutSlideCollection, IMasterLayoutSlideColle
 
 
     def __len__(self) -> int:
-        if hasattr(self, '_layouts'):
-            return len(self._layouts)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return len(self._layouts)
 
     def __iter__(self):
-        if hasattr(self, '_layouts'):
-            return iter(self._layouts)
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return iter(self._layouts)
 

@@ -11,8 +11,6 @@ class HeadingPair(IHeadingPair):
     @property
     def name(self) -> str:
         """Returns the group name of document parts. Read-only ."""
-        if not hasattr(self, '_name'):
-            return ''
         return self._name
 
     @property

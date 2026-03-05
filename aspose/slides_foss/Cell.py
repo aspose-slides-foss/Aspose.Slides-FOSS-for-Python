@@ -29,7 +29,7 @@ class Cell(ICell, ISlideComponent, IPresentationComponent):
 
     def _get_tc_pr(self):
         """Get or create the <a:tcPr> element."""
-        if not hasattr(self, '_tc_element') or self._tc_element is None:
+        if self._tc_element is None:
             return None
         from ._internal.pptx.constants import Elements
         tc_pr = self._tc_element.find(Elements.A_TC_PR)
@@ -47,8 +47,6 @@ class Cell(ICell, ISlideComponent, IPresentationComponent):
     @property
     def offset_x(self) -> float:
         """Returns a distance from left side of a table to left side of a cell. Read-only ."""
-        if not hasattr(self, '_table'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         from ._internal.pptx.constants import EMU_PER_POINT
         total = 0.0
         cols = self._table.columns
@@ -59,8 +57,6 @@ class Cell(ICell, ISlideComponent, IPresentationComponent):
     @property
     def offset_y(self) -> float:
         """Returns a distance from top side of a table to top side of a cell. Read-only ."""
-        if not hasattr(self, '_table'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         total = 0.0
         rows = self._table.rows
         for i in range(self._row_index):
@@ -70,22 +66,16 @@ class Cell(ICell, ISlideComponent, IPresentationComponent):
     @property
     def first_row_index(self) -> int:
         """Returns an index of first row, covered by the cell. Read-only ."""
-        if hasattr(self, '_row_index'):
-            return self._row_index
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return self._row_index
 
     @property
     def first_column_index(self) -> int:
         """Returns an index of first column, covered by the cell. Read-only ."""
-        if hasattr(self, '_col_index'):
-            return self._col_index
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return self._col_index
 
     @property
     def width(self) -> float:
         """Returns the width of the cell. Read-only ."""
-        if not hasattr(self, '_table'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         cols = self._table.columns
         span = self.col_span
         total = 0.0
@@ -96,8 +86,6 @@ class Cell(ICell, ISlideComponent, IPresentationComponent):
     @property
     def height(self) -> float:
         """Returns the height of the cell. Read-only ."""
-        if not hasattr(self, '_table'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         rows = self._table.rows
         span = self.row_span
         total = 0.0
@@ -108,8 +96,6 @@ class Cell(ICell, ISlideComponent, IPresentationComponent):
     @property
     def minimal_height(self) -> float:
         """Returns the minimum height of a cell. This is a sum of minimal heights of all rows cowered by the cell. Read-only ."""
-        if not hasattr(self, '_table'):
-            raise NotImplementedError("This feature is not yet available in this version.")
         rows = self._table.rows
         span = self.row_span
         total = 0.0
@@ -297,16 +283,12 @@ class Cell(ICell, ISlideComponent, IPresentationComponent):
     @property
     def first_row(self) -> IRow:
         """Gets first row of cell. Read-only ."""
-        if hasattr(self, '_table') and hasattr(self, '_row_index'):
-            return self._table.rows[self._row_index]
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return self._table.rows[self._row_index]
 
     @property
     def first_column(self) -> IColumn:
         """Gets first column of cell. Read-only ."""
-        if hasattr(self, '_table') and hasattr(self, '_col_index'):
-            return self._table.columns[self._col_index]
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return self._table.columns[self._col_index]
 
     @property
     def col_span(self) -> int:
@@ -329,13 +311,13 @@ class Cell(ICell, ISlideComponent, IPresentationComponent):
     @property
     def text_frame(self) -> ITextFrame:
         """Returns the text frame of a cell. Read-only ."""
-        if not hasattr(self, '_tc_element') or self._tc_element is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+        if self._tc_element is None:
+            return None
         from .TextFrame import TextFrame
         from ._internal.pptx.constants import Elements
         txbody = self._tc_element.find(Elements.A_TX_BODY)
         if txbody is None:
-            raise NotImplementedError("This feature is not yet available in this version.")
+            return None
         tf = TextFrame()
         tf._init_internal(txbody, self._slide_part, self._parent_slide)
         tf._parent_cell = self
@@ -344,14 +326,12 @@ class Cell(ICell, ISlideComponent, IPresentationComponent):
     @property
     def table(self) -> ITable:
         """Returns the parent Table object for a cell. Read-only ."""
-        if hasattr(self, '_table'):
-            return self._table
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return self._table
 
     @property
     def is_merged_cell(self) -> bool:
         """Returns true if the cell is merged with any adjusted cell, false otherwise. Read-only ."""
-        if not hasattr(self, '_tc_element') or self._tc_element is None:
+        if self._tc_element is None:
             return False
         tc = self._tc_element
         if tc.get('gridSpan') is not None and int(tc.get('gridSpan', '1')) > 1:
@@ -376,16 +356,14 @@ class Cell(ICell, ISlideComponent, IPresentationComponent):
     @property
     def slide(self) -> IBaseSlide:
         """Returns the parent slide of a cell. Read-only ."""
-        if hasattr(self, '_parent_slide'):
-            return self._parent_slide
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return self._parent_slide
 
     @property
     def presentation(self) -> IPresentation:
         """Returns the parent presentation of a cell. Read-only ."""
         if hasattr(self, '_parent_slide') and self._parent_slide is not None:
             return self._parent_slide.presentation
-        raise NotImplementedError("This feature is not yet available in this version.")
+        return None
 
     @property
     def as_i_slide_component(self) -> ISlideComponent:
