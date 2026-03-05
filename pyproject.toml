@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aspose-slides-foss"
-version = "26.3.0"
+version = "26.3.1"
 description = "Official open-source Python library by Aspose.Slides for creating, reading, and editing PowerPoint (.pptx) presentations. Designed for developers and AI agents."
 readme = "README.md"
 license = "MIT"

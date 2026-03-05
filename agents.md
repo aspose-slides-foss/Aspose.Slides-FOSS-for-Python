@@ -73,7 +73,7 @@ fmt.fill_format.solid_fill_color.color = Color.from_argb(255, 0, 70, 127)
 col_widths = [120.0, 120.0, 120.0]
 row_heights = [40.0, 40.0]
 table = slide.shapes.add_table(x, y, col_widths, row_heights)
-table.rows[0].cells[0].text_frame.text = "Header"
+table.rows[0][0].text_frame.text = "Header"
 ```
 
 ### Connectors

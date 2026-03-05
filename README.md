@@ -70,7 +70,7 @@ with slides.Presentation() as prs:
 ### Text Formatting
 
 ```python
-from aspose.slides_foss import ShapeType
+from aspose.slides_foss import ShapeType, NullableBool, FillType
 from aspose.slides_foss.drawing import Color
 import aspose.slides_foss as slides
 from aspose.slides_foss.export import SaveFormat
@@ -80,8 +80,9 @@ with slides.Presentation() as prs:
     tf = shape.add_text_frame("Formatted text")
     fmt = tf.paragraphs[0].portions[0].portion_format
     fmt.font_height = 24
-    fmt.font_bold = 1
-    fmt.font_color.color = Color.from_argb(255, 0, 70, 127)
+    fmt.font_bold = NullableBool.TRUE
+    fmt.fill_format.fill_type = FillType.SOLID
+    fmt.fill_format.solid_fill_color.color = Color.from_argb(255, 0, 70, 127)
     prs.save("text.pptx", SaveFormat.PPTX)
 ```
 
@@ -93,8 +94,8 @@ from aspose.slides_foss.export import SaveFormat
 
 with slides.Presentation() as prs:
     table = prs.slides[0].shapes.add_table(50, 50, [120.0, 120.0, 120.0], [40.0, 40.0])
-    table.rows[0].cells[0].text_frame.text = "Name"
-    table.rows[0].cells[1].text_frame.text = "Value"
+    table.rows[0][0].text_frame.text = "Name"
+    table.rows[0][1].text_frame.text = "Value"
     prs.save("table.pptx", SaveFormat.PPTX)
 ```
 
@@ -139,7 +140,7 @@ import aspose.slides_foss as slides
 from aspose.slides_foss.export import SaveFormat
 
 with slides.Presentation() as prs:
-    notes = prs.slides[0].notes_slide_manager.notes_slide
+    notes = prs.slides[0].notes_slide_manager.add_notes_slide()
     notes.notes_text_frame.text = "Speaker notes go here."
     prs.save("notes.pptx", SaveFormat.PPTX)
 ```
@@ -165,7 +166,7 @@ with slides.Presentation() as prs:
 import aspose.slides_foss as slides
 from aspose.slides_foss.export import SaveFormat
 
-with slides.Presentation("deck.pptx") as prs:
+with slides.Presentation() as prs:
     prs.document_properties.title = "Q1 Results"
     prs.document_properties.author = "Finance Team"
     prs.document_properties.set_custom_property_value("Version", 3)
