@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aspose-slides-foss"
+version = "26.3.1"
+description = "Official open-source Python library by Aspose.Slides for creating, reading, and editing PowerPoint (.pptx) presentations. Designed for developers and AI agents."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [
+    { name = "Aspose" },
+]
+keywords = [
+    "powerpoint",
+    "pptx",
+    "presentation",
+    "slides",
+    "aspose",
+    "office",
+    "openxml",
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Office/Business",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "lxml>=4.9",
+]
+
+[project.urls]
+Homepage = "https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python"
+Repository = "https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python"
+Issues = "https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/issues"
+
+[tool.setuptools.packages.find]
+include = ["aspose.*"]
+exclude = ["tests*", "examples*"]
+namespaces = true
+
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
+"aspose.slides_foss._internal.pptx" = ["*.pptx"]

@@ -1,0 +1,33 @@
+from __future__ import annotations
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from .ICommentAuthor import ICommentAuthor
+
+class ICommentAuthorCollection(ABC):
+    """Represents a collection of comment authors."""
+    @property
+    def as_i_collection(self) -> list:
+        ...
+
+    @property
+    def as_i_enumerable(self) -> Any:
+        ...
+    def add_author(self, name, initials) -> ICommentAuthor:
+        ...
+    def to_array(self) -> list[ICommentAuthor]:
+        ...
+    def find_by_name(self, name) -> list[ICommentAuthor]:
+        ...
+    def find_by_name_and_initials(self, name, initials) -> list[ICommentAuthor]:
+        ...
+    def remove_at(self, index) -> None:
+        ...
+    def remove(self, author) -> None:
+        ...
+    def clear(self) -> None:
+        ...
+    def __getitem__(self, index: int) -> ICommentAuthor:
+        ...
+
