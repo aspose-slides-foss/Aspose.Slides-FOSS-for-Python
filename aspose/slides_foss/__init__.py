@@ -180,6 +180,8 @@ from .ThreeDFormat import ThreeDFormat
 
 
 
+from . import drawing
+
 
 
 try:

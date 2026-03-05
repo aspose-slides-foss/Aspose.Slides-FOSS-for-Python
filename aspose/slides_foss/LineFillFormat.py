@@ -59,6 +59,23 @@ class LineFillFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFi
         self._ln_element.append(el)
         return el
 
+    def _reset_style_ln_ref(self) -> None:
+        """Reset <a:lnRef idx> to 0 in the parent shape's <p:style> so the
+        explicit line fill takes priority over the theme reference."""
+        ln = self._ln_element
+        sp_pr = ln.getparent()
+        if sp_pr is None:
+            return
+        shape_el = sp_pr.getparent()
+        if shape_el is None:
+            return
+        style_el = shape_el.find(f"{NS.P}style")
+        if style_el is None:
+            return
+        ln_ref = style_el.find(f"{NS.A}lnRef")
+        if ln_ref is not None:
+            ln_ref.set("idx", "0")
+
     def _save(self) -> None:
         if hasattr(self, '_slide_part') and self._slide_part:
             self._slide_part.save()
@@ -97,6 +114,7 @@ class LineFillFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFi
         self._remove_fill_elements()
         if tag is not None:
             self._insert_fill_element(tag)
+            self._reset_style_ln_ref()
         self._save()
 
     @property

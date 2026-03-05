@@ -21,7 +21,7 @@ Requires Python 3.10+. The only runtime dependency is `lxml`.
 
 ```python
 import aspose.slides_foss as slides
-from aspose.slides_foss import ShapeType, FillType
+from aspose.slides_foss import ShapeType, FillType, NullableBool
 from aspose.slides_foss.export import SaveFormat
 from aspose.slides_foss.drawing import Color, PointF, SizeF, Size
 ```
@@ -61,9 +61,10 @@ Coordinates and dimensions are in points (1 point = 1/72 inch).
 portion = shape.text_frame.paragraphs[0].portions[0]
 fmt = portion.portion_format
 fmt.font_height = 24
-fmt.font_bold = 1          # NullableBool: 0=false, 1=true, 2=not defined
-fmt.font_italic = 1
-fmt.font_color.color = Color.from_argb(255, 0, 70, 127)
+fmt.font_bold = NullableBool.TRUE
+fmt.font_italic = NullableBool.TRUE
+fmt.fill_format.fill_type = FillType.SOLID
+fmt.fill_format.solid_fill_color.color = Color.from_argb(255, 0, 70, 127)
 ```
 
 ### Tables
@@ -105,7 +106,7 @@ slide.shapes.add_picture_frame(ShapeType.RECTANGLE, x, y, w, h, image)
 ### Notes
 
 ```python
-notes = slide.notes_slide_manager.notes_slide
+notes = slide.notes_slide_manager.add_notes_slide()
 notes.notes_text_frame.text = "Speaker notes here."
 ```
 
@@ -193,7 +194,7 @@ aspose/
 - Use `SaveFormat.PPTX` when saving — it is the only supported format
 - Use `Color.from_argb(a, r, g, b)` or named constants like `Color.red`, `Color.blue`
 - Access slides via `prs.slides[index]` — slides are 0-indexed
-- Use `NullableBool` values (0, 1, 2) for boolean formatting properties like `font_bold`
+- Use `NullableBool` enum (`NullableBool.FALSE`, `NullableBool.TRUE`, `NullableBool.NOT_DEFINED`) for boolean formatting properties like `font_bold`
 - Import drawing types from `aspose.slides_foss.drawing`
 
 ## Don't

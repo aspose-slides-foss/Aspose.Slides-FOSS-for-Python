@@ -47,7 +47,8 @@ class Portion(IPortion, ISlideComponent, IPresentationComponent):
         rpr = self._r_element.find(Elements.A_R_PR)
         if rpr is None:
             import lxml.etree as ET
-            rpr = ET.SubElement(self._r_element, Elements.A_R_PR)
+            rpr = ET.Element(Elements.A_R_PR)
+            self._r_element.insert(0, rpr)
         pf = PortionFormat()
         slide_part = getattr(self, '_slide_part', None)
         parent_slide = getattr(self, '_parent_slide', None)

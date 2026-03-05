@@ -76,10 +76,13 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
             return NullableBool.NOT_DEFINED
         return NullableBool.TRUE if val == '1' else NullableBool.FALSE
 
-    def _set_nullable_bool_attr(self, attr: str, value: NullableBool) -> None:
+    def _set_nullable_bool_attr(self, attr: str, value) -> None:
         from .NullableBool import NullableBool
         if self._rpr_element is None:
             return
+        # Accept integers: 0 = FALSE, non-zero = TRUE
+        if isinstance(value, int):
+            value = NullableBool.TRUE if value else NullableBool.FALSE
         if value == NullableBool.NOT_DEFINED:
             if attr in self._rpr_element.attrib:
                 del self._rpr_element.attrib[attr]
