@@ -1,7 +1,6 @@
 # Aspose.Slides FOSS
 
-The official open-source Python library by [Aspose.Slides](https://products.aspose.org/slides/) for creating, reading, and editing PowerPoint (`.pptx`) presentations.
-API-compatible with [Aspose.Slides for Python via .NET](https://pypi.org/project/Aspose.Slides/) — existing code migrates with minimal changes.
+The official open-source Python library by Aspose.Slides for creating, reading, and editing PowerPoint (`.pptx`) presentations.
 
 ---
 

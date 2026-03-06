@@ -1,6 +1,6 @@
 # Aspose.Slides FOSS — Guide for AI Agents
 
-You are working with `aspose-slides-foss`, the official open-source Python library by Aspose.Slides for creating, reading, and editing PowerPoint (.pptx) presentations. The API is compatible with [Aspose.Slides for Python via .NET](https://pypi.org/project/Aspose.Slides/).
+You are working with `aspose-slides-foss`, the official open-source Python library by Aspose.Slides for creating, reading, and editing PowerPoint (.pptx) presentations.
 
 ## Installation
 
@@ -220,3 +220,4 @@ Not yet implemented (will raise `NotImplementedError`):
 - [Issue Tracker](https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/issues)
 - [PyPI](https://pypi.org/project/aspose-slides-foss/)
 - [Aspose.Slides](https://products.aspose.org/slides/)
+
