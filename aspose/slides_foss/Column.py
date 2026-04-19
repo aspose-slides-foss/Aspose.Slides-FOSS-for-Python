@@ -52,12 +52,6 @@ class Column(CellCollection, IColumn):
                 self._slide_part.save()
 
     @property
-    def column_format(self) -> IColumnFormat:
-        """Returns the ColumnFormat object that contains formatting properties for this column. Read-only ."""
-        from .ColumnFormat import ColumnFormat
-        return ColumnFormat()
-
-    @property
     def as_i_cell_collection(self) -> ICellCollection:
         return self
 

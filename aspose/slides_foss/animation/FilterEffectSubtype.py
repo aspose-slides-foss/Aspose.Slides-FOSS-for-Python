@@ -1,0 +1,32 @@
+from __future__ import annotations
+from enum import Enum
+
+class FilterEffectSubtype(Enum):
+    """Represents filter effect subtypes."""
+    NONE = 'None'
+    ACROSS = 'Across'
+    DOWN = 'Down'
+    DOWN_LEFT = 'DownLeft'
+    DOWN_RIGHT = 'DownRight'
+    FROM_BOTTOM = 'FromBottom'
+    FROM_LEFT = 'FromLeft'
+    FROM_RIGHT = 'FromRight'
+    FROM_TOP = 'FromTop'
+    HORIZONTAL = 'Horizontal'
+    IN = 'In'
+    IN_HORIZONTAL = 'InHorizontal'
+    IN_VERTICAL = 'InVertical'
+    LEFT = 'Left'
+    OUT = 'Out'
+    OUT_HORIZONTAL = 'OutHorizontal'
+    OUT_VERTICAL = 'OutVertical'
+    RIGHT = 'Right'
+    SPOKES1 = 'Spokes1'
+    SPOKES2 = 'Spokes2'
+    SPOKES3 = 'Spokes3'
+    SPOKES4 = 'Spokes4'
+    SPOKES8 = 'Spokes8'
+    UP = 'Up'
+    UP_LEFT = 'UpLeft'
+    UP_RIGHT = 'UpRight'
+    VERTICAL = 'Vertical'

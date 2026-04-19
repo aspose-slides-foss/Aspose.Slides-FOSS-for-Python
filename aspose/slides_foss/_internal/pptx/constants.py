@@ -249,6 +249,51 @@ class Elements:
     A_LN_TL_TO_BR = f"{NS.A}lnTlToBr"
     A_LN_BL_TO_TR = f"{NS.A}lnBlToTr"
 
+    # Animation/timing elements
+    P_TIMING = f"{NS.P}timing"
+    P_TN_LST = f"{NS.P}tnLst"
+    P_PAR = f"{NS.P}par"
+    P_SEQ = f"{NS.P}seq"
+    P_C_TN = f"{NS.P}cTn"
+    P_CHILD_TN_LST = f"{NS.P}childTnLst"
+    P_ST_COND_LST = f"{NS.P}stCondLst"
+    P_END_COND_LST = f"{NS.P}endCondLst"
+    P_COND = f"{NS.P}cond"
+    P_PREV_COND_LST = f"{NS.P}prevCondLst"
+    P_NEXT_COND_LST = f"{NS.P}nextCondLst"
+    P_SET = f"{NS.P}set"
+    P_ANIM = f"{NS.P}anim"
+    P_ANIM_EFFECT = f"{NS.P}animEffect"
+    P_ANIM_MOTION = f"{NS.P}animMotion"
+    P_ANIM_CLR = f"{NS.P}animClr"
+    P_ANIM_ROT = f"{NS.P}animRot"
+    P_ANIM_SCALE = f"{NS.P}animScale"
+    P_CMD = f"{NS.P}cmd"
+    P_C_BHVR = f"{NS.P}cBhvr"
+    P_TGT_EL = f"{NS.P}tgtEl"
+    P_SP_TGT = f"{NS.P}spTgt"
+    P_SLD_TGT = f"{NS.P}sldTgt"
+    P_ATTR_NAME_LST = f"{NS.P}attrNameLst"
+    P_ATTR_NAME = f"{NS.P}attrName"
+    P_TO = f"{NS.P}to"
+    P_FROM = f"{NS.P}from"
+    P_BY = f"{NS.P}by"
+    P_STR_VAL = f"{NS.P}strVal"
+    P_FLT_VAL = f"{NS.P}fltVal"
+    P_INT_VAL = f"{NS.P}intVal"
+    P_BLD_LST = f"{NS.P}bldLst"
+    P_BLD_P = f"{NS.P}bldP"
+    P_END_SYNC = f"{NS.P}endSync"
+    P_RTN = f"{NS.P}rtn"
+
+    # Background elements
+    P_BG = f"{NS.P}bg"
+    P_BG_PR = f"{NS.P}bgPr"
+    P_BG_REF = f"{NS.P}bgRef"
+
+    # Transition element
+    P_TRANSITION = f"{NS.P}transition"
+
     # GraphicFrame elements
     P_GRAPHIC_FRAME = f"{NS.P}graphicFrame"
     P_NV_GRAPHIC_FRAME_PR = f"{NS.P}nvGraphicFramePr"
@@ -259,6 +304,10 @@ class Elements:
 
     # Table URI
     TABLE_URI = 'http://schemas.openxmlformats.org/drawingml/2006/table'
+
+    # Chart URI and elements
+    CHART_URI = 'http://schemas.openxmlformats.org/drawingml/2006/chart'
+    C_CHART = f"{NS.C}chart"
 
     # DrawingML txBody (for table cells)
     A_TX_BODY = f"{NS.A}txBody"

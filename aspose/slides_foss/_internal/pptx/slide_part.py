@@ -123,6 +123,89 @@ class SlidePart:
                 resolved.append(part)
         return '/'.join(resolved)
 
+    # ------------------------------------------------------------------
+    # Animation / timing
+    # ------------------------------------------------------------------
+
+    @property
+    def timing_element(self) -> Optional[ET._Element]:
+        """Return the <p:timing> element, or None if the slide has no animations."""
+        return self._root.find(Elements.P_TIMING)
+
+    def ensure_timing_element(self) -> ET._Element:
+        """Get or create the <p:timing> element with the root boilerplate.
+
+        Creates: <p:timing>/<p:tnLst>/<p:par>/<p:cTn tmRoot>/<p:childTnLst>
+        Does NOT create the main sequence — call ensure_main_sequence() for that.
+        """
+        timing = self.timing_element
+        if timing is not None:
+            return timing
+
+        timing = ET.SubElement(self._root, Elements.P_TIMING)
+        tn_lst = ET.SubElement(timing, Elements.P_TN_LST)
+        root_par = ET.SubElement(tn_lst, Elements.P_PAR)
+        root_ctn = ET.SubElement(root_par, Elements.P_C_TN,
+                                 id='1', dur='indefinite', restart='never',
+                                 nodeType='tmRoot')
+        ET.SubElement(root_ctn, Elements.P_CHILD_TN_LST)
+        return timing
+
+    def ensure_main_sequence(self) -> ET._Element:
+        """Get or create the <p:seq nodeType="mainSeq"> inside the timing element."""
+        timing = self.ensure_timing_element()
+
+        # Navigate to root childTnLst
+        tn_lst = timing.find(Elements.P_TN_LST)
+        root_par = tn_lst.find(Elements.P_PAR)
+        root_ctn = root_par.find(Elements.P_C_TN)
+        child_tn = root_ctn.find(Elements.P_CHILD_TN_LST)
+
+        # Check if main sequence already exists
+        for seq in child_tn.findall(Elements.P_SEQ):
+            seq_ctn = seq.find(Elements.P_C_TN)
+            if seq_ctn is not None and seq_ctn.get('nodeType') == 'mainSeq':
+                return seq
+
+        # Create main sequence — insert as first child so it's before interactive seqs
+        main_seq = ET.Element(Elements.P_SEQ)
+        main_seq.set('concurrent', '1')
+        main_seq.set('nextAc', 'seek')
+        child_tn.insert(0, main_seq)
+
+        next_id = self.next_ctn_id()
+        seq_ctn = ET.SubElement(main_seq, Elements.P_C_TN,
+                                id=str(next_id), dur='indefinite', nodeType='mainSeq')
+        ET.SubElement(seq_ctn, Elements.P_CHILD_TN_LST)
+
+        # prev/next conditions for main sequence
+        prev_cond = ET.SubElement(main_seq, Elements.P_PREV_COND_LST)
+        pc = ET.SubElement(prev_cond, Elements.P_COND, evt='onPrev', delay='0')
+        tgt = ET.SubElement(pc, Elements.P_TGT_EL)
+        ET.SubElement(tgt, Elements.P_SLD_TGT)
+
+        next_cond_el = ET.SubElement(main_seq, Elements.P_NEXT_COND_LST)
+        nc = ET.SubElement(next_cond_el, Elements.P_COND, evt='onNext', delay='0')
+        tgt2 = ET.SubElement(nc, Elements.P_TGT_EL)
+        ET.SubElement(tgt2, Elements.P_SLD_TGT)
+
+        return main_seq
+
+    def next_ctn_id(self) -> int:
+        """Return the next available cTn id for this slide's timing tree."""
+        timing = self.timing_element
+        if timing is None:
+            return 1
+        max_id = 0
+        for ctn in timing.iter(Elements.P_C_TN):
+            try:
+                cid = int(ctn.get('id', '0'))
+                if cid > max_id:
+                    max_id = cid
+            except ValueError:
+                pass
+        return max_id + 1
+
     def save(self) -> None:
         """Save the slide XML back to the package."""
         xml_bytes = ET.tostring(

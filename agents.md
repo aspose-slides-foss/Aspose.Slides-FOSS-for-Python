@@ -201,15 +201,14 @@ aspose/
 
 - Don't import from `aspose.slides_foss._internal` — it is a private implementation detail
 - Don't attempt PDF, HTML, SVG, or image export — only PPTX is supported
-- Don't use charts, SmartArt, animations, or VBA — they are not yet implemented and will raise `NotImplementedError`
+- Don't use SmartArt, OLE objects, or VBA macros — they are not yet implemented and will raise `NotImplementedError`
 - Don't modify the public API class signatures — they are fixed
 
 ## Limitations
 
 Not yet implemented (will raise `NotImplementedError`):
 
-- Charts, SmartArt, OLE objects, mathematical text
-- Animations and slide transitions
+- SmartArt, OLE objects, mathematical text
 - Export to PDF, HTML, SVG, or images
 - VBA macros, digital signatures
 - Hyperlinks and action settings

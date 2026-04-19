@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from .IImage import IImage
     from .ILayoutSlide import ILayoutSlide
     from .INotesSlideManager import INotesSlideManager
+    from .theme.IOverrideThemeManager import IOverrideThemeManager
     from ._internal.pptx.slide_part import SlidePart
     from ._internal.pptx.presentation_part import SlideReference
     from ._internal.opc import OpcPackage
@@ -77,6 +78,16 @@ class Slide(BaseSlide, ISlide):
                 return self._layout_slide_cache
         return None
 
+
+    @property
+    def theme_manager(self) -> IOverrideThemeManager:
+        """Returns the overriding theme manager. Read-only ."""
+        if not hasattr(self, '_theme_manager_cache') or self._theme_manager_cache is None:
+            from .theme.SlideThemeManager import SlideThemeManager
+            mgr = SlideThemeManager()
+            mgr._init_internal()
+            self._theme_manager_cache = mgr
+        return self._theme_manager_cache
 
     @property
     def notes_slide_manager(self) -> INotesSlideManager:

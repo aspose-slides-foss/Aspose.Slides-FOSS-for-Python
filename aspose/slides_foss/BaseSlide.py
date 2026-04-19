@@ -6,9 +6,12 @@ from .ISlideComponent import ISlideComponent
 from .IPresentationComponent import IPresentationComponent
 
 if TYPE_CHECKING:
+    from .IAnimationTimeLine import IAnimationTimeLine
+    from .IBackground import IBackground
     from .IPresentation import IPresentation
     from .IShape import IShape
     from .IShapeCollection import IShapeCollection
+    from .ISlideShowTransition import ISlideShowTransition
 
 class BaseSlide(IBaseSlide, IThemeable, ISlideComponent, IPresentationComponent):
     """Represents common data for all slide types."""
@@ -16,6 +19,8 @@ class BaseSlide(IBaseSlide, IThemeable, ISlideComponent, IPresentationComponent)
     def __init__(self):
         """Initialize base slide."""
         self._shapes_collection: Optional[IShapeCollection] = None
+        self._slide_show_transition_cache = None
+        self._background_cache = None
 
     def _get_slide_part(self):
         """
@@ -82,11 +87,64 @@ class BaseSlide(IBaseSlide, IThemeable, ISlideComponent, IPresentationComponent)
 
 
     @property
+    def background(self) -> IBackground:
+        """Returns slide's background. Read-only."""
+        if self._background_cache is None:
+            from .Background import Background
+            slide_part = self._get_slide_part()
+            if slide_part is not None:
+                bg = Background()
+                bg._init_internal(slide_part, self)
+                self._background_cache = bg
+        return self._background_cache
+
+    @property
+    def slide_show_transition(self) -> ISlideShowTransition:
+        """Returns the TransitionEx object which contains information about how the specified slide advances during a slide show. Read-only ."""
+        if self._slide_show_transition_cache is None:
+            from .slideshow.SlideShowTransition import SlideShowTransition
+            slide_part = self._get_slide_part()
+            if slide_part is not None:
+                obj = SlideShowTransition()
+                obj._init_internal(slide_part)
+                self._slide_show_transition_cache = obj
+        return self._slide_show_transition_cache
+
+    @property
+    def timeline(self) -> IAnimationTimeLine:
+        """Returns animation timeline object. Read-only."""
+        if not hasattr(self, '_timeline_cache') or self._timeline_cache is None:
+            from .animation.AnimationTimeLine import AnimationTimeLine
+            slide_part = self._get_slide_part()
+            if slide_part is not None:
+                tl = AnimationTimeLine()
+                tl._init_internal(slide_part, self)
+                self._timeline_cache = tl
+        return getattr(self, '_timeline_cache', None)
+
+    @property
     def presentation(self) -> IPresentation:
         """Returns IPresentation interface. Read-only ."""
         if hasattr(self, '_presentation_ref') and self._presentation_ref is not None:
             return self._presentation_ref
         return None
+
+    @property
+    def slide(self) -> IBaseSlide:
+        """Returns the parent slide. Read-only."""
+        return self
+
+    @property
+    def as_i_slide_component(self) -> ISlideComponent:
+        return self
+
+    @property
+    def as_i_presentation_component(self) -> IPresentationComponent:
+        return self
+
+    @property
+    def as_i_themeable(self) -> IThemeable:
+        return self
 
 
 

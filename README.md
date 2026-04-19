@@ -37,8 +37,13 @@ with slides.Presentation() as prs:
 
 - **Presentation I/O** — Open, create, and save `.pptx` files with full round-trip fidelity
 - **Slides** — Add, remove, clone, reorder, and iterate slides
-- **Shapes** — AutoShapes, PictureFrames, Tables, Connectors
+- **Shapes** — AutoShapes, PictureFrames, Tables, Connectors, GroupShapes
 - **Text** — TextFrame, Paragraph, Portion with character, paragraph, and text frame formatting (including bullets)
+- **Charts** — 70+ chart types, series, categories, axes, trendlines, error bars, legend, titles, data labels, markers, series groups, 3D
+- **Animations** — Shape and text-level animations with sequences, effects, triggers, and motion paths
+- **Slide transitions** — 60+ transition types with per-slide timing, advance settings, and morph support
+- **Themes** — Color schemes, font schemes, format schemes, master/override themes
+- **Backgrounds** — Per-slide and master slide backgrounds with solid/gradient/pattern/picture fills
 - **Fill** — Solid, gradient, pattern, and picture fills
 - **Lines** — Width, dash style, arrows, join and alignment
 - **Effects** — Outer shadow, glow, soft edge, blur, reflection, inner shadow
@@ -172,14 +177,94 @@ with slides.Presentation() as prs:
     prs.save("deck.pptx", SaveFormat.PPTX)
 ```
 
+### Chart
+
+Build a chart from scratch by populating its backing workbook:
+
+```python
+from aspose.slides_foss.charts import ChartType
+import aspose.slides_foss as slides
+from aspose.slides_foss.export import SaveFormat
+
+with slides.Presentation() as prs:
+    slide = prs.slides[0]
+
+    # Pass has_default_data=False to start with an empty workbook
+    chart = slide.shapes.add_chart(ChartType.CLUSTERED_COLUMN, 50, 50, 600, 400, False)
+    chart.chart_title.add_text_frame_for_overriding("Quarterly Sales")
+
+    cd = chart.chart_data
+    wb = cd.chart_data_workbook  # embedded XLSX workbook backing the chart
+
+    cd.series.clear()
+    cd.categories.clear()
+
+    # Workbook layout (worksheet 0):
+    #          col 0   col 1      col 2
+    #  row 0            "Revenue"  "Expenses"   <- series name row
+    #  row 1   "Q1"     1200       800
+    #  row 2   "Q2"     1500       900
+    #  row 3   "Q3"     1800       1000
+    #  row 4   "Q4"     2100       1100
+
+    # Categories — column 0, rows 1..4
+    for row, name in enumerate(["Q1", "Q2", "Q3", "Q4"], start=1):
+        cd.categories.add(wb.get_cell(0, row, 0, name))
+
+    # Series 1 (Revenue) — name at (row 0, col 1), values at (rows 1..4, col 1)
+    s1 = cd.series.add(wb.get_cell(0, 0, 1, "Revenue"), chart.type)
+    for row, value in enumerate([1200, 1500, 1800, 2100], start=1):
+        s1.data_points.add_data_point_for_bar_series(wb.get_cell(0, row, 1, value))
+
+    # Series 2 (Expenses) — name at (row 0, col 2), values at (rows 1..4, col 2)
+    s2 = cd.series.add(wb.get_cell(0, 0, 2, "Expenses"), chart.type)
+    for row, value in enumerate([800, 900, 1000, 1100], start=1):
+        s2.data_points.add_data_point_for_bar_series(wb.get_cell(0, row, 2, value))
+
+    prs.save("chart.pptx", SaveFormat.PPTX)
+```
+
+`wb.get_cell(worksheet_index, row, column, value)` writes the value to the embedded
+XLSX and returns a cell reference that the chart series and categories bind to.
+
+### Slide Transition
+
+```python
+from aspose.slides_foss.slideshow import TransitionType
+import aspose.slides_foss as slides
+from aspose.slides_foss.export import SaveFormat
+
+with slides.Presentation() as prs:
+    slide = prs.slides[0]
+    slide.slide_show_transition.type = TransitionType.CIRCLE
+    slide.slide_show_transition.advance_on_click = True
+    slide.slide_show_transition.advance_after_time = 3000  # ms
+    prs.save("transition.pptx", SaveFormat.PPTX)
+```
+
+### Group Shape
+
+```python
+from aspose.slides_foss import ShapeType
+import aspose.slides_foss as slides
+from aspose.slides_foss.export import SaveFormat
+
+with slides.Presentation() as prs:
+    slide = prs.slides[0]
+    group = slide.shapes.add_group_shape()
+    group.shapes.add_auto_shape(ShapeType.RECTANGLE, 300, 100, 100, 100)
+    group.shapes.add_auto_shape(ShapeType.RECTANGLE, 500, 100, 100, 100)
+    group.name = "TwoRectangles"
+    prs.save("group.pptx", SaveFormat.PPTX)
+```
+
 ---
 
 ## Limitations
 
 The following areas are not yet implemented and will raise `NotImplementedError`:
 
-- Charts, SmartArt, OLE objects, mathematical text
-- Animations and slide transitions
+- SmartArt, OLE objects, mathematical text
 - Export to non-PPTX formats (PDF, HTML, SVG, images)
 - VBA macros, digital signatures
 - Hyperlinks and action settings

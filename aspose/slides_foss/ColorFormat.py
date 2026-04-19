@@ -145,6 +145,14 @@ class ColorFormat(PVIObject, ISlideComponent, IPresentationComponent, IColorForm
             b = int(hex_val[4:6], 16)
             a = self._read_alpha(el)
             return Color(a, r, g, b)
+        if el.tag == Elements.A_SYS_CLR:
+            last_clr = el.get('lastClr', '')
+            if last_clr and len(last_clr) == 6:
+                r = int(last_clr[0:2], 16)
+                g = int(last_clr[2:4], 16)
+                b = int(last_clr[4:6], 16)
+                a = self._read_alpha(el)
+                return Color(a, r, g, b)
         return Color(255, 0, 0, 0)
 
     @color.setter

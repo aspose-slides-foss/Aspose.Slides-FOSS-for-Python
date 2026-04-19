@@ -7,6 +7,7 @@ from ._internal.pptx.constants import NS, Elements
 if TYPE_CHECKING:
     from .IAutoShape import IAutoShape
     from .IConnector import IConnector
+    from .IGroupShape import IGroupShape
     from .IPictureFrame import IPictureFrame
     from .IShape import IShape
     from .ITable import ITable
@@ -40,6 +41,9 @@ class ShapeCollection(BaseCollection, IShapeCollection):
         # Maps id(xml_element) -> shape object so that the same element always
         # returns the same Python wrapper (preserves `is` identity).
         self._element_to_shape: dict = {}
+        # For group shape child collections, the container XML element (grpSp).
+        self._container_element: Optional[ET._Element] = None
+        self._parent_group_shape: Optional[IGroupShape] = None
 
     def _init_internal(self, slide_part: SlidePart, parent_slide) -> None:
         """
@@ -54,8 +58,32 @@ class ShapeCollection(BaseCollection, IShapeCollection):
         self._shapes_cache = None
         self._element_to_shape = {}
 
+    def _init_internal_group(self, grp_sp_element: ET._Element, slide_part: SlidePart,
+                              parent_slide, parent_group: IGroupShape) -> None:
+        """
+        Internal initialization for a group shape's child collection.
+
+        Args:
+            grp_sp_element: The grpSp XML element that contains child shapes.
+            slide_part: The SlidePart containing the slide XML.
+            parent_slide: The parent Slide object.
+            parent_group: The parent GroupShape object.
+        """
+        self._slide_part = slide_part
+        self._parent_slide = parent_slide
+        self._container_element = grp_sp_element
+        self._parent_group_shape = parent_group
+        self._shapes_cache = None
+        self._element_to_shape = {}
+
     def _get_sp_tree(self) -> Optional[ET._Element]:
-        """Get the spTree element from the slide XML."""
+        """Get the shape container element.
+
+        For slide-level collections, this is the spTree from the slide XML.
+        For group shape child collections, this is the grpSp element itself.
+        """
+        if self._container_element is not None:
+            return self._container_element
         if self._slide_part is None or self._slide_part._root is None:
             return None
         return self._slide_part._root.find(f".//{Elements.SP_TREE}")
@@ -106,8 +134,83 @@ class ShapeCollection(BaseCollection, IShapeCollection):
 
     def _save(self) -> None:
         """Save changes to the slide part."""
+        if self._parent_group_shape is not None:
+            self._update_group_transform()
         if self._slide_part:
             self._slide_part.save()
+
+    def _update_group_transform(self) -> None:
+        """Recompute the parent group shape's xfrm bounding box from child shapes."""
+        grp_sp = self._container_element
+        if grp_sp is None:
+            return
+
+        min_x = min_y = float('inf')
+        max_x = max_y = float('-inf')
+        has_children = False
+
+        for elem in grp_sp:
+            tag = elem.tag
+            if tag in (f"{NS.P}nvGrpSpPr", f"{NS.P}grpSpPr"):
+                continue
+
+            # xfrm lives in spPr for most shapes, grpSpPr for nested groups
+            if tag == f"{NS.P}grpSp":
+                container = elem.find(f"{NS.P}grpSpPr")
+            else:
+                container = elem.find(f"{NS.P}spPr")
+
+            if container is None:
+                continue
+
+            xfrm = container.find(f"{NS.A}xfrm")
+            if xfrm is None:
+                continue
+
+            off = xfrm.find(f"{NS.A}off")
+            ext = xfrm.find(f"{NS.A}ext")
+            if off is None or ext is None:
+                continue
+
+            x = int(off.get('x', '0'))
+            y = int(off.get('y', '0'))
+            cx = int(ext.get('cx', '0'))
+            cy = int(ext.get('cy', '0'))
+
+            min_x = min(min_x, x)
+            min_y = min(min_y, y)
+            max_x = max(max_x, x + cx)
+            max_y = max(max_y, y + cy)
+            has_children = True
+
+        if not has_children:
+            return
+
+        grp_sp_pr = grp_sp.find(f"{NS.P}grpSpPr")
+        if grp_sp_pr is None:
+            return
+        xfrm = grp_sp_pr.find(f"{NS.A}xfrm")
+        if xfrm is None:
+            return
+
+        width = max_x - min_x
+        height = max_y - min_y
+
+        # Group position and size on slide
+        off = xfrm.find(f"{NS.A}off")
+        off.set('x', str(min_x))
+        off.set('y', str(min_y))
+        ext = xfrm.find(f"{NS.A}ext")
+        ext.set('cx', str(width))
+        ext.set('cy', str(height))
+
+        # Child coordinate space (1:1 mapping — child coords are slide coords)
+        ch_off = xfrm.find(f"{NS.A}chOff")
+        ch_off.set('x', str(min_x))
+        ch_off.set('y', str(min_y))
+        ch_ext = xfrm.find(f"{NS.A}chExt")
+        ch_ext.set('cx', str(width))
+        ch_ext.set('cy', str(height))
 
     def _next_shape_id(self) -> int:
         """Find the next available shape ID in the spTree."""
@@ -180,6 +283,7 @@ class ShapeCollection(BaseCollection, IShapeCollection):
         ET.SubElement(tx_body, f"{NS.A}bodyPr", rtlCol="0", anchor="ctr")
         ET.SubElement(tx_body, f"{NS.A}lstStyle")
         a_p = ET.SubElement(tx_body, f"{NS.A}p")
+        ET.SubElement(a_p, f"{NS.A}pPr", algn="ctr")
         ET.SubElement(a_p, f"{NS.A}endParaRPr")
 
         return sp
@@ -325,8 +429,7 @@ class ShapeCollection(BaseCollection, IShapeCollection):
     @property
     def parent_group(self) -> IGroupShape:
         """Gets the parent group shape object for the shapes collection. Read-only ."""
-        # For slide-level shapes, there's no parent group
-        return None
+        return self._parent_group_shape
 
     @property
     def as_i_collection(self) -> list:
@@ -484,8 +587,62 @@ class ShapeCollection(BaseCollection, IShapeCollection):
             return self._add_connector_impl(index, shape_type, x, y, width, height, create_from_template)
         raise ValueError("Unsupported arguments for this method.")
 
+    def _build_group_shape_xml(self, shape_id: int, name: str) -> ET._Element:
+        """Build XML for a new empty GroupShape element."""
+        grp_sp = ET.Element(f"{NS.P}grpSp")
 
+        # nvGrpSpPr
+        nv_grp_sp_pr = ET.SubElement(grp_sp, f"{NS.P}nvGrpSpPr")
+        c_nv_pr = ET.SubElement(nv_grp_sp_pr, Elements.C_NV_PR)
+        c_nv_pr.set('id', str(shape_id))
+        c_nv_pr.set('name', name)
+        ET.SubElement(nv_grp_sp_pr, f"{NS.P}cNvGrpSpPr")
+        ET.SubElement(nv_grp_sp_pr, f"{NS.P}nvPr")
 
+        # grpSpPr with empty transform
+        grp_sp_pr = ET.SubElement(grp_sp, f"{NS.P}grpSpPr")
+        xfrm = ET.SubElement(grp_sp_pr, f"{NS.A}xfrm")
+        off = ET.SubElement(xfrm, f"{NS.A}off")
+        off.set('x', '0')
+        off.set('y', '0')
+        ext = ET.SubElement(xfrm, f"{NS.A}ext")
+        ext.set('cx', '0')
+        ext.set('cy', '0')
+        ch_off = ET.SubElement(xfrm, f"{NS.A}chOff")
+        ch_off.set('x', '0')
+        ch_off.set('y', '0')
+        ch_ext = ET.SubElement(xfrm, f"{NS.A}chExt")
+        ch_ext.set('cx', '0')
+        ch_ext.set('cy', '0')
+
+        return grp_sp
+
+    def add_group_shape(self, *args, **kwargs) -> IGroupShape:
+        """Add a new GroupShape to the collection.
+
+        Overloads:
+            add_group_shape() -> IGroupShape
+                Creates an empty group shape.
+        """
+        from .GroupShape import GroupShape
+
+        sp_tree = self._get_sp_tree()
+        if sp_tree is None:
+            raise RuntimeError("Cannot add shape: slide has no shape tree")
+
+        shape_id = self._next_shape_id()
+        name = f"Group {shape_id}"
+
+        grp_xml = self._build_group_shape_xml(shape_id, name)
+        sp_tree.append(grp_xml)
+
+        self._invalidate_cache()
+        self._save()
+
+        group = GroupShape()
+        group._init_internal(grp_xml, self._slide_part, self._parent_slide)
+        self._element_to_shape[id(grp_xml)] = group
+        return group
 
 
 
@@ -630,6 +787,343 @@ class ShapeCollection(BaseCollection, IShapeCollection):
         picture_frame._init_internal(pic, self._slide_part, self._parent_slide)
         self._element_to_shape[id(pic)] = picture_frame
         return picture_frame
+
+    def add_chart(self, *args, **kwargs):
+        """
+        Add a chart to the slide.
+
+        Overloads:
+        - add_chart(type, x, y, width, height)
+        - add_chart(type, x, y, width, height, init_with_sample)
+        """
+        chart_type = args[0]
+        x, y, width, height = args[1], args[2], args[3], args[4]
+        init_with_sample = args[5] if len(args) > 5 else True
+        return self._add_chart_impl(None, chart_type, x, y, width, height, init_with_sample)
+
+    def insert_chart(self, *args, **kwargs):
+        """
+        Insert a chart at a specific index.
+
+        Overloads:
+        - insert_chart(type, x, y, width, height, index)
+        - insert_chart(type, x, y, width, height, index, init_with_sample)
+        """
+        chart_type = args[0]
+        x, y, width, height = args[1], args[2], args[3], args[4]
+        index = args[5]
+        init_with_sample = args[6] if len(args) > 6 else True
+        return self._add_chart_impl(index, chart_type, x, y, width, height, init_with_sample)
+
+    def _add_chart_impl(self, index, chart_type, x, y, width, height, init_with_sample=True):
+        """Core implementation for add_chart and insert_chart."""
+        from .charts.Chart import Chart
+        from ._internal.pptx.chart_part import ChartPart
+        from ._internal.pptx.constants import EMU_PER_POINT, Elements
+        from ._internal.xlsx.cell_reference import format_cell_ref
+        from .charts.ChartType import ChartType
+        from ._internal.opc.relationships import REL_TYPES
+        from ._internal.opc.content_types import ContentTypesManager
+
+        sp_tree = self._get_sp_tree()
+        if sp_tree is None:
+            raise RuntimeError("Cannot add shape: slide has no shape tree")
+
+        shape_id = self._next_shape_id()
+        name = f"Chart {shape_id}"
+
+        x_emu = str(int(round(x * EMU_PER_POINT)))
+        y_emu = str(int(round(y * EMU_PER_POINT)))
+        w_emu = str(int(round(width * EMU_PER_POINT)))
+        h_emu = str(int(round(height * EMU_PER_POINT)))
+
+        # Determine chart part name
+        chart_num = self._next_chart_number()
+        chart_part_name = f'ppt/charts/chart{chart_num}.xml'
+        xlsx_num = self._next_embeddings_number()
+        xlsx_part_name = f'ppt/embeddings/Microsoft_Excel_Worksheet{xlsx_num}.xlsx'
+
+        # Get the chart type value
+        ct_val = chart_type.value if isinstance(chart_type, ChartType) else str(chart_type)
+
+        # Create the chart part + embedded XLSX
+        chart_part = ChartPart.create_new(
+            self._slide_part._package, chart_part_name, ct_val, xlsx_part_name
+        )
+
+        # Populate sample data if requested
+        if init_with_sample:
+            self._populate_sample_data(chart_part, ct_val)
+
+        # Add slide → chart relationship
+        rel_target = f'../charts/chart{chart_num}.xml'
+        rel_id = self._slide_part._rels_manager.add_relationship(
+            REL_TYPES['chart'], rel_target
+        )
+
+        # Build graphicFrame XML
+        gf = ET.Element(Elements.P_GRAPHIC_FRAME)
+
+        # nvGraphicFramePr
+        nv_gf_pr = ET.SubElement(gf, Elements.P_NV_GRAPHIC_FRAME_PR)
+        c_nv_pr = ET.SubElement(nv_gf_pr, Elements.C_NV_PR)
+        c_nv_pr.set('id', str(shape_id))
+        c_nv_pr.set('name', name)
+        c_nv_gf_pr = ET.SubElement(nv_gf_pr, Elements.P_C_NV_GRAPHIC_FRAME_PR)
+        gf_locking = ET.SubElement(c_nv_gf_pr, Elements.A_GRAPHIC_FRAME_LOCKING)
+        gf_locking.set('noGrp', '1')
+        ET.SubElement(nv_gf_pr, Elements.P_NV_PR)
+
+        # p:xfrm
+        xfrm = ET.SubElement(gf, Elements.P_XFRM)
+        off = ET.SubElement(xfrm, Elements.A_OFF)
+        off.set('x', x_emu)
+        off.set('y', y_emu)
+        ext = ET.SubElement(xfrm, Elements.A_EXT)
+        ext.set('cx', w_emu)
+        ext.set('cy', h_emu)
+
+        # a:graphic > a:graphicData > c:chart
+        graphic = ET.SubElement(gf, Elements.A_GRAPHIC)
+        graphic_data = ET.SubElement(graphic, Elements.A_GRAPHIC_DATA)
+        graphic_data.set('uri', Elements.CHART_URI)
+        c_chart = ET.SubElement(graphic_data, Elements.C_CHART)
+        c_chart.set(f'{NS.R}id', rel_id)
+
+        # Insert into spTree
+        if index is None:
+            sp_tree.append(gf)
+        else:
+            shape_count = 0
+            insert_pos = len(sp_tree)
+            for i, elem in enumerate(sp_tree):
+                tag = elem.tag
+                if tag in (f"{NS.P}nvGrpSpPr", f"{NS.P}grpSpPr"):
+                    continue
+                if shape_count == index:
+                    insert_pos = i
+                    break
+                shape_count += 1
+            sp_tree.insert(insert_pos, gf)
+
+        self._invalidate_cache()
+        self._save()
+
+        # Save the chart part and its relationships
+        chart_part.save()
+
+        # Create Chart wrapper
+        chart = Chart()
+        chart._init_internal(gf, self._slide_part, self._parent_slide)
+        # Honor the requested chart type — detection from XML can't tell
+        # BubbleWith3D from Bubble before any series are emitted (the
+        # distinguishing <c:bubble3D val="1"/> lives inside <c:ser>).
+        if isinstance(chart_type, ChartType):
+            chart.type = chart_type
+        return chart
+
+    def _next_chart_number(self) -> int:
+        """Find next available chart number across the package."""
+        counter = 1
+        while self._slide_part._package.has_part(f'ppt/charts/chart{counter}.xml'):
+            counter += 1
+        return counter
+
+    def _next_embeddings_number(self) -> int:
+        """Find next available embeddings number across the package."""
+        counter = 1
+        while self._slide_part._package.has_part(
+                f'ppt/embeddings/Microsoft_Excel_Worksheet{counter}.xlsx'):
+            counter += 1
+        return counter
+
+    def _populate_sample_data(self, chart_part, chart_type_value: str):
+        """Populate chart with sample data (3 series x 4 categories)."""
+        from ._internal.pptx.chart_mappings import get_chart_type_info, DP_SCATTER, DP_BUBBLE, DP_PIE, DP_DOUGHNUT
+
+        info = get_chart_type_info(chart_type_value)
+        if info is None:
+            return
+
+        _, _, _, dp_family = info
+        xlsx = chart_part.get_xlsx()
+        ws = xlsx.get_worksheet(0)
+        if ws is None:
+            return
+
+        C = NS.C
+        ct_elem = chart_part.get_chart_type_element()
+        if ct_elem is None:
+            return
+
+        # Bubble/scatter use a numeric X/Y layout, not category+series columns.
+        # One series, with x-values in column A and y-values in column B
+        # (plus bubble sizes in column C for bubble). Writing multiple series
+        # against overlapping columns confuses PowerPoint's "Edit Data" refresh.
+        if dp_family in (DP_SCATTER, DP_BUBBLE):
+            self._populate_xy_sample_data(chart_part, ct_elem, ws,
+                                          is_bubble=(dp_family == DP_BUBBLE))
+            chart_part.save()
+            return
+
+        categories = ['Category 1', 'Category 2', 'Category 3', 'Category 4']
+        series_names = ['Series 1', 'Series 2', 'Series 3']
+        sample_data = [
+            [4.3, 2.5, 3.5, 4.5],
+            [2.4, 4.4, 1.8, 2.8],
+            [2.0, 2.0, 3.0, 5.0],
+        ]
+
+        if dp_family in (DP_PIE, DP_DOUGHNUT):
+            series_names = ['Series 1']
+            sample_data = [sample_data[0]]
+
+        # Write to XLSX
+        ws.set_cell('A1', ' ')
+        for si, sname in enumerate(series_names):
+            from ._internal.xlsx.cell_reference import format_cell_ref
+            ws.set_cell(format_cell_ref(0, si + 1), sname)
+        for ci, cname in enumerate(categories):
+            from ._internal.xlsx.cell_reference import format_cell_ref
+            ws.set_cell(format_cell_ref(ci + 1, 0), cname)
+            for si, vals in enumerate(sample_data):
+                ws.set_cell(format_cell_ref(ci + 1, si + 1), vals[ci])
+
+        # Build series XML
+        for si, sname in enumerate(series_names):
+            from ._internal.xlsx.cell_reference import format_cell_ref
+            ser = ET.SubElement(ct_elem, f'{C}ser')
+            idx_elem = ET.SubElement(ser, f'{C}idx')
+            idx_elem.set('val', str(si))
+            order_elem = ET.SubElement(ser, f'{C}order')
+            order_elem.set('val', str(si))
+
+            # Series name
+            tx = ET.SubElement(ser, f'{C}tx')
+            str_ref = ET.SubElement(tx, f'{C}strRef')
+            f_elem = ET.SubElement(str_ref, f'{C}f')
+            col_letter = format_cell_ref(0, si + 1).rstrip('1')
+            f_elem.text = f'Sheet1!${col_letter}$1'
+            str_cache = ET.SubElement(str_ref, f'{C}strCache')
+            pt_count = ET.SubElement(str_cache, f'{C}ptCount')
+            pt_count.set('val', '1')
+            pt = ET.SubElement(str_cache, f'{C}pt')
+            pt.set('idx', '0')
+            v = ET.SubElement(pt, f'{C}v')
+            v.text = sname
+
+            # Categories — only on the last series (matching PowerPoint behavior)
+            if si == len(series_names) - 1:
+                cat = ET.SubElement(ser, f'{C}cat')
+                cat_str_ref = ET.SubElement(cat, f'{C}strRef')
+                cat_f = ET.SubElement(cat_str_ref, f'{C}f')
+                cat_f.text = f'Sheet1!$A$2:$A${len(categories) + 1}'
+                cat_cache = ET.SubElement(cat_str_ref, f'{C}strCache')
+                cat_pt_count = ET.SubElement(cat_cache, f'{C}ptCount')
+                cat_pt_count.set('val', str(len(categories)))
+                for ci, cname in enumerate(categories):
+                    cat_pt = ET.SubElement(cat_cache, f'{C}pt')
+                    cat_pt.set('idx', str(ci))
+                    cat_v = ET.SubElement(cat_pt, f'{C}v')
+                    cat_v.text = cname
+
+            # Values
+            val = ET.SubElement(ser, f'{C}val')
+            num_ref = ET.SubElement(val, f'{C}numRef')
+            val_f = ET.SubElement(num_ref, f'{C}f')
+            val_col = format_cell_ref(0, si + 1).rstrip('1')
+            val_f.text = f'Sheet1!${val_col}$2:${val_col}${len(categories) + 1}'
+            num_cache = ET.SubElement(num_ref, f'{C}numCache')
+            fmt = ET.SubElement(num_cache, f'{C}formatCode')
+            fmt.text = 'General'
+            val_pt_count = ET.SubElement(num_cache, f'{C}ptCount')
+            val_pt_count.set('val', str(len(categories)))
+            for ci, dval in enumerate(sample_data[si]):
+                val_pt = ET.SubElement(num_cache, f'{C}pt')
+                val_pt.set('idx', str(ci))
+                val_v = ET.SubElement(val_pt, f'{C}v')
+                # Format: integers without .0
+                val_v.text = str(int(dval)) if dval == int(dval) else str(dval)
+
+        # Move axId elements after all ser elements
+        # They were already added by ChartPart.create_new before ser elements,
+        # but OOXML requires axId after ser. Fix order.
+        ax_ids = ct_elem.findall(f'{C}axId')
+        for ax_id in ax_ids:
+            ct_elem.remove(ax_id)
+            ct_elem.append(ax_id)
+
+        # Save the chart part with updated XML
+        chart_part.save()
+
+    def _populate_xy_sample_data(self, chart_part, ct_elem, ws, is_bubble: bool):
+        """Populate a scatter/bubble chart with one series of X/Y (and size) data.
+
+        xlsx layout:
+            A1=X-Values   B1=Y-Values   C1=Size (bubble only)
+            A2..A4, B2..B4, C2..C4 — 3 numeric data points
+        Chart XML: a single <c:ser> with <c:xVal>/<c:yVal>(/<c:bubbleSize>)
+        referencing those ranges.
+        """
+        C = NS.C
+        x_vals = [0.7, 1.8, 2.6]
+        y_vals = [2.7, 3.2, 0.8]
+        sizes = [4.0, 5.0, 6.0]
+
+        ws.set_cell('A1', 'X-Values')
+        ws.set_cell('B1', 'Y-Values')
+        if is_bubble:
+            ws.set_cell('C1', 'Size')
+        for i, (xv, yv) in enumerate(zip(x_vals, y_vals)):
+            ws.set_cell(f'A{i + 2}', xv)
+            ws.set_cell(f'B{i + 2}', yv)
+            if is_bubble:
+                ws.set_cell(f'C{i + 2}', sizes[i])
+
+        ser = ET.SubElement(ct_elem, f'{C}ser')
+        idx_elem = ET.SubElement(ser, f'{C}idx')
+        idx_elem.set('val', '0')
+        order_elem = ET.SubElement(ser, f'{C}order')
+        order_elem.set('val', '0')
+
+        tx = ET.SubElement(ser, f'{C}tx')
+        str_ref = ET.SubElement(tx, f'{C}strRef')
+        f_elem = ET.SubElement(str_ref, f'{C}f')
+        f_elem.text = 'Sheet1!$B$1'
+        str_cache = ET.SubElement(str_ref, f'{C}strCache')
+        pt_count = ET.SubElement(str_cache, f'{C}ptCount')
+        pt_count.set('val', '1')
+        pt = ET.SubElement(str_cache, f'{C}pt')
+        pt.set('idx', '0')
+        v = ET.SubElement(pt, f'{C}v')
+        v.text = 'Y-Values'
+
+        def _write_num_ref(parent_tag, range_ref, values):
+            parent = ET.SubElement(ser, f'{C}{parent_tag}')
+            num_ref = ET.SubElement(parent, f'{C}numRef')
+            fe = ET.SubElement(num_ref, f'{C}f')
+            fe.text = range_ref
+            num_cache = ET.SubElement(num_ref, f'{C}numCache')
+            fmt = ET.SubElement(num_cache, f'{C}formatCode')
+            fmt.text = 'General'
+            pc = ET.SubElement(num_cache, f'{C}ptCount')
+            pc.set('val', str(len(values)))
+            for i, val in enumerate(values):
+                pt_el = ET.SubElement(num_cache, f'{C}pt')
+                pt_el.set('idx', str(i))
+                ve = ET.SubElement(pt_el, f'{C}v')
+                ve.text = str(int(val)) if val == int(val) else str(val)
+
+        last_row = len(x_vals) + 1
+        _write_num_ref('xVal', f'Sheet1!$A$2:$A${last_row}', x_vals)
+        _write_num_ref('yVal', f'Sheet1!$B$2:$B${last_row}', y_vals)
+        if is_bubble:
+            _write_num_ref('bubbleSize', f'Sheet1!$C$2:$C${last_row}', sizes)
+
+        ax_ids = ct_elem.findall(f'{C}axId')
+        for ax_id in ax_ids:
+            ct_elem.remove(ax_id)
+            ct_elem.append(ax_id)
 
     def add_table(self, x, y, column_widths, row_heights) -> ITable:
         return self._add_table_impl(None, x, y, column_widths, row_heights)

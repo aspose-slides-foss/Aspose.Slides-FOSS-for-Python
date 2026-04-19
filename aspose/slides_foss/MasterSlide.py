@@ -6,6 +6,7 @@ from .IMasterSlide import IMasterSlide
 if TYPE_CHECKING:
     from .IMasterLayoutSlideCollection import IMasterLayoutSlideCollection
     from .ISlide import ISlide
+    from .theme.IMasterThemeManager import IMasterThemeManager
     from ._internal.pptx.master_slide_part import MasterSlidePart
     from ._internal.opc import OpcPackage
 
@@ -35,6 +36,19 @@ class MasterSlide(BaseSlide, IMasterSlide):
 
 
 
+
+    @property
+    def theme_manager(self) -> IMasterThemeManager:
+        """Returns the theme manager. Read-only ."""
+        if not hasattr(self, '_theme_manager_cache') or self._theme_manager_cache is None:
+            from .theme.MasterThemeManager import MasterThemeManager
+            mgr = MasterThemeManager()
+            mgr._init_internal(
+                self._presentation_ref.master_theme,
+                self._presentation_ref,
+            )
+            self._theme_manager_cache = mgr
+        return self._theme_manager_cache
 
     @property
     def layout_slides(self) -> IMasterLayoutSlideCollection:

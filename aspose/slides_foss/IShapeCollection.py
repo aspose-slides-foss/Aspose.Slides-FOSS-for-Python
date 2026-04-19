@@ -5,6 +5,7 @@ from typing import overload, TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from .IAutoShape import IAutoShape
     from .IConnector import IConnector
+    from .IGroupShape import IGroupShape
     from .IPictureFrame import IPictureFrame
     from .IShape import IShape
     from .ITable import ITable
@@ -112,6 +113,18 @@ class IShapeCollection(ABC):
     @overload
     def insert_connector(self, index, shape_type, x, y, width, height, create_from_template) -> IConnector:
         ...
+
+    @overload
+    def add_group_shape(self) -> IGroupShape:
+        ...
+
+    @overload
+    def add_group_shape(self, svg_image, x, y, width, height) -> IGroupShape:
+        ...
+
+    def add_group_shape(self, *args, **kwargs) -> IGroupShape:
+        ...
+
     def index_of(self, shape) -> int:
         ...
     def add_picture_frame(self, shape_type, x, y, width, height, image) -> IPictureFrame:

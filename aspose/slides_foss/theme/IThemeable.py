@@ -10,11 +10,24 @@ if TYPE_CHECKING:
 
 class IThemeable(ISlideComponent, IPresentationComponent, ABC):
     """Represents objects that can be themed with ."""
-
-
-
     @property
-    def presentation(self) -> IPresentation:
+    @abstractmethod
+    def as_i_slide_component(self) -> ISlideComponent:
+        """Returns ISlideComponent interface. Read-only ."""
         ...
 
+    @property
+    @abstractmethod
+    def slide(self) -> IBaseSlide:
+        ...
+
+    @property
+    @abstractmethod
+    def as_i_presentation_component(self) -> IPresentationComponent:
+        ...
+
+    @property
+    @abstractmethod
+    def presentation(self) -> IPresentation:
+        ...
 

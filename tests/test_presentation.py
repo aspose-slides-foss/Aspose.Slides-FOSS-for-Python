@@ -51,7 +51,7 @@ def test_first_slide_number(tmp_pptx):
 
 def test_load_existing(test_data_dir):
     """Load a known .pptx from test_data and verify it opens."""
-    path = os.path.join(os.path.dirname(test_data_dir), "..", "test_data", "Presentation.pptx")
+    path = os.path.join(test_data_dir, "Presentation.pptx")
     if not os.path.exists(path):
         pytest.skip("Presentation.pptx not found in test_data")
     pres = Presentation(path)

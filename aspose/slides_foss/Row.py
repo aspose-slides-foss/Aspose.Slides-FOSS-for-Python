@@ -59,12 +59,6 @@ class Row(CellCollection, IRow):
                 self._slide_part.save()
 
     @property
-    def row_format(self) -> IRowFormat:
-        """Returns the RowFormat object that contains formatting properties for this row. Read-only ."""
-        from .RowFormat import RowFormat
-        return RowFormat()
-
-    @property
     def as_i_cell_collection(self) -> ICellCollection:
         return self
 

@@ -4,9 +4,6 @@ from typing import overload, TYPE_CHECKING, Any
 from .ICellCollection import ICellCollection
 from .IBulkTextFormattable import IBulkTextFormattable
 
-if TYPE_CHECKING:
-    from .IRowFormat import IRowFormat
-
 class IRow(ICellCollection, IBulkTextFormattable, ABC):
     """Represents a row in a table."""
     @property
@@ -21,11 +18,6 @@ class IRow(ICellCollection, IBulkTextFormattable, ABC):
 
     @minimal_height.setter
     def minimal_height(self, value: float):
-        ...
-
-    @property
-    def row_format(self) -> IRowFormat:
-        """Returns the RowFormat object that contains formatting properties for this row. Read-only ."""
         ...
 
     @property

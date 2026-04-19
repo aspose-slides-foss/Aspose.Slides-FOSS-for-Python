@@ -23,6 +23,7 @@ if TYPE_CHECKING:
     from .IMasterSlideCollection import IMasterSlideCollection
     from .INotesSize import INotesSize
     from .ISlideCollection import ISlideCollection
+    from .theme.IMasterTheme import IMasterTheme
 
 
 class Presentation(IPresentation, IPresentationComponent):
@@ -57,6 +58,8 @@ class Presentation(IPresentation, IPresentationComponent):
         self._layout_slides_map: Optional[dict] = None
         self._document_properties = None
         self._comment_authors = None
+        self._master_theme = None
+        self._theme_part = None
 
         # Parse arguments to determine which overload was called
         source: Optional[Union[str, BinaryIO]] = None
@@ -222,6 +225,18 @@ class Presentation(IPresentation, IPresentationComponent):
             self._images._init_internal(self._opc_package)
         return self._images
 
+    @property
+    def master_theme(self) -> IMasterTheme:
+        """Returns master theme of the presentation. Read-only ."""
+        if self._master_theme is None:
+            self._theme_part = self._presentation_part.get_theme_part()
+            if self._theme_part is not None:
+                from .theme.MasterTheme import MasterTheme
+                mt = MasterTheme()
+                mt._init_internal(self._theme_part, self)
+                self._master_theme = mt
+        return self._master_theme
+
 
 
 
@@ -364,6 +379,9 @@ class Presentation(IPresentation, IPresentationComponent):
             for slide in self._slides:
                 if hasattr(slide, '_slide_part') and slide._slide_part is not None:
                     slide._slide_part.save()
+                    # Save chart parts registered on this slide
+                    for cp in getattr(slide._slide_part, '_chart_parts', []):
+                        cp.save()
                 # Save notes slide if it was loaded or created
                 if hasattr(slide, '_notes_slide_manager_cache') and \
                         slide._notes_slide_manager_cache is not None:
@@ -386,6 +404,10 @@ class Presentation(IPresentation, IPresentationComponent):
                 if part_name.startswith('ppt/comments/') and part_name.endswith('.xml'):
                     cp = CommentsPart(self._opc_package, part_name)
                     cp.save()
+
+        # Save theme if it was loaded/modified
+        if self._theme_part is not None:
+            self._theme_part.save()
 
         # Update the presentation.xml part before saving
         if self._presentation_part:

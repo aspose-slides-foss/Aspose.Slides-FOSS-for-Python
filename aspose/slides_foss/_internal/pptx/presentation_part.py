@@ -10,9 +10,11 @@ import lxml.etree as ET
 from typing import Optional, TYPE_CHECKING
 
 from .constants import NS, Elements, Attributes, NAMESPACES
+from ..opc.relationships import REL_TYPES
 
 if TYPE_CHECKING:
     from ..opc import OpcPackage
+    from .theme_part import ThemePart
 
 # Register namespaces for clean XML output
 for prefix, uri in NAMESPACES.items():
@@ -358,6 +360,21 @@ class PresentationPart:
     def set_first_slide_number(self, number: int) -> None:
         """Set the first slide number for numbering."""
         self._root.set('firstSlideNum', str(number))
+
+    def get_theme_part(self) -> ThemePart:
+        """Get the theme part referenced by this presentation."""
+        from ..opc import RelationshipsManager
+        rels = RelationshipsManager(self._package, self.PART_NAME)
+        theme_rels = rels.get_relationships_by_type(REL_TYPES['theme'])
+        if not theme_rels:
+            return None
+        target = theme_rels[0].target
+        if target.startswith('/'):
+            part_name = target.lstrip('/')
+        else:
+            part_name = 'ppt/' + target
+        from .theme_part import ThemePart as TP
+        return TP(self._package, part_name)
 
     def save(self) -> None:
         """Save the presentation.xml back to the package."""

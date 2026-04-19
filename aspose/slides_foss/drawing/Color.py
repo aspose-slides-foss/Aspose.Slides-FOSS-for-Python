@@ -11,8 +11,21 @@ class Color:
         self._b = b
 
     @staticmethod
-    def from_argb(a: int, r: int, g: int, b: int) -> Color:
-        return Color(a, r, g, b)
+    def from_argb(*args) -> Color:
+        """Create a Color from ARGB components.
+
+        Overloads:
+            from_argb(r, g, b) — alpha defaults to 255
+            from_argb(a, r, g, b) — explicit alpha
+        """
+        if len(args) == 3:
+            r, g, b = args
+            return Color(255, r, g, b)
+        elif len(args) == 4:
+            a, r, g, b = args
+            return Color(a, r, g, b)
+        else:
+            raise TypeError(f"from_argb() takes 3 or 4 arguments ({len(args)} given)")
 
     @property
     def r(self) -> int:

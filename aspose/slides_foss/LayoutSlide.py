@@ -7,6 +7,7 @@ if TYPE_CHECKING:
     from .IMasterSlide import IMasterSlide
     from .ISlide import ISlide
     from .SlideLayoutType import SlideLayoutType
+    from .theme.IOverrideThemeManager import IOverrideThemeManager
     from ._internal.pptx.layout_slide_part import LayoutSlidePart
     from ._internal.opc import OpcPackage
 
@@ -35,6 +36,16 @@ class LayoutSlide(BaseSlide, ILayoutSlide):
         self._master_slide_cache: Optional[IMasterSlide] = None
 
 
+
+    @property
+    def theme_manager(self) -> IOverrideThemeManager:
+        """Returns the overriding theme manager. Read-only ."""
+        if not hasattr(self, '_theme_manager_cache') or self._theme_manager_cache is None:
+            from .theme.LayoutSlideThemeManager import LayoutSlideThemeManager
+            mgr = LayoutSlideThemeManager()
+            mgr._init_internal()
+            self._theme_manager_cache = mgr
+        return self._theme_manager_cache
 
     @property
     def master_slide(self) -> IMasterSlide:
