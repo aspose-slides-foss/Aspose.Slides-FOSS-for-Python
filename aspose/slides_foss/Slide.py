@@ -128,7 +128,7 @@ class Slide(BaseSlide, ISlide):
         Pass None to get comments from all authors.
         """
         class ICommentList(list):
-            """list subclass that also exposes .length for .NET API compatibility."""
+            """list subclass that also exposes .length for API compatibility."""
             @property
             def length(self):
                 return len(self)

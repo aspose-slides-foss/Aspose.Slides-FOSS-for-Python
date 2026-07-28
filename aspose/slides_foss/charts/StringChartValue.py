@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from .ChartDataCell import ChartDataCell
 
 
-class StringChartValue(IStringChartValue, BaseChartValue):
+class StringChartValue(BaseChartValue, IStringChartValue):
     """Represents a string value backed by workbook cells or literal."""
 
     @property

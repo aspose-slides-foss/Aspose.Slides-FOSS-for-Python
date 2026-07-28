@@ -53,8 +53,8 @@ class DataLabel(IDataLabel):
         New per-point labels inherit show_* flag values from the series
         default (the <c:dLbls> element), then PowerPoint treats the <c:dLbl>
         as a complete override and stops falling back to the series default.
-        This matches commercial Aspose output and avoids PP corruption when
-        a per-point override is written without an explicit show_* flag.
+        This avoids PP corruption when a per-point override is written
+        without an explicit show_* flag.
         """
         if self._elem is not None:
             return self._elem
@@ -205,8 +205,8 @@ class DataLabel(IDataLabel):
         elem.set('val', str(value))
 
     # Data label width/height live in a c15:layout extension, not in the base
-    # <c:manualLayout>. Commercial Aspose uses this pattern and PowerPoint
-    # expects w/h here for data-label sizing (as opposed to x/y positioning).
+    # <c:manualLayout> — PowerPoint expects w/h here for data-label sizing
+    # (as opposed to x/y positioning).
 
     def _read_c15_layout_val(self, attr: str) -> float:
         """Read w or h from the c15:layout extension."""
@@ -324,8 +324,9 @@ class DataLabel(IDataLabel):
     def get_actual_label_text(self) -> str:
         """Return the explicit override text when present, else empty string.
 
-        Aspose computes auto-generated text from show_* flags at render time.
-        FOSS does not render, so only the explicit override text is known.
+        Auto-generated label text is computed from show_* flags at render
+        time; this library does not render, so only the explicit override
+        text is known.
         """
         tf = self.text_frame_for_overriding
         if tf is None:

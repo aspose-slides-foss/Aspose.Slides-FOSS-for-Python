@@ -18,7 +18,7 @@ class BaseCollection:
       - __getitem__(self, index: int) -> item
 
     In return they automatically get:
-      - .length property  (mirrors Aspose .NET ICollection.Count / len())
+      - .length property  (mirrors the collection Count / len())
       - __iter__          (sequential index-based iteration)
       - __contains__      (identity + equality membership test)
     """

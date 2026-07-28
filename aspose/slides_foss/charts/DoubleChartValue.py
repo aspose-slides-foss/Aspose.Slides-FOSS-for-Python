@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from .IChartDataCell import IChartDataCell
 
 
-class DoubleChartValue(IDoubleChartValue, BaseChartValue):
+class DoubleChartValue(BaseChartValue, IDoubleChartValue):
     """Represents a double value backed by a workbook cell or literal."""
 
     @property

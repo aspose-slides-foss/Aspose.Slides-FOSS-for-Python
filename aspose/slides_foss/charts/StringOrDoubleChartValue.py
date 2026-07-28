@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from .IChartDataCell import IChartDataCell
 
 
-class StringOrDoubleChartValue(IStringOrDoubleChartValue, BaseChartValue):
+class StringOrDoubleChartValue(BaseChartValue, IStringOrDoubleChartValue):
     """Represents a value that can be string or double, backed by a cell or literal."""
 
     @property

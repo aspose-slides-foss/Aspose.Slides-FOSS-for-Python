@@ -278,8 +278,8 @@ class TestXlsxFromChartsPptx(unittest.TestCase):
         self.assertEqual(ws.get_cell('D2').value, 2)
 
     def test_read_chart2_data(self):
-        """Read the second embedded XLSX (single-series pie chart)."""
-        xlsx_bytes = self._extract_xlsx_bytes('ppt/embeddings/Microsoft_Excel_Worksheet2.xlsx')
+        """Read the pie chart's embedded XLSX (single series)."""
+        xlsx_bytes = self._extract_xlsx_bytes('ppt/embeddings/Microsoft_Excel_Worksheet8.xlsx')
         xlsx = XlsxPackage.from_bytes(xlsx_bytes)
 
         ws = xlsx.get_worksheet('Sheet1')

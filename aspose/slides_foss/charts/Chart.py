@@ -255,7 +255,7 @@ class Chart(IChart, GraphicalObject):
         if elem is None:
             elem = ET.SubElement(chart_elem, f'{NS.C}dispBlanksAs')
         xml_val = _BLANKS_XML_MAP.get(value.value, 'zero')
-        # Commercial omits val for default "zero"
+        # The val attribute is omitted for the default "zero"
         if xml_val == 'zero':
             if 'val' in elem.attrib:
                 del elem.attrib['val']
@@ -613,38 +613,52 @@ class Chart(IChart, GraphicalObject):
                     if val_elem is not None:
                         is_xy_series = True
                 if val_elem is not None:
+                    cache = None
                     num_ref = val_elem.find(f'{C}numRef')
                     if num_ref is not None:
                         cache = num_ref.find(f'{C}numCache')
-                        if cache is not None:
-                            for pt in cache.findall(f'{C}pt'):
-                                v = pt.find(f'{C}v')
-                                if v is not None and v.text:
-                                    try:
-                                        val = float(v.text)
-                                        if val == int(val):
-                                            val = int(val)
-                                    except ValueError:
-                                        val = 0
+                    if cache is None:
+                        cache = val_elem.find(f'{C}numLit')
+                    if cache is not None:
+                        values_by_idx = {}
+                        for pos, pt in enumerate(cache.findall(f'{C}pt')):
+                            v = pt.find(f'{C}v')
+                            if v is not None and v.text:
+                                try:
+                                    val = float(v.text)
+                                    if val == int(val):
+                                        val = int(val)
+                                except ValueError:
+                                    val = 0
+                                try:
+                                    idx = int(pt.get('idx', pos))
+                                except ValueError:
+                                    idx = pos
+                                values_by_idx[idx] = float(val)
+                        if values_by_idx:
+                            for i in range(max(values_by_idx) + 1):
+                                dv = None
+                                y_val = None
+                                if i in values_by_idx:
                                     dv = DoubleChartValue()
-                                    dv._init_internal(DataSourceType.DOUBLE_LITERALS, literal=float(val))
-                                    dp = ChartDataPoint()
+                                    dv._init_internal(DataSourceType.DOUBLE_LITERALS,
+                                                      literal=values_by_idx[i])
                                     # For scatter/bubble, also populate y_value so
                                     # the emitter round-trips through the xy path.
-                                    y_val = None
                                     if is_xy_series:
                                         y_val = DoubleChartValue()
                                         y_val._init_internal(
                                             DataSourceType.DOUBLE_LITERALS,
-                                            literal=float(val),
+                                            literal=values_by_idx[i],
                                         )
-                                    dp._init_internal(
-                                        index=len(series.data_points._points),
-                                        value=dv,
-                                        y_value=y_val,
-                                        parent_collection=series.data_points,
-                                    )
-                                    series.data_points._points.append(dp)
+                                dp = ChartDataPoint()
+                                dp._init_internal(
+                                    index=i,
+                                    value=dv,
+                                    y_value=y_val,
+                                    parent_collection=series.data_points,
+                                )
+                                series.data_points._points.append(dp)
 
                 # Parse X values from <c:xVal> (scatter/bubble) into dp.x_value
                 if is_xy_series:
@@ -684,34 +698,67 @@ class Chart(IChart, GraphicalObject):
             if cat_elem is not None:
                 break
         if cat_elem is not None:
+            cache = None
+            numeric = False
             str_ref = cat_elem.find(f'{C}strRef')
             if str_ref is not None:
                 cache = str_ref.find(f'{C}strCache')
-                if cache is not None:
-                    for pt in cache.findall(f'{C}pt'):
-                        v = pt.find(f'{C}v')
-                        if v is not None and v.text:
-                            from .ChartCategory import ChartCategory
-                            cat = ChartCategory()
-                            cat._init_internal(literal=v.text,
-                                               parent_collection=self._chart_data.categories)
-                            self._chart_data.categories._categories.append(cat)
+            if cache is None:
+                cache = cat_elem.find(f'{C}strLit')
+            if cache is None:
+                num_ref = cat_elem.find(f'{C}numRef')
+                if num_ref is not None:
+                    cache = num_ref.find(f'{C}numCache')
+                if cache is None:
+                    cache = cat_elem.find(f'{C}numLit')
+                numeric = cache is not None
+            if cache is not None:
+                from .ChartCategory import ChartCategory
+                fmt_elem = cache.find(f'{C}formatCode')
+                format_code = fmt_elem.text if fmt_elem is not None else None
+                for pt in cache.findall(f'{C}pt'):
+                    v = pt.find(f'{C}v')
+                    if v is not None and v.text:
+                        value = v.text
+                        if numeric:
+                            try:
+                                value = float(v.text)
+                                if value == int(value):
+                                    value = int(value)
+                            except ValueError:
+                                value = v.text
+                        cat = ChartCategory()
+                        cat._init_internal(literal=value,
+                                           parent_collection=self._chart_data.categories)
+                        cat._format_code = format_code
+                        self._chart_data.categories._categories.append(cat)
+
+    @staticmethod
+    def _point_at(series, idx):
+        """Returns the data point at positional index idx, creating empty
+        (value-less) points as needed so sparse series keep their gaps."""
+        from .ChartDataPoint import ChartDataPoint
+
+        points = series.data_points._points
+        while len(points) <= idx:
+            dp = ChartDataPoint()
+            dp._init_internal(index=len(points), parent_collection=series.data_points)
+            points.append(dp)
+        return points[idx]
 
     @staticmethod
     def _load_xvalues_into_points(series, ser_elem):
         """Populate dp.x_value on each data point from <c:xVal>.
 
         Handles both <c:numRef>/<c:numCache> and <c:strRef>/<c:strCache>.
-        Points are expected to already exist in series.data_points._points.
+        Points are positional by the pt idx attribute; missing positions are
+        created as empty points.
         """
         from .._internal.pptx.constants import NS
         from .DataSourceType import DataSourceType
         from .StringOrDoubleChartValue import StringOrDoubleChartValue
         C = NS.C
 
-        points = series.data_points._points
-        if not points:
-            return
         x_elem = ser_elem.find(f'{C}xVal')
         if x_elem is None:
             return
@@ -723,14 +770,14 @@ class Chart(IChart, GraphicalObject):
                 for pt in cache.findall(f'{C}pt'):
                     idx = int(pt.get('idx', '0'))
                     v = pt.find(f'{C}v')
-                    if v is not None and v.text and idx < len(points):
+                    if v is not None and v.text:
                         try:
                             val = float(v.text)
                         except ValueError:
                             continue
                         xv = StringOrDoubleChartValue()
                         xv._init_internal(DataSourceType.DOUBLE_LITERALS, literal=val)
-                        points[idx]._x_value = xv
+                        Chart._point_at(series, idx)._x_value = xv
             return
 
         str_ref = x_elem.find(f'{C}strRef')
@@ -740,22 +787,23 @@ class Chart(IChart, GraphicalObject):
                 for pt in cache.findall(f'{C}pt'):
                     idx = int(pt.get('idx', '0'))
                     v = pt.find(f'{C}v')
-                    if v is not None and v.text is not None and idx < len(points):
+                    if v is not None and v.text is not None:
                         xv = StringOrDoubleChartValue()
                         xv._init_internal(DataSourceType.STRING_LITERALS, literal=v.text)
-                        points[idx]._x_value = xv
+                        Chart._point_at(series, idx)._x_value = xv
 
     @staticmethod
     def _load_bubble_sizes_into_points(series, ser_elem):
-        """Populate dp.bubble_size on each data point from <c:bubbleSize>."""
+        """Populate dp.bubble_size on each data point from <c:bubbleSize>.
+
+        Points are positional by the pt idx attribute; missing positions are
+        created as empty points.
+        """
         from .._internal.pptx.constants import NS
         from .DataSourceType import DataSourceType
         from .DoubleChartValue import DoubleChartValue
         C = NS.C
 
-        points = series.data_points._points
-        if not points:
-            return
         bub_elem = ser_elem.find(f'{C}bubbleSize')
         if bub_elem is None:
             return
@@ -768,14 +816,14 @@ class Chart(IChart, GraphicalObject):
         for pt in cache.findall(f'{C}pt'):
             idx = int(pt.get('idx', '0'))
             v = pt.find(f'{C}v')
-            if v is not None and v.text and idx < len(points):
+            if v is not None and v.text:
                 try:
                     val = float(v.text)
                 except ValueError:
                     continue
                 bs = DoubleChartValue()
                 bs._init_internal(DataSourceType.DOUBLE_LITERALS, literal=val)
-                points[idx]._bubble_size = bs
+                Chart._point_at(series, idx)._bubble_size = bs
 
     @staticmethod
     def _distribute_custom_error_values(series):

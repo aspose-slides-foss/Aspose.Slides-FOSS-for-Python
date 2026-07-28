@@ -145,6 +145,12 @@ class ChartPart:
 
     def detect_chart_type(self) -> Optional[str]:
         """Detect ChartType enum value from the loaded XML."""
+        ct_elems = self.get_all_chart_type_elements()
+        if len(ct_elems) > 1:
+            detected = {self._detect_type_from_elem(e) for e in ct_elems}
+            detected.discard(None)
+            if len(detected) > 1:
+                return 'SeriesOfMixedTypes'
         ct_elem = self.get_chart_type_element()
         if ct_elem is None:
             return None
@@ -515,16 +521,16 @@ class ChartPart:
             val_pt_count = ET.SubElement(num_cache, _PT_COUNT)
             val_pt_count.set('val', str(len(data_points)))
             for di, dp in enumerate(data_points):
+                # For scatter/bubble, y_value holds the Y coordinate.
+                # For other chart types, value holds it. Fall back either way.
+                # Value-less points are gaps in a sparse series — emit no pt.
+                dv = (dp.y_value if is_xy else None) or dp.value
+                if dv is None:
+                    continue
                 val_pt = ET.SubElement(num_cache, _PT)
                 val_pt.set('idx', str(di))
                 val_v = ET.SubElement(val_pt, _V)
-                # For scatter/bubble, y_value holds the Y coordinate.
-                # For other chart types, value holds it. Fall back either way.
-                dv = (dp.y_value if is_xy else None) or dp.value
-                if dv is not None:
-                    val_v.text = _format_num(dv.to_double())
-                else:
-                    val_v.text = '0'
+                val_v.text = _format_num(dv.to_double())
 
             # Bubble size (bubble charts only)
             if dp_family == 'bubble':
@@ -545,14 +551,14 @@ class ChartPart:
                 bub_pt_count = ET.SubElement(bub_cache, _PT_COUNT)
                 bub_pt_count.set('val', str(len(data_points)))
                 for di, dp in enumerate(data_points):
+                    # Size-less points are gaps in a sparse series — emit no pt.
+                    bs = dp.bubble_size
+                    if bs is None:
+                        continue
                     bub_pt = ET.SubElement(bub_cache, _PT)
                     bub_pt.set('idx', str(di))
                     bub_v = ET.SubElement(bub_pt, _V)
-                    bs = dp.bubble_size
-                    if bs is not None:
-                        bub_v.text = _format_num(bs.to_double())
-                    else:
-                        bub_v.text = '1'
+                    bub_v.text = _format_num(bs.to_double())
 
                 # Always emit <c:bubble3D> after bubbleSize — PowerPoint does
                 # the same for plain bubble series (val="0") and 3D ones (val="1").
@@ -694,8 +700,8 @@ class ChartPart:
 
         elif axis_config == AXES_CAT_VAL_SER:
             # surface3DChart and bar3DChart-standard require a third axis
-            # (serAx — depth). Commercial expects 3 axIds in the chart-type
-            # element and 3 axis elements in plotArea.
+            # (serAx — depth): 3 axIds in the chart-type element and
+            # 3 axis elements in plotArea.
             for aid in (_CAT_AX_ID, _VAL_AX_ID, _SER_AX_ID):
                 e = ET.SubElement(ct_elem, _AX_ID)
                 e.set('val', aid)
@@ -934,7 +940,8 @@ def _emit_xy_x_values(ser_elem: ET._Element, tag: str, x_values: list,
         except (ValueError, TypeError):
             return False
 
-    all_numeric = all(_is_numeric(xv) for xv in x_values)
+    # X-less points are gaps in a sparse series — emit no pt for them.
+    all_numeric = all(_is_numeric(xv) for xv in x_values if xv is not None)
     x_range = range_override or f'Sheet1!$A$2:$A${pt_count + 1}'
 
     x_elem = ET.SubElement(ser_elem, tag)
@@ -948,6 +955,8 @@ def _emit_xy_x_values(ser_elem: ET._Element, tag: str, x_values: list,
         pt_count_elem = ET.SubElement(num_cache, _PT_COUNT)
         pt_count_elem.set('val', str(pt_count))
         for i, xv in enumerate(x_values):
+            if xv is None:
+                continue
             pt = ET.SubElement(num_cache, _PT)
             pt.set('idx', str(i))
             v = ET.SubElement(pt, _V)
@@ -960,6 +969,8 @@ def _emit_xy_x_values(ser_elem: ET._Element, tag: str, x_values: list,
         pt_count_elem = ET.SubElement(str_cache, _PT_COUNT)
         pt_count_elem.set('val', str(pt_count))
         for i, xv in enumerate(x_values):
+            if xv is None:
+                continue
             pt = ET.SubElement(str_cache, _PT)
             pt.set('idx', str(i))
             v = ET.SubElement(pt, _V)
@@ -969,8 +980,8 @@ def _emit_xy_x_values(ser_elem: ET._Element, tag: str, x_values: list,
 def _ensure_chart_type_dlbls(ct_elem: ET._Element) -> None:
     """Insert a chart-type-level <c:dLbls> with all show_* flags set to '0'.
 
-    Commercial Aspose emits this sibling to <c:ser> so PowerPoint does not
-    apply chart-type default visibility when a series configures labels.
+    This sibling of <c:ser> keeps PowerPoint from applying chart-type
+    default visibility when a series configures labels.
     Inserts after the last <c:ser>, before <c:gapWidth>/<c:overlap>/<c:axId>.
     Preserves any existing chart-type-level <c:dLbls> unchanged.
     """
@@ -996,7 +1007,7 @@ def _ensure_stacked_defaults(ct_elem: ET._Element) -> None:
     """For stacked bar/column charts, ensure overlap=100 and serLines exist.
 
     Called after sync_from_model writes <c:ser> elements. Elements are
-    placed after ser and before axId to match commercial element order.
+    placed after ser and before axId, matching the schema element order.
     """
     local_tag = ct_elem.tag.split('}')[-1] if '}' in ct_elem.tag else ct_elem.tag
     if local_tag not in ('barChart', 'bar3DChart'):
@@ -1033,7 +1044,7 @@ def _ensure_stacked_defaults(ct_elem: ET._Element) -> None:
 
 
 def _add_default_sg_props(ct_elem: ET._Element, xml_tag: str, attrs: dict) -> None:
-    """Add default series-group properties to match commercial Aspose output.
+    """Add default series-group properties expected in chart-type elements.
 
     Only adds varyColors here (must precede <c:ser> elements).
     Other defaults (overlap, serLines for stacked) are handled in

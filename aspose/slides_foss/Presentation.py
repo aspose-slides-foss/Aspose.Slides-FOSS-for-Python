@@ -453,6 +453,11 @@ class Presentation(IPresentation, IPresentationComponent):
         if save_format is None:
             raise ValueError("Save format is required")
 
+        if save_format == SaveFormat.MD:
+            from ._internal.export.markdown import save_presentation_to_markdown
+            save_presentation_to_markdown(self, destination, slides, options)
+            return
+
         format_value = save_format.value
 
         # Get the appropriate exporter from the registry

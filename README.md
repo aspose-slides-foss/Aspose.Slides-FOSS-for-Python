@@ -52,6 +52,7 @@ with slides.Presentation() as prs:
 - **Notes slides** — Per-slide notes with header/footer management
 - **Comments** — Threaded comments with authors, timestamps, and positions
 - **Images** — Embed from file, bytes, or stream
+- **Markdown export** — Save presentation text as Markdown in 24 flavor dialects, with tables, lists, headings, comments, and chart data
 
 ---
 
@@ -258,6 +259,33 @@ with slides.Presentation() as prs:
     prs.save("group.pptx", SaveFormat.PPTX)
 ```
 
+### Markdown Export
+
+```python
+import aspose.slides_foss as slides
+from aspose.slides_foss.export import SaveFormat, MarkdownSaveOptions, Flavor, NewLineType
+
+with slides.Presentation("input.pptx") as prs:
+    # Save the whole presentation with default options
+    prs.save("output.md", SaveFormat.MD)
+
+    # Or customize the output
+    options = MarkdownSaveOptions()
+    options.flavor = Flavor.GITHUB
+    options.new_line_type = NewLineType.UNIX
+    options.show_slide_number = True
+    options.slide_number_format = "## Slide {0}"
+    options.show_hidden_slides = True
+    options.show_comments = True
+    prs.save("custom.md", SaveFormat.MD, options)
+
+    # Save only selected slides (1-based, order and repeats respected)
+    prs.save("subset.md", [2, 1], SaveFormat.MD, options)
+```
+
+Text frames, tables, lists, titles/subtitles (as headings), comments, and chart
+data are exported; the export is text-only, so images, media, and SmartArt are skipped.
+
 ---
 
 ## Limitations
@@ -265,7 +293,7 @@ with slides.Presentation() as prs:
 The following areas are not yet implemented and will raise `NotImplementedError`:
 
 - SmartArt, OLE objects, mathematical text
-- Export to non-PPTX formats (PDF, HTML, SVG, images)
+- Export to PDF, HTML, SVG, and image formats
 - VBA macros, digital signatures
 - Hyperlinks and action settings
 

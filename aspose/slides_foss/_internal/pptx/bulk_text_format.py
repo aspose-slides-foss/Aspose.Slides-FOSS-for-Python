@@ -83,9 +83,8 @@ def _apply_paragraph_format(cells, source) -> None:
 def _apply_text_frame_format(cells, source) -> None:
     """Apply a TextFrameFormat to every text body in every cell.
 
-    Also propagates the ``vert`` attribute to ``<a:tcPr>`` to match
-    Aspose.Slides behaviour where vertical text type is mirrored on the
-    cell properties element.
+    Also propagates the ``vert`` attribute to ``<a:tcPr>`` so the vertical
+    text type is mirrored on the cell properties element.
     """
     if not hasattr(source, '_txbody_element') or source._txbody_element is None:
         return

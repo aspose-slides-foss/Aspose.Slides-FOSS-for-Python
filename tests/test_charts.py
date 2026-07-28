@@ -496,7 +496,7 @@ class TestComboChartSeriesGroups(unittest.TestCase):
             self.assertIs(s.parent_series_group, groups[1])
 
     def test_load_existing_combo_chart(self):
-        """Create combo with commercial-like XML, verify it loads correctly."""
+        """Create a combo chart, save it, and verify it loads correctly."""
         # Create, save, reload — simulates loading an existing combo chart
         pres = Presentation()
         chart = pres.slides[0].shapes.add_chart(ChartType.CLUSTERED_COLUMN, 50, 50, 600, 400)
@@ -2072,6 +2072,31 @@ class TestDataLabels(unittest.TestCase):
         self.assertFalse(labels.is_visible)
         labels.default_data_label_format.show_value = True
         self.assertTrue(labels.is_visible)
+
+
+class TestChartLiteralData(unittest.TestCase):
+    """Loading charts whose data is not backed by workbook references."""
+
+    def test_numlit_values_and_numeric_categories(self):
+        # chart_numlit.pptx stores series values as <c:numLit> literals and
+        # categories as numeric <c:cat>/<c:numRef>/<c:numCache> entries.
+        path = os.path.join(os.path.dirname(__file__), 'test_data', 'chart_numlit.pptx')
+        with Presentation(path) as pres:
+            chart = pres.slides[0].shapes[0]
+            series = chart.chart_data.series[0]
+            self.assertEqual([dp.value.data for dp in series.data_points], [150.0, 210.5, 300.0])
+            self.assertEqual([c.value for c in chart.chart_data.categories], [2023, 2024, 2025])
+
+    def test_sparse_points_stay_positional(self):
+        # chart_sparse.pptx has value pts only at idx 0 and 3 (of 4); the
+        # gaps must load as value-less points, not shift later values left.
+        path = os.path.join(os.path.dirname(__file__), 'test_data', 'chart_sparse.pptx')
+        with Presentation(path) as pres:
+            chart = pres.slides[0].shapes[0]
+            series = chart.chart_data.series[0]
+            values = [dp.value.data if dp.value is not None else None
+                      for dp in series.data_points]
+            self.assertEqual(values, [4.3, None, None, 4.5])
 
 
 if __name__ == '__main__':

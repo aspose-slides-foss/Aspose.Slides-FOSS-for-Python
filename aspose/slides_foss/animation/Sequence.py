@@ -209,7 +209,7 @@ class Sequence(ISequence):
                                                paragraph_index=paragraph_index)
 
         # Add <p:bldLst>/<p:bldP> entry
-        # Commercial adds for path/entrance effects targeting the whole shape.
+        # Emitted for path/entrance effects targeting the whole shape.
         # Paragraph-level animations must NOT have <p:bldP> — it would override
         # the per-paragraph <p:pRg> targeting and animate all paragraphs together.
         if preset_class_str in ('path', 'entr') and paragraph_index is None:
