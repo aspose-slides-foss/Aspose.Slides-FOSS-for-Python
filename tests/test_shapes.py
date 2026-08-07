@@ -116,3 +116,31 @@ def test_shape_persists_after_reload(tmp_pptx):
     assert len(pres2.slides[0].shapes) >= 1
     assert pres2.slides[0].shapes[0].shape_type == ShapeType.RECTANGLE
     pres2.dispose()
+
+
+def test_all_shape_types_have_shape_type():
+    """Table, Chart, GroupShape, AutoShape, and Connector all expose shape_type without AttributeError."""
+    from aspose.slides_foss import Table
+    from aspose.slides_foss.charts.ChartType import ChartType
+
+    with Presentation() as pres:
+        slide = _blank_slide(pres)
+
+        # Create one of each shape type
+        table = slide.shapes.add_table(50, 50, [100.0, 100.0], [30.0, 30.0])
+        chart = slide.shapes.add_chart(ChartType.CLUSTERED_COLUMN, 100, 100, 500, 400)
+        rect = slide.shapes.add_auto_shape(ShapeType.RECTANGLE, 200, 200, 100, 80)
+        group = slide.shapes.add_group_shape()
+        conn = slide.shapes.add_connector(ShapeType.BENT_CONNECTOR3, 0, 0, 10, 10)
+
+        # Every shape must expose shape_type without raising AttributeError
+        assert table.shape_type == ShapeType.NOT_DEFINED
+        assert chart.shape_type == ShapeType.NOT_DEFINED
+        assert rect.shape_type == ShapeType.RECTANGLE
+        assert group.shape_type == ShapeType.NOT_DEFINED
+        assert conn.shape_type == ShapeType.BENT_CONNECTOR3
+
+        # Iteration over all shapes must not crash
+        types = [s.shape_type for s in slide.shapes]
+        assert len(types) == 5
+        assert ShapeType.NOT_DEFINED in types

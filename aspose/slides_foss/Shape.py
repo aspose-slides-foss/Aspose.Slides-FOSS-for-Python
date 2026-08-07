@@ -221,6 +221,14 @@ class Shape(IShape, ISlideComponent, IPresentationComponent, IHyperlinkContainer
         return 0
 
     @property
+    def shape_type(self):
+        """Returns the type of the shape.
+        Default returns ShapeType.NOT_DEFINED.
+        Subclasses (AutoShape, Connector) override with the specific shape type."""
+        from .ShapeType import ShapeType
+        return ShapeType.NOT_DEFINED
+
+    @property
     def rotation(self) -> float:
         """Returns or sets the number of degrees the specified shape is rotated around the z-axis. A positive value indicates clockwise rotation; a negative value indicates counterclockwise rotation. Read/write ."""
         xfrm = self._get_xfrm()
