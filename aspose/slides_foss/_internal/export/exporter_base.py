@@ -64,6 +64,19 @@ class ExporterBase(ABC):
         pass
 
     @classmethod
+    def create_for_format(cls, format_value: str) -> "ExporterBase":
+        """
+        Create an instance of this exporter bound to one of its formats.
+
+        Exporters that serve several formats override this to remember which
+        one was requested.  The default ignores the argument.
+
+        Args:
+            format_value: The SaveFormat enum value string being exported to.
+        """
+        return cls()
+
+    @classmethod
     def get_supported_formats(cls) -> list[str]:
         """
         Get the list of SaveFormat values this exporter supports.
