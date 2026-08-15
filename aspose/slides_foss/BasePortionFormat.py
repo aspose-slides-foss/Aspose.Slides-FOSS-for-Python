@@ -5,6 +5,7 @@ import lxml.etree as ET
 from .PVIObject import PVIObject
 from .IBasePortionFormat import IBasePortionFormat
 from ._internal.pptx.constants import NS, Elements
+from ._internal.pptx.child_order import sub_element_in_order
 
 if TYPE_CHECKING:
     from .IColorFormat import IColorFormat
@@ -113,7 +114,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
                 self._rpr_element.remove(el)
         else:
             if el is None:
-                el = ET.SubElement(self._rpr_element, tag)
+                el = sub_element_in_order(self._rpr_element, tag)
             el.set('typeface', value.font_name)
         self._save()
 
@@ -157,7 +158,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
         from .ColorFormat import ColorFormat
         highlight_el = self._rpr_element.find(Elements.A_HIGHLIGHT)
         if highlight_el is None:
-            highlight_el = ET.SubElement(self._rpr_element, Elements.A_HIGHLIGHT)
+            highlight_el = sub_element_in_order(self._rpr_element, Elements.A_HIGHLIGHT)
         cf = ColorFormat()
         cf._init_internal(highlight_el, self._slide_part, self._parent_slide)
         return cf
@@ -181,7 +182,7 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
         # <a:uFill> contains fill children, acts as parent for FillFormat
         u_fill_el = self._rpr_element.find(Elements.A_U_FILL)
         if u_fill_el is None:
-            u_fill_el = ET.SubElement(self._rpr_element, Elements.A_U_FILL)
+            u_fill_el = sub_element_in_order(self._rpr_element, Elements.A_U_FILL)
         ff = FillFormat()
         ff._init_internal(u_fill_el, self._slide_part, self._parent_slide)
         return ff
@@ -338,9 +339,9 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
             if el is not None:
                 self._rpr_element.remove(el)
         if value == NullableBool.TRUE:
-            ET.SubElement(self._rpr_element, Elements.A_U_LN)
+            sub_element_in_order(self._rpr_element, Elements.A_U_LN)
         elif value == NullableBool.FALSE:
-            ET.SubElement(self._rpr_element, Elements.A_U_LN_TX)
+            sub_element_in_order(self._rpr_element, Elements.A_U_LN_TX)
         self._save()
 
     @property
@@ -366,9 +367,9 @@ class BasePortionFormat(PVIObject, IBasePortionFormat):
             if el is not None:
                 self._rpr_element.remove(el)
         if value == NullableBool.TRUE:
-            ET.SubElement(self._rpr_element, Elements.A_U_FILL)
+            sub_element_in_order(self._rpr_element, Elements.A_U_FILL)
         elif value == NullableBool.FALSE:
-            ET.SubElement(self._rpr_element, Elements.A_U_FILL_TX)
+            sub_element_in_order(self._rpr_element, Elements.A_U_FILL_TX)
         self._save()
 
     # --- Float attribute properties (NaN = undefined) ---

@@ -7,6 +7,7 @@ from .IPresentationComponent import IPresentationComponent
 from .ILineFormat import ILineFormat
 from .ILineParamSource import ILineParamSource
 from ._internal.pptx.constants import NS, Elements, EMU_PER_POINT
+from ._internal.pptx.child_order import insert_in_order, sub_element_in_order
 
 if TYPE_CHECKING:
     from .ILineFillFormat import ILineFillFormat
@@ -86,81 +87,22 @@ class LineFormat(PVIObject, ISlideComponent, IPresentationComponent, ILineFormat
         tag = getattr(self, '_ln_tag', Elements.A_LN)
         return self._parent_element.find(tag)
 
-    # OOXML CT_TableCellProperties child order for border lines within <a:tcPr>:
-    # lnL → lnR → lnT → lnB → lnTlToBr → lnBlToTr → fill → cell3D → extLst
-    _TC_PR_CHILD_ORDER = [
-        Elements.A_LN_L, Elements.A_LN_R, Elements.A_LN_T, Elements.A_LN_B,
-        Elements.A_LN_TL_TO_BR, Elements.A_LN_BL_TO_TR,
-    ]
-
     def _ensure_ln(self) -> ET._Element:
-        """Get or create the <a:ln> element at the correct position.
+        """Get or create the line element where its container's sequence puts it.
 
-        OOXML requires spPr children in order: xfrm, geometry, fill, ln, effects.
-        For tcPr children, border lines must be in order: lnL, lnR, lnT, lnB, lnTlToBr, lnBlToTr.
+        The element is <a:ln> under CT_ShapeProperties and one of the six
+        border elements under CT_TableCellProperties, and each container orders
+        it differently.
         """
         ln = self._get_ln()
         if ln is not None:
             return ln
         tag = getattr(self, '_ln_tag', Elements.A_LN)
-        el = ET.Element(tag)
-        # For table cell border elements, use the tcPr child ordering
-        if tag in self._TC_PR_CHILD_ORDER:
-            new_rank = self._TC_PR_CHILD_ORDER.index(tag)
-            for i, child in enumerate(self._parent_element):
-                try:
-                    child_rank = self._TC_PR_CHILD_ORDER.index(child.tag)
-                except ValueError:
-                    # Non-border child (fill, cell3D, extLst) comes after all borders
-                    self._parent_element.insert(i, el)
-                    return el
-                if child_rank > new_rank:
-                    self._parent_element.insert(i, el)
-                    return el
-            self._parent_element.append(el)
-            return el
-        # Default: insert after fill elements, before effects
-        insert_before = None
-        for child in self._parent_element:
-            if child.tag in (f"{NS.A}effectLst", f"{NS.A}effectDag",
-                             f"{NS.A}scene3d", f"{NS.A}sp3d", f"{NS.A}extLst"):
-                insert_before = child
-                break
-        if insert_before is not None:
-            idx = list(self._parent_element).index(insert_before)
-            self._parent_element.insert(idx, el)
-        else:
-            self._parent_element.append(el)
-        return el
-
-    # OOXML CT_LineProperties child order within <a:ln>:
-    # fill → prstDash/custDash → round/bevel/miter → headEnd → tailEnd → extLst
-    _LN_CHILD_ORDER = [
-        Elements.A_NO_FILL, Elements.A_SOLID_FILL, Elements.A_GRAD_FILL, Elements.A_PATT_FILL,
-        Elements.A_PRST_DASH, Elements.A_CUST_DASH,
-        Elements.A_ROUND, Elements.A_BEVEL, Elements.A_MITER,
-        Elements.A_HEAD_END, Elements.A_TAIL_END,
-        f"{NS.A}extLst",
-    ]
+        return insert_in_order(self._parent_element, ET.Element(tag))
 
     def _insert_ln_child(self, ln: ET._Element, tag: str, **attribs) -> ET._Element:
-        """Insert a child element into <a:ln> at the correct OOXML position."""
-        new_el = ET.Element(tag, **attribs)
-        try:
-            new_rank = self._LN_CHILD_ORDER.index(tag)
-        except ValueError:
-            ln.append(new_el)
-            return new_el
-        for i, child in enumerate(ln):
-            try:
-                child_rank = self._LN_CHILD_ORDER.index(child.tag)
-            except ValueError:
-                continue
-            if child_rank > new_rank:
-                ln.insert(i, new_el)
-                return new_el
-        ln.append(new_el)
-        return new_el
+        """Insert a child element into <a:ln> at the position CT_LineProperties gives it."""
+        return sub_element_in_order(ln, tag, **attribs)
 
     def _save(self) -> None:
         if hasattr(self, '_slide_part') and self._slide_part:
