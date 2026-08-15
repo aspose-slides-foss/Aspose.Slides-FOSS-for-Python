@@ -272,11 +272,14 @@ whatever else answers to the name `aspose`.
 
 
 def verify_library_not_shadowed() -> None:
-    """Fail loudly, with a diagnosis, if `aspose.slides_foss` is unimportable.
+    """Fail loudly, with a diagnosis, if another distribution owns ``aspose``.
 
     Import order alone decides this and the losing side gets a bare
     ``ModuleNotFoundError``, which reads like a broken checkout rather than
-    like a package collision.  Turn it into a sentence that says what happened.
+    like a package collision.  Turn it into a sentence that says what happened
+    — but only when ``aspose`` really has been captured, which is exactly the
+    case where it has a ``__file__``.  Any other ``ImportError`` is re-raised
+    untouched.
     """
     import importlib
 
@@ -284,12 +287,17 @@ def verify_library_not_shadowed() -> None:
         importlib.import_module("aspose.slides_foss")
         return
     except ImportError as exc:
-        origin = "<not found>"
         try:
             aspose = importlib.import_module("aspose")
-            origin = getattr(aspose, "__file__", None) or "<namespace package>"
         except ImportError:
-            pass
+            raise
+        origin = getattr(aspose, "__file__", None)
+        if not origin:
+            # `aspose` is still a namespace package, so nothing has captured
+            # the name and the import failed for its own reasons — a missing
+            # dependency, or an error inside the library.  Diagnosing that as
+            # a package collision sends the reader to the wrong problem.
+            raise
         raise RuntimeError(_SHADOW_MESSAGE.format(origin=origin)) from exc
 
 
