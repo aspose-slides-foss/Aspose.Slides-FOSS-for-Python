@@ -187,9 +187,11 @@ class Elements:
     A_CS = f"{NS.A}cs"
     A_SYM = f"{NS.A}sym"
 
-    # Hyperlink elements
+    # Hyperlink elements.  CT_TextCharacterProperties names the mouse-over
+    # link hlinkMouseOver; CT_NonVisualDrawingProps names it hlinkHover.
     A_HLINK_CLICK = f"{NS.A}hlinkClick"
     A_HLINK_MOUSE_OVER = f"{NS.A}hlinkMouseOver"
+    A_HLINK_HOVER = f"{NS.A}hlinkHover"
 
     # Autofit elements
     A_NO_AUTOFIT = f"{NS.A}noAutofit"

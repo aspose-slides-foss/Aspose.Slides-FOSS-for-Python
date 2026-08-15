@@ -542,12 +542,12 @@ class Shape(StrictAttributes, IShape, ISlideComponent, IPresentationComponent, I
     def hyperlink_mouse_over(self) -> IHyperlink:
         """Returns or sets the hyperlink followed when the pointer rests on the shape. Read/write ."""
         from ._internal.pptx.hyperlinks import get_hyperlink
-        return get_hyperlink(self._get_c_nv_pr(), self._slide_part, Elements.A_HLINK_MOUSE_OVER)
+        return get_hyperlink(self._get_c_nv_pr(), self._slide_part, Elements.A_HLINK_HOVER)
 
     @hyperlink_mouse_over.setter
     def hyperlink_mouse_over(self, value):
         from ._internal.pptx.hyperlinks import set_hyperlink
-        set_hyperlink(self._get_c_nv_pr(), self._slide_part, Elements.A_HLINK_MOUSE_OVER, value)
+        set_hyperlink(self._get_c_nv_pr(), self._slide_part, Elements.A_HLINK_HOVER, value)
         if self._slide_part:
             self._slide_part.save()
 
