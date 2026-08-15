@@ -413,6 +413,13 @@ class Presentation(IPresentation, IPresentationComponent):
         if self._presentation_part:
             self._presentation_part.save()
 
+        # The document summary describes the parts that were just written, so
+        # it is recomputed last of all; otherwise docProps/app.xml keeps
+        # whatever the template said.
+        if self._opc_package is not None:
+            from ._internal.pptx.document_summary import refresh_document_summary
+            refresh_document_summary(self._opc_package)
+
         # Parse arguments to determine which overload was called
         destination: Optional[Union[str, BinaryIO]] = None
         save_format: Optional[SaveFormat] = None
