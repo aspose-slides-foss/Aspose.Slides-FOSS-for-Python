@@ -35,14 +35,23 @@ def produced(tmp_path):
     fall back on the in-memory object and assert against the library's own idea
     of what it wrote.
     """
+    opened: list[ProducedPackage] = []
 
     def _save(pres, save_format: SaveFormat = SaveFormat.PPTX, name: str = "produced.pptx"):
         path = os.path.join(str(tmp_path), name)
         pres.save(path, save_format)
         pres.dispose()
-        return ProducedPackage(path)
+        package = ProducedPackage(path)
+        opened.append(package)
+        return package
 
-    return _save
+    yield _save
+
+    # An archive left open holds a handle inside tmp_path, and Windows refuses
+    # to remove a directory that has one; the failure then lands on teardown
+    # rather than on the test that opened it.
+    for package in opened:
+        package.close()
 
 
 @pytest.fixture()

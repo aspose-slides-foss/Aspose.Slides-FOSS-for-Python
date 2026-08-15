@@ -40,6 +40,7 @@ NS = {
     "ct": "http://schemas.openxmlformats.org/package/2006/content-types",
     "p": "http://schemas.openxmlformats.org/presentationml/2006/main",
     "p14": "http://schemas.microsoft.com/office/powerpoint/2010/main",
+    "p15": "http://schemas.microsoft.com/office/powerpoint/2012/main",
     "p188": "http://schemas.microsoft.com/office/powerpoint/2018/8/main",
     "pr": "http://schemas.openxmlformats.org/package/2006/relationships",
     "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
@@ -312,6 +313,21 @@ class ProducedPackage:
         self._zip = zipfile.ZipFile(self.path)
         self.namelist = self._zip.namelist()
 
+    def close(self) -> None:
+        """Release the open archive.
+
+        Windows will not remove a directory that still has an open handle in
+        it, so a package left open outlives the test and breaks ``tmp_path``
+        teardown rather than the test itself.
+        """
+        self._zip.close()
+
+    def __enter__(self) -> "ProducedPackage":
+        return self
+
+    def __exit__(self, *exc_info) -> None:
+        self.close()
+
     # -- raw access -------------------------------------------------------
 
     def __contains__(self, part: str) -> bool:
@@ -458,6 +474,53 @@ class ProducedPackage:
                     )
         assert not failures, "dangling relationship references:\n" + "\n".join(failures)
 
+    @classmethod
+    def _resolve_target(cls, rels_part: str, target: str) -> str:
+        """Absolute part name for a relationship target declared in ``rels_part``."""
+        if target.startswith("/"):
+            return target.lstrip("/")
+        owner_dir = posixpath.dirname(posixpath.dirname(rels_part))
+        return posixpath.normpath(posixpath.join(owner_dir, target))
+
+    def _internal_targets(self, rels_part: str) -> Iterator[str]:
+        root = ET.fromstring(self.read(rels_part))
+        for rel in root.xpath("/pr:Relationships/pr:Relationship", namespaces=NS):
+            if rel.get("TargetMode") == "External":
+                continue
+            yield self._resolve_target(rels_part, rel.get("Target") or "")
+
+    def assert_every_part_is_reachable(self) -> None:
+        """Every part is reachable by walking relationships from ``_rels/.rels``.
+
+        ISO/IEC 29500-2 §9.3 makes the relationship graph the only way into a
+        package: a consumer starts at the package relationships and follows
+        them part by part.  A part nothing points at is therefore not in the
+        document at all — but it is still in the ZIP, still shipped, and still
+        readable by anyone who opens the file with a zip tool.
+
+        This is the rule that catches an orphan, which the other three cannot:
+        an orphaned part with its own ``Override`` breaks no reference and
+        resolves its content type perfectly well.
+        """
+        reached = {"[Content_Types].xml"}
+        pending = ["_rels/.rels"]
+        while pending:
+            rels_part = pending.pop()
+            if rels_part in reached or rels_part not in self.namelist:
+                continue
+            reached.add(rels_part)
+            for target in self._internal_targets(rels_part):
+                if target in reached:
+                    continue
+                reached.add(target)
+                pending.append(self.rels_part_for(target))
+
+        unreachable = sorted(set(self.namelist) - reached)
+        assert not unreachable, (
+            "parts no relationship names, so no consumer can reach them "
+            "although they ship in the file:\n  %s" % "\n  ".join(unreachable)
+        )
+
     def assert_relationship_targets_exist(self) -> None:
         """Every internal relationship names a part that is in the package."""
         failures = []
@@ -544,10 +607,11 @@ class ProducedPackage:
         assert not wrong, "parts with the wrong content type:\n" + "\n".join(wrong)
 
     def assert_package_is_consistent(self) -> None:
-        """All three package-level rules at once."""
+        """All four package-level rules at once."""
         self.assert_relationship_ids_resolve()
         self.assert_relationship_targets_exist()
         self.assert_content_types_resolve()
+        self.assert_every_part_is_reachable()
 
     # -- third-party read-back -------------------------------------------
 

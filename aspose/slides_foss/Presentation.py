@@ -354,6 +354,24 @@ class Presentation(IPresentation, IPresentationComponent):
 
 
 
+    def _live_slide_rels(self) -> dict:
+        """``{slide part name: the relationships manager that will be saved}``.
+
+        A slide part loads its relationships once and writes that set back on
+        every save, so anything that needs to add a relationship to a slide
+        during a save has to add it to this object rather than to a second
+        manager reading the same part.
+        """
+        managers = {}
+        if self._slides is None:
+            return managers
+        for slide in self._slides:
+            slide_part = getattr(slide, '_slide_part', None)
+            rels = getattr(slide_part, '_rels_manager', None)
+            if rels is not None:
+                managers[slide_part.part_name] = rels
+        return managers
+
     def save(self, *args, **kwargs) -> None:
         """
         Save the presentation to a file or stream.
@@ -407,9 +425,12 @@ class Presentation(IPresentation, IPresentationComponent):
                     cp = CommentsPart(self._opc_package, part_name)
                     cp.save()
             # Replies are only replies in the modern parts; the classic list
-            # has no way to express one.
+            # has no way to express one.  The slide parts' own relationship
+            # managers are handed over, because a slide part rewrites its
+            # relationships from the set it loaded and would otherwise erase
+            # the one added here on the next save.
             from ._internal.pptx.threaded_comments import write_threaded_comments
-            write_threaded_comments(self._opc_package)
+            write_threaded_comments(self._opc_package, self._live_slide_rels())
 
         # Save theme if it was loaded/modified
         if self._theme_part is not None:
