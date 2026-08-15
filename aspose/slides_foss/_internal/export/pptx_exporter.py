@@ -56,7 +56,10 @@ class PptxExporter(ExporterBase):
             ValueError: If the format is not one of the OPC presentation formats.
         """
         if target_format not in self._CONTENT_TYPES:
-            raise ValueError(f"Export format '{target_format}' is not supported")
+            raise ValueError(
+                f"Export format '{target_format}' is not supported by this "
+                f"exporter; it writes {', '.join(sorted(self._CONTENT_TYPES))}"
+            )
         self._target_format = target_format
 
     @classmethod

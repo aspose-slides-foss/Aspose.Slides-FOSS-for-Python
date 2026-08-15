@@ -310,12 +310,34 @@ data are exported; the export is text-only, so images, media, and SmartArt are s
 
 ## Limitations
 
-The following areas are not yet implemented and will raise `NotImplementedError`:
+Saving to a format this library does not write raises `ValueError`, naming the
+formats it does write. The written formats are `.pptx`, `.ppsx`, `.potx`,
+`.pptm`, `.ppsm`, `.potm` and Markdown; asking for any other member of
+`SaveFormat` — PDF, HTML, XPS, TIFF, GIF, SWF, ODP, or the binary `.ppt`
+family — raises rather than writing a mislabelled package.
+
+The following areas are not yet implemented:
 
 - SmartArt, OLE objects, mathematical text
-- Export to PDF, HTML, SVG, and image formats
+- Export to PDF, HTML, and image formats
 - VBA macros, digital signatures
 - Action settings other than external hyperlinks
+
+`SaveFormat` and the file name are independent: `save("deck.pptx",
+SaveFormat.POTX)` writes a genuine template under a `.pptx` name, and
+PowerPoint refuses to open a file whose extension disagrees with the format
+declared inside it. Give the file the extension of the format you asked for.
+
+Assigning to a property a shape or a formatting object does not have raises
+`AttributeError` rather than being accepted and discarded, so a misspelt
+property name fails where it is written. Names beginning with an underscore
+are unaffected.
+
+Comment threads are written from the classic comment list on save. A deck
+authored in PowerPoint can carry resolved status, @-mentions and reply chains
+that the classic list cannot express; those are lost if the presentation's
+comment authors are touched before saving. Loading and saving without going
+near comments preserves the file's own threads untouched.
 
 Unknown XML parts encountered during load are preserved verbatim on save —
 opening and re-saving a file will never strip content this library does not yet understand.

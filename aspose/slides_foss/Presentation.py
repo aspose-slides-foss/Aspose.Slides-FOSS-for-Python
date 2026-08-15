@@ -497,7 +497,16 @@ class Presentation(IPresentation, IPresentationComponent):
         # Get the appropriate exporter from the registry
         exporter = ExporterRegistry.get_exporter(format_value)
         if exporter is None:
-            raise ValueError(f"Export format '{format_value}' is not supported")
+            # Naming the formats that do work turns "no" into an answer: the
+            # caller sees at once whether the format is misspelt or simply not
+            # written by this library.
+            supported = sorted(
+                set(ExporterRegistry.get_supported_formats()) | {SaveFormat.MD.value}
+            )
+            raise ValueError(
+                f"Export format '{format_value}' is not supported; "
+                f"this library writes {', '.join(supported)}"
+            )
 
         # TODO: Handle slides parameter for partial export
         if slides is not None:
