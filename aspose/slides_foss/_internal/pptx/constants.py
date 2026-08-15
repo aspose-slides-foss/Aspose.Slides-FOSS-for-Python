@@ -186,6 +186,10 @@ class Elements:
     A_CS = f"{NS.A}cs"
     A_SYM = f"{NS.A}sym"
 
+    # Hyperlink elements
+    A_HLINK_CLICK = f"{NS.A}hlinkClick"
+    A_HLINK_MOUSE_OVER = f"{NS.A}hlinkMouseOver"
+
     # Autofit elements
     A_NO_AUTOFIT = f"{NS.A}noAutofit"
     A_SP_AUTO_FIT = f"{NS.A}spAutoFit"

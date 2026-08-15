@@ -7,11 +7,13 @@ from .ISlideComponent import ISlideComponent
 from .IPresentationComponent import IPresentationComponent
 from .IHyperlinkContainer import IHyperlinkContainer
 from ._internal.pptx.constants import NS, Elements, EMU_PER_POINT, ROTATION_UNIT
+from ._internal.strict_attributes import StrictAttributes
 
 if TYPE_CHECKING:
     from .IBaseSlide import IBaseSlide
     from .IEffectFormat import IEffectFormat
     from .IFillFormat import IFillFormat
+    from .IHyperlink import IHyperlink
     from .IImage import IImage
     from .ILineFormat import ILineFormat
     from .IPresentation import IPresentation
@@ -19,7 +21,7 @@ if TYPE_CHECKING:
     from .IThreeDFormat import IThreeDFormat
     from ._internal.pptx.slide_part import SlidePart
 
-class Shape(IShape, ISlideComponent, IPresentationComponent, IHyperlinkContainer, ABC):
+class Shape(StrictAttributes, IShape, ISlideComponent, IPresentationComponent, IHyperlinkContainer, ABC):
     """Represents a shape on a slide. This is an abstract base class."""
 
     def __init__(self):
@@ -522,6 +524,32 @@ class Shape(IShape, ISlideComponent, IPresentationComponent, IHyperlinkContainer
             c_nv_pr.set('title', value)
             if self._slide_part:
                 self._slide_part.save()
+
+    @property
+    def hyperlink_click(self) -> IHyperlink:
+        """Returns or sets the hyperlink followed when the shape is clicked. Read/write ."""
+        from ._internal.pptx.hyperlinks import get_hyperlink
+        return get_hyperlink(self._get_c_nv_pr(), self._slide_part, Elements.A_HLINK_CLICK)
+
+    @hyperlink_click.setter
+    def hyperlink_click(self, value):
+        from ._internal.pptx.hyperlinks import set_hyperlink
+        set_hyperlink(self._get_c_nv_pr(), self._slide_part, Elements.A_HLINK_CLICK, value)
+        if self._slide_part:
+            self._slide_part.save()
+
+    @property
+    def hyperlink_mouse_over(self) -> IHyperlink:
+        """Returns or sets the hyperlink followed when the pointer rests on the shape. Read/write ."""
+        from ._internal.pptx.hyperlinks import get_hyperlink
+        return get_hyperlink(self._get_c_nv_pr(), self._slide_part, Elements.A_HLINK_MOUSE_OVER)
+
+    @hyperlink_mouse_over.setter
+    def hyperlink_mouse_over(self, value):
+        from ._internal.pptx.hyperlinks import set_hyperlink
+        set_hyperlink(self._get_c_nv_pr(), self._slide_part, Elements.A_HLINK_MOUSE_OVER, value)
+        if self._slide_part:
+            self._slide_part.save()
 
     @property
     def name(self) -> str:

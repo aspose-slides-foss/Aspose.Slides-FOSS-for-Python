@@ -77,6 +77,8 @@ CHILD_SEQUENCES: dict[str, dict[str, int]] = {
     "fillOverlay": _sequence(_FILL),
     # CT_Scene3D — 20.1.4.1.26.
     "scene3d": _sequence("camera", "lightRig", "backdrop", "extLst"),
+    # CT_NonVisualDrawingProps — 20.1.2.2.8.
+    "cNvPr": _sequence("hlinkClick", "hlinkMouseOver", "extLst"),
 }
 
 for _line_element in ("uLn", "lnL", "lnR", "lnT", "lnB", "lnTlToBr", "lnBlToTr"):

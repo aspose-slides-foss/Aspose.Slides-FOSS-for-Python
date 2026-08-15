@@ -83,6 +83,8 @@ from .IGraphicalObject import IGraphicalObject
 from .IGroupShape import IGroupShape
 from .IGroupShapeLock import IGroupShapeLock
 from .IHeadingPair import IHeadingPair
+from .Hyperlink import Hyperlink
+from .IHyperlink import IHyperlink
 from .IHyperlinkContainer import IHyperlinkContainer
 from .IImage import IImage
 from .IImageCollection import IImageCollection
@@ -332,6 +334,8 @@ __all__ = [
     'IGroupShape',
     'IGroupShapeLock',
     'IHeadingPair',
+    'Hyperlink',
+    'IHyperlink',
     'IHyperlinkContainer',
     'IImage',
     'IImageCollection',

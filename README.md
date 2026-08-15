@@ -52,6 +52,7 @@ with slides.Presentation() as prs:
 - **Notes slides** — Per-slide notes with header/footer management
 - **Comments** — Threaded comments with authors, timestamps, and positions
 - **Images** — Embed from file, bytes, or stream
+- **Hyperlinks** — External links on a text portion or on a whole shape, on click or on mouse over
 - **Markdown export** — Save presentation text as Markdown in 24 flavor dialects, with tables, lists, headings, comments, and chart data
 
 ---
@@ -90,6 +91,25 @@ with slides.Presentation() as prs:
     fmt.fill_format.solid_fill_color.color = Color.from_argb(255, 0, 70, 127)
     prs.save("text.pptx", SaveFormat.PPTX)
 ```
+
+### Hyperlinks
+
+```python
+import aspose.slides_foss as slides
+from aspose.slides_foss import Hyperlink, ShapeType
+from aspose.slides_foss.export import SaveFormat
+
+with slides.Presentation() as prs:
+    shape = prs.slides[0].shapes.add_auto_shape(ShapeType.RECTANGLE, 50, 50, 400, 100)
+    tf = shape.add_text_frame("Read the report")
+    # On a single text portion ...
+    tf.paragraphs[0].portions[0].portion_format.hyperlink_click = "https://example.com/report"
+    # ... or on the whole shape, with a tooltip.
+    shape.hyperlink_mouse_over = Hyperlink("https://example.com", tooltip="Home")
+    prs.save("links.pptx", SaveFormat.PPTX)
+```
+
+Assigning `None` removes the link and the relationship it owns.
 
 ### Table
 
@@ -295,7 +315,7 @@ The following areas are not yet implemented and will raise `NotImplementedError`
 - SmartArt, OLE objects, mathematical text
 - Export to PDF, HTML, SVG, and image formats
 - VBA macros, digital signatures
-- Hyperlinks and action settings
+- Action settings other than external hyperlinks
 
 Unknown XML parts encountered during load are preserved verbatim on save —
 opening and re-saving a file will never strip content this library does not yet understand.
