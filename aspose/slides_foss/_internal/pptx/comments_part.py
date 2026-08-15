@@ -75,17 +75,21 @@ class CommentData:
         self._elem.set('dt', value)
 
     @property
-    def parent_cm_id(self) -> Optional[int]:
-        val = self._elem.get('parentCmId')
-        return int(val) if val is not None else None
+    def parent_ref(self) -> Optional[tuple]:
+        """The ``(authorId, idx)`` of the comment this one replies to.
 
-    @parent_cm_id.setter
-    def parent_cm_id(self, value: Optional[int]) -> None:
-        if value is None:
-            if 'parentCmId' in self._elem.attrib:
-                del self._elem.attrib['parentCmId']
-        else:
-            self._elem.set('parentCmId', str(value))
+        CT_Comment has no attribute for a parent, so the link lives in the
+        threading extension PowerPoint itself writes rather than in an
+        invented attribute that no consumer reads.
+        """
+        from .threaded_comments import parent_of
+        parent = parent_of(self._elem)
+        return (int(parent[0]), int(parent[1])) if parent is not None else None
+
+    @parent_ref.setter
+    def parent_ref(self, value: Optional[tuple]) -> None:
+        from .threaded_comments import set_parent
+        set_parent(self._elem, value)
 
     @property
     def text(self) -> str:
@@ -173,7 +177,7 @@ class CommentsPart:
         return None
 
     def find_comment_by_idx_all(self, idx: int) -> Optional[CommentData]:
-        """Find a comment by idx across all authors (for parentCmId lookup)."""
+        """Find a comment by idx across all authors."""
         for e in self._root.findall(f"{_P}cm"):
             if int(e.get('idx', '-1')) == idx:
                 return CommentData(e)
@@ -181,14 +185,12 @@ class CommentsPart:
 
     def add_comment(self, author_id: int, idx: int, text: str, pos_x: float,
                     pos_y: float, dt_str: str,
-                    parent_idx: Optional[int] = None) -> CommentData:
+                    parent_ref: Optional[tuple] = None) -> CommentData:
         """Append a new comment element and return its CommentData."""
         elem = ET.SubElement(self._root, f"{_P}cm")
         elem.set('authorId', str(author_id))
         elem.set('dt', dt_str)
         elem.set('idx', str(idx))
-        if parent_idx is not None:
-            elem.set('parentCmId', str(parent_idx))
 
         pos = ET.SubElement(elem, f"{_P}pos")
         pos.set('x', str(round(pos_x * _CM_TO_EMU)))
@@ -197,18 +199,19 @@ class CommentsPart:
         text_elem = ET.SubElement(elem, f"{_P}text")
         text_elem.text = text
 
-        return CommentData(elem)
+        data = CommentData(elem)
+        if parent_ref is not None:
+            data.parent_ref = parent_ref
+        return data
 
     def insert_comment(self, index: int, author_id: int, idx: int, text: str,
                        pos_x: float, pos_y: float, dt_str: str,
-                       parent_idx: Optional[int] = None) -> CommentData:
+                       parent_ref: Optional[tuple] = None) -> CommentData:
         """Insert a comment at the given index."""
         elem = ET.Element(f"{_P}cm")
         elem.set('authorId', str(author_id))
         elem.set('dt', dt_str)
         elem.set('idx', str(idx))
-        if parent_idx is not None:
-            elem.set('parentCmId', str(parent_idx))
 
         pos = ET.SubElement(elem, f"{_P}pos")
         pos.set('x', str(round(pos_x * _CM_TO_EMU)))
@@ -226,7 +229,10 @@ class CommentsPart:
             ref_pos = list(self._root).index(ref)
             self._root.insert(ref_pos, elem)
 
-        return CommentData(elem)
+        data = CommentData(elem)
+        if parent_ref is not None:
+            data.parent_ref = parent_ref
+        return data
 
     def remove_comment(self, author_id: int, idx: int) -> None:
         for e in self._root.findall(f"{_P}cm"):

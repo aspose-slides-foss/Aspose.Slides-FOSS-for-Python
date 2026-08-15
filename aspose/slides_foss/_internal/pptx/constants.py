@@ -52,6 +52,7 @@ NAMESPACES = {
     # Microsoft Office extensions (2010+)
     'p14': 'http://schemas.microsoft.com/office/powerpoint/2010/main',
     'p15': 'http://schemas.microsoft.com/office/powerpoint/2012/main',
+    'p188': 'http://schemas.microsoft.com/office/powerpoint/2018/8/main',
     'a14': 'http://schemas.microsoft.com/office/drawing/2010/main',
 
     # Markup Compatibility namespace

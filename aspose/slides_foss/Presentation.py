@@ -404,6 +404,10 @@ class Presentation(IPresentation, IPresentationComponent):
                 if part_name.startswith('ppt/comments/') and part_name.endswith('.xml'):
                     cp = CommentsPart(self._opc_package, part_name)
                     cp.save()
+            # Replies are only replies in the modern parts; the classic list
+            # has no way to express one.
+            from ._internal.pptx.threaded_comments import write_threaded_comments
+            write_threaded_comments(self._opc_package)
 
         # Save theme if it was loaded/modified
         if self._theme_part is not None:

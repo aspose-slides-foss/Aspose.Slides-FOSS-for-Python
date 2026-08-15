@@ -33,6 +33,9 @@ CONTENT_TYPES = {
     'chartsheet': 'application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml',
     'comments': 'application/vnd.openxmlformats-officedocument.presentationml.comments+xml',
     'commentAuthors': 'application/vnd.openxmlformats-officedocument.presentationml.commentAuthors+xml',
+    # Modern threaded comments, PowerPoint 2018 and later.
+    'threadedComments': 'application/vnd.ms-powerpoint.threadedcomments+xml',
+    'authors': 'application/vnd.ms-powerpoint.authors+xml',
 }
 
 

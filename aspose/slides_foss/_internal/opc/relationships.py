@@ -40,6 +40,9 @@ REL_TYPES = {
     'video': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/video',
     'comments': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments',
     'commentAuthors': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/commentAuthors',
+    # Modern threaded comments, PowerPoint 2018 and later.
+    'threadedComment': 'http://schemas.microsoft.com/office/2018/10/relationships/threadedComment',
+    'authors': 'http://schemas.microsoft.com/office/2018/10/relationships/authors',
 }
 
 
