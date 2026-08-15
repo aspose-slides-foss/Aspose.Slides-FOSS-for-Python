@@ -40,6 +40,15 @@ dependencies = [
     "lxml>=4.9",
 ]
 
+[project.optional-dependencies]
+# Test-only. python-pptx is an independent reader used by the conformance
+# tests: it reads the produced package without going through this library, so
+# a writer bug cannot be hidden by a matching reader bug.
+test = [
+    "pytest>=7",
+    "python-pptx>=1.0",
+]
+
 [project.urls]
 Homepage = "https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python"
 Repository = "https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python"

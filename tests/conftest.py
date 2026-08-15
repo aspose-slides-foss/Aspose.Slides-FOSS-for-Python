@@ -17,6 +17,16 @@ else:
     if SRC_DIR not in sys.path:
         sys.path.insert(0, SRC_DIR)
 
+# `aspose` is a namespace package, so another distribution installed under the
+# same name can capture it and hide this library. Diagnose that here rather
+# than letting the import fail with a bare ModuleNotFoundError.
+_TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
+if _TESTS_DIR not in sys.path:
+    sys.path.insert(0, _TESTS_DIR)
+from conformance.harness import verify_library_not_shadowed
+
+verify_library_not_shadowed()
+
 from aspose.slides_foss import Presentation
 from aspose.slides_foss.export import SaveFormat
 
