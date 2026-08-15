@@ -125,6 +125,17 @@ class Shape(StrictAttributes, IShape, ISlideComponent, IPresentationComponent, I
             raise RuntimeError("Shape has no XML element")
         return ET.SubElement(self._xml_element, f"{NS.P}spPr")
 
+    def _is_group_properties(self, sp_pr: ET._Element) -> bool:
+        """True when the properties element is `p:grpSpPr`.
+
+        `CT_GroupShapeProperties` (ECMA-376 §19.3.1.23) is a shorter sequence
+        than `CT_ShapeProperties` and is not a superset of it: it has no
+        `a:ln` and no `a:sp3d`. Writing either into a group's properties
+        produces a package the Open XML SDK rejects outright and PowerPoint
+        will not open, from a call that reported success.
+        """
+        return sp_pr is not None and sp_pr.tag == f"{NS.P}grpSpPr"
+
     @property
     def line_format(self) -> ILineFormat:
         """Returns the LineFormat object that contains line formatting properties for a shape. Note: can return null for certain types of shapes which don't have line properties. Read-only ."""
@@ -132,6 +143,9 @@ class Shape(StrictAttributes, IShape, ISlideComponent, IPresentationComponent, I
             return None
         from .LineFormat import LineFormat
         sp_pr = self._ensure_sp_pr()
+        if self._is_group_properties(sp_pr):
+            # A group is a container and has no outline of its own.
+            return None
         lf = LineFormat()
         lf._init_internal(sp_pr, self._slide_part, self._parent_slide)
         return lf
@@ -143,6 +157,10 @@ class Shape(StrictAttributes, IShape, ISlideComponent, IPresentationComponent, I
             return None
         from .ThreeDFormat import ThreeDFormat
         sp_pr = self._ensure_sp_pr()
+        if self._is_group_properties(sp_pr):
+            # A group has no extrusion of its own; `a:sp3d` is not a child
+            # `CT_GroupShapeProperties` has.
+            return None
         tdf = ThreeDFormat()
         tdf._init_internal(sp_pr, self._slide_part, self._parent_slide)
         return tdf

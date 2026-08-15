@@ -57,6 +57,10 @@ CHILD_SEQUENCES: dict[str, dict[str, int]] = {
         "xfrm", ("custGeom", "prstGeom"), _FILL, "ln", _EFFECT,
         "scene3d", "sp3d", "extLst",
     ),
+    # CT_GroupShapeProperties — 19.3.1.23.  A shorter sequence than
+    # CT_ShapeProperties, and not a superset of it: a group has no geometry,
+    # no `ln` and no `sp3d`, so those three have no position here at all.
+    "grpSpPr": _sequence("xfrm", _FILL, _EFFECT, "scene3d", "extLst"),
     # CT_LineProperties — 20.1.2.2.24.  Aliased below onto every element name
     # that carries it: the underline line and the six table cell borders.
     "ln": _sequence(

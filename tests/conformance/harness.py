@@ -151,6 +151,15 @@ CHILD_ORDER = {
         ["a:sp3d"],
         ["a:extLst"],
     ],
+    # CT_GroupShapeProperties (19.3.1.23 / p:grpSpPr).  Shorter than
+    # CT_ShapeProperties: no geometry, no a:ln and no a:sp3d.
+    "p:grpSpPr": [
+        ["a:xfrm"],
+        ["a:noFill", "a:solidFill", "a:gradFill", "a:blipFill", "a:pattFill", "a:grpFill"],
+        ["a:effectLst", "a:effectDag"],
+        ["a:scene3d"],
+        ["a:extLst"],
+    ],
     # CT_EffectList (20.1.8.26 / a:effectLst)
     "a:effectLst": [
         ["a:blur"],
