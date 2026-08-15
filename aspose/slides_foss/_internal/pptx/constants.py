@@ -298,7 +298,7 @@ class Elements:
     P_GRAPHIC_FRAME = f"{NS.P}graphicFrame"
     P_NV_GRAPHIC_FRAME_PR = f"{NS.P}nvGraphicFramePr"
     P_C_NV_GRAPHIC_FRAME_PR = f"{NS.P}cNvGraphicFramePr"
-    A_GRAPHIC_FRAME_LOCKING = f"{NS.A}graphicFrameLocking"
+    A_GRAPHIC_FRAME_LOCKS = f"{NS.A}graphicFrameLocks"
     P_NV_PR = f"{NS.P}nvPr"
     P_XFRM = f"{NS.P}xfrm"
 

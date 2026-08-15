@@ -870,7 +870,7 @@ class ShapeCollection(BaseCollection, IShapeCollection):
         c_nv_pr.set('id', str(shape_id))
         c_nv_pr.set('name', name)
         c_nv_gf_pr = ET.SubElement(nv_gf_pr, Elements.P_C_NV_GRAPHIC_FRAME_PR)
-        gf_locking = ET.SubElement(c_nv_gf_pr, Elements.A_GRAPHIC_FRAME_LOCKING)
+        gf_locking = ET.SubElement(c_nv_gf_pr, Elements.A_GRAPHIC_FRAME_LOCKS)
         gf_locking.set('noGrp', '1')
         ET.SubElement(nv_gf_pr, Elements.P_NV_PR)
 
@@ -1163,7 +1163,7 @@ class ShapeCollection(BaseCollection, IShapeCollection):
         c_nv_pr.set('id', str(shape_id))
         c_nv_pr.set('name', name)
         c_nv_gf_pr = ET.SubElement(nv_gf_pr, Elements.P_C_NV_GRAPHIC_FRAME_PR)
-        gf_locking = ET.SubElement(c_nv_gf_pr, Elements.A_GRAPHIC_FRAME_LOCKING)
+        gf_locking = ET.SubElement(c_nv_gf_pr, Elements.A_GRAPHIC_FRAME_LOCKS)
         gf_locking.set('noGrp', '1')
         ET.SubElement(nv_gf_pr, Elements.P_NV_PR)
 
