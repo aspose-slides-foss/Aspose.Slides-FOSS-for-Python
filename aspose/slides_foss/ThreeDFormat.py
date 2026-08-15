@@ -30,6 +30,15 @@ _MATERIAL_MAP_REV = {v: k for k, v in _MATERIAL_MAP.items()}
 _POST_SP3D_TAGS = {Elements.A_EXT_LST}
 _POST_SCENE3D_TAGS = {Elements.A_SP_3D, Elements.A_EXT_LST}
 
+# CT_Scene3D (ECMA-376 Part 1, 20.1.4.1.26) is a sequence of a required
+# <a:camera> and a required <a:lightRig>, so a scene is never valid
+# half-populated.  CT_Camera requires @prst and CT_LightRig requires both
+# @rig and @dir; these are the values PowerPoint itself writes for a shape
+# given depth from the ribbon.
+_DEFAULT_CAMERA_PRESET = 'orthographicFront'
+_DEFAULT_LIGHT_RIG = 'threePt'
+_DEFAULT_LIGHT_DIRECTION = 't'
+
 
 class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFormat, IThreeDParamSource):
     """Represents 3-D properties."""
@@ -54,6 +63,10 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
         sp3d = self._get_sp3d()
         if sp3d is not None:
             return sp3d
+        # An extrusion with no scene has no camera and no lighting, so the
+        # shape is rendered flat.  Give it the default scene as PowerPoint
+        # does when depth is applied from the ribbon.
+        self._ensure_scene3d()
         el = ET.Element(Elements.A_SP_3D)
         insert_before = None
         for child in self._parent_element:
@@ -85,6 +98,13 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
             self._parent_element.insert(idx, el)
         else:
             self._parent_element.append(el)
+        ET.SubElement(el, Elements.A_CAMERA, prst=_DEFAULT_CAMERA_PRESET)
+        ET.SubElement(
+            el,
+            Elements.A_LIGHT_RIG,
+            rig=_DEFAULT_LIGHT_RIG,
+            dir=_DEFAULT_LIGHT_DIRECTION,
+        )
         return el
 
     def _save(self) -> None:
