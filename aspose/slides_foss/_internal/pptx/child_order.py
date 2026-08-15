@@ -31,13 +31,13 @@ _FILL = ("noFill", "solidFill", "gradFill", "blipFill", "pattFill", "grpFill")
 _EFFECT = ("effectLst", "effectDag")
 
 
-def _sequence(*positions) -> dict[str, int]:
+def _sequence(*positions, namespace: str = NS.A) -> dict[str, int]:
     """Expand a sequence of names and choice groups into ``{tag: rank}``."""
     ranks: dict[str, int] = {}
     for rank, position in enumerate(positions):
         names = (position,) if isinstance(position, str) else position
         for name in names:
-            ranks[f"{NS.A}{name}"] = rank
+            ranks[f"{namespace}{name}"] = rank
     return ranks
 
 
@@ -79,6 +79,10 @@ CHILD_SEQUENCES: dict[str, dict[str, int]] = {
     "scene3d": _sequence("camera", "lightRig", "backdrop", "extLst"),
     # CT_NonVisualDrawingProps — 20.1.2.2.8.
     "cNvPr": _sequence("hlinkClick", "hlinkMouseOver", "extLst"),
+    # CT_Slide — 19.3.1.38.  PresentationML, so these children are p-namespaced.
+    "sld": _sequence(
+        "cSld", "clrMapOvr", "transition", "timing", "extLst", namespace=NS.P,
+    ),
 }
 
 for _line_element in ("uLn", "lnL", "lnR", "lnT", "lnB", "lnTlToBr", "lnBlToTr"):
