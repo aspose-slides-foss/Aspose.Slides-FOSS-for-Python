@@ -1,5 +1,5 @@
 from __future__ import annotations
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import overload, TYPE_CHECKING, Any, BinaryIO, Optional, Union
 from .IPresentation import IPresentation
 from .IPresentationComponent import IPresentationComponent
@@ -369,10 +369,12 @@ class Presentation(IPresentation, IPresentationComponent):
         - save(stream, slides, format): Save specific slides to stream
         - save(stream, slides, format, options): Save specific slides with options
         """
-        # Save document properties (auto-update last_saved_time)
-        if self._document_properties is not None:
-            self._document_properties.last_saved_time = datetime.utcnow()
-            self._document_properties._save()
+        # Stamp the modification time on every save, not only when the caller
+        # happened to touch the document properties first: otherwise the file
+        # keeps saying it was last modified whenever the template was built.
+        properties = self.document_properties
+        properties.last_saved_time = datetime.now(timezone.utc).replace(tzinfo=None)
+        properties._save()
 
         # Save all modified slide parts and their associated notes slides
         if self._slides is not None:
