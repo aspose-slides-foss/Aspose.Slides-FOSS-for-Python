@@ -42,6 +42,64 @@ permissions:
   contents: read
 
 jobs:
+  # Five seconds of checking, before fifteen jobs of building. Everything here
+  # is knowable from the ref alone, and every one of these failures used to
+  # happen at the upload step instead — after the whole matrix had run.
+  #
+  #   * The version in pyproject.toml is already on PyPI. PyPI does not allow
+  #     re-uploading a version, not even an identical file, so a release cut
+  #     without bumping the version cannot succeed however long it runs.
+  #   * The release tag does not name the version being built.
+  #
+  # It also closes the workflow_dispatch hole: the tag check further down is
+  # scoped to `release` events, because a dispatch has no release tag, so a
+  # dispatch on any ref used to publish whatever pyproject.toml happened to
+  # say. The PyPI check below is not scoped, and it is the one that matters.
+  preflight:
+    name: pre-flight checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          # tomllib is in the standard library from 3.11.
+          python-version: "3.12"
+
+      - name: Check the version is one PyPI will accept
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          set -eu
+          version=$(python -c "import pathlib, tomllib; print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])")
+          echo "pyproject.toml version: $version"
+
+          if [ "$EVENT" = "release" ]; then
+            tag="${GITHUB_REF_NAME#v}"
+            echo "release tag:            $tag"
+            if [ "$version" != "$tag" ]; then
+              echo "::error::release tag $GITHUB_REF_NAME does not name version $version from pyproject.toml" >&2
+              exit 1
+            fi
+          fi
+
+          code=$(curl -sS -o /dev/null -w '%{http_code}' \
+            "https://pypi.org/pypi/aspose-slides-foss/$version/json")
+          case "$code" in
+            404)
+              echo "$version is not on PyPI yet — good"
+              ;;
+            200)
+              echo "::error::aspose-slides-foss $version is already on PyPI. PyPI refuses a re-upload of a version, identical file or not. Bump the version in pyproject.toml and cut a new release." >&2
+              exit 1
+              ;;
+            *)
+              echo "::error::could not ask PyPI whether $version exists (HTTP $code). Re-run this workflow." >&2
+              exit 1
+              ;;
+          esac
+
   # The gate. This is the same CI that runs on every push, invoked as a
   # reusable workflow: it runs the full suite across the whole support matrix
   # and builds the distributions. If any of it fails, `publish` never starts,
@@ -52,6 +110,7 @@ jobs:
   # form for a reusable workflow in the same repository; it resolves to the
   # copy of ci.yml at the commit being released, which is what should gate it.
   ci:
+    needs: preflight
     uses: ./.github/workflows/ci.yml
 
   publish:
@@ -78,9 +137,11 @@ jobs:
           path: dist
 
       - name: Check the release tag matches the version being published
-        # Publishing 26.8.0 from a tag that says v26.9.0 produces a release
-        # nobody can find and a version number that means nothing. Compare
-        # them before the upload, which is the last moment either can change.
+        # `preflight` compared the tag against pyproject.toml. This compares it
+        # against the artefact about to be uploaded, which is the only thing
+        # that can still disagree: a stale or hand-edited `dist/`. Publishing
+        # 26.8.0 from a tag that says v26.9.0 produces a release nobody can
+        # find and a version number that means nothing.
         if: github.event_name == 'release'
         run: |
           set -eu

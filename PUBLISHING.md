@@ -52,6 +52,13 @@ At the time of writing, `pyproject.toml` says `26.8.0`, and `26.8.0` is
 already on PyPI. **Bump it before cutting the first release through this
 workflow.**
 
+The workflow now says so itself rather than letting you find out at the end.
+Its first job asks PyPI whether the version in `pyproject.toml` exists and
+refuses to go on if it does, which takes seconds; the fifteen-job build only
+starts after that passes. The same job compares the release tag against
+`pyproject.toml`, so a mismatched tag also fails before the build rather than
+after it.
+
 ## Cutting a release
 
 1. Bump `version` in `pyproject.toml` and commit it.
@@ -62,14 +69,18 @@ workflow.**
 
 Publishing the release starts `publish.yml`, which:
 
-1. runs `ci.yml` in full — the whole test suite on Linux, Windows and macOS
-   across Python 3.10 to 3.14, then a build, `twine check --strict`, an
-   inventory of the wheel and sdist contents, a run of the suite against the
-   installed wheel, and a CycloneDX SBOM;
-2. downloads the distributions those jobs produced — the release uploads the
+1. checks, before anything is built, that the tag names the version in
+   `pyproject.toml` and that PyPI does not already have that version;
+2. runs `ci.yml` in full — the whole test suite on Linux, Windows and macOS
+   across Python 3.10 to 3.14, a `mypy` run against the recorded baseline, then
+   a build, `twine check --strict`, an inventory of the wheel and sdist
+   contents, a run of the suite against the installed wheel, and a CycloneDX
+   SBOM;
+3. downloads the distributions those jobs produced — the release uploads the
    artefact that was tested, not a rebuild;
-3. checks the release tag against the built version;
-4. uploads to PyPI with PEP 740 attestations.
+4. checks the release tag against the built version, which is the last thing
+   that can still disagree;
+5. uploads to PyPI with PEP 740 attestations.
 
 If any of that fails, nothing is uploaded.
 
