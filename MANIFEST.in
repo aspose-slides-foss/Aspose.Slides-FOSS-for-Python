@@ -7,6 +7,13 @@
 
 graft tests
 
+# The community documents. setuptools puts README.md in the sdist because
+# `readme` names it and LICENSE because `license-files` does; the rest are not
+# referenced from pyproject.toml and are dropped without this line. The README
+# links to four of them, so a source distribution without them ships a set of
+# broken links as well as no contributing, security or conduct policy.
+include *.md
+
 # Byte-compiled leftovers are not source. `graft` would otherwise pull in
 # whatever __pycache__ happens to be lying around in the working tree.
 # Building from an already-clean sdist prints "no previously-included files
