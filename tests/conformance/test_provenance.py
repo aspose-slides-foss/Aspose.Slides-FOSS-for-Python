@@ -17,16 +17,19 @@ itself, which is the kind of defect nobody finds until it is embarrassing.
 from __future__ import annotations
 
 import datetime
-import os
 import re
 import zipfile
 
 from aspose.slides_foss import Presentation
 
-TEMPLATE = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-    "aspose", "slides_foss", "_internal", "pptx", "Template.pptx",
-)
+# Ask the library where its template is, rather than guessing at the source
+# layout from this file's location. The two are the same directory in a
+# checkout and different directories when the tests run against an installed
+# package, and it is the template the library will actually open that this
+# test is about.
+from aspose.slides_foss._internal.pptx.template import get_template_path
+
+TEMPLATE = get_template_path()
 
 
 def _lang_counts(zip_file) -> dict:
