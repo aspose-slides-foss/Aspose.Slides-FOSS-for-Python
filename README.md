@@ -11,8 +11,21 @@ pip install aspose-slides-foss
 ```
 
 **Requires:** Python 3.10 or later, and `lxml` (installed automatically as a
-dependency). Every release is tested on Python 3.10, 3.11, 3.12, 3.13 and 3.14,
-on Linux, Windows and macOS. Pure Python — there is nothing to compile.
+dependency). Continuous integration runs the full test suite on Python 3.10,
+3.11, 3.12, 3.13 and 3.14, on Linux, Windows and macOS — fifteen jobs, and a
+release is gated on all of them passing. Pure Python — there is nothing to
+compile.
+
+> **The latest release on PyPI predates this page.** `pip install` gets
+> `26.8.0`, and the changes listed in
+> [CHANGELOG.md](https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/blob/main/CHANGELOG.md)
+> under `## [Unreleased]` are not in it — including hyperlinks, which the
+> example below needs, and the six distinct PowerPoint save formats. For the
+> behaviour described here, install from the repository:
+>
+> ```bash
+> pip install git+https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python.git
+> ```
 
 > The `aspose` name is a shared namespace package. If the **commercial**
 > `aspose` package is installed in the same environment it takes the name over
@@ -28,15 +41,15 @@ on Linux, Windows and macOS. Pure Python — there is nothing to compile.
 import aspose.slides_foss as slides
 from aspose.slides_foss.export import SaveFormat
 
-# Open an existing presentation
-with slides.Presentation("input.pptx") as prs:
-    print(f"Slides: {len(prs.slides)}")
-    prs.save("output.pptx", SaveFormat.PPTX)
-
-# Create a new presentation
+# Create a new presentation — needs no input file, so this runs as it stands
 with slides.Presentation() as prs:
     slide = prs.slides[0]
     prs.save("new.pptx", SaveFormat.PPTX)
+
+# Open an existing presentation
+with slides.Presentation("new.pptx") as prs:
+    print(f"Slides: {len(prs.slides)}")
+    prs.save("output.pptx", SaveFormat.PPTX)
 ```
 
 ---
@@ -387,10 +400,10 @@ opening and re-saving a file will never strip content this library does not yet 
 
 - [GitHub Repository](https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python)
 - [Issue Tracker](https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/issues)
-- [Changelog](CHANGELOG.md) — what changed, and what changed in a way you will notice
-- [Contributing](CONTRIBUTING.md) — how to build, how to run the tests, and how to report a fix
-- [Security policy](SECURITY.md) — how to report a vulnerability privately
-- [Code of conduct](CODE_OF_CONDUCT.md)
+- [Changelog](https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/blob/main/CHANGELOG.md) — what changed, and what changed in a way you will notice
+- [Contributing](https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/blob/main/CONTRIBUTING.md) — how to build, how to run the tests, and how to report a fix
+- [Security policy](https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/blob/main/SECURITY.md) — how to report a vulnerability privately
+- [Code of conduct](https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/blob/main/CODE_OF_CONDUCT.md)
 
 ---
 
