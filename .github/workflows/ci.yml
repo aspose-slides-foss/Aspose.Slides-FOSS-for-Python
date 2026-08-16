@@ -64,6 +64,50 @@ jobs:
       - name: Run the full test suite
         run: python -m pytest -q
 
+  types:
+    name: mypy ratchet
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          # Must match `python_version` under [tool.mypy] in pyproject.toml.
+          # The baseline below is a count, and a count is only comparable
+          # against the same analysis.
+          python-version: "3.12"
+
+      - name: Install mypy
+        # Pinned exactly. A new mypy release adds checks, the count moves, and
+        # a ratchet whose baseline moves on its own is not a ratchet. Bump this
+        # and the baseline below in the same commit.
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install mypy==1.19.0 lxml
+
+      - name: Type-check, and fail if the error count has grown
+        # The package ships py.typed, so these are the errors a consumer's own
+        # checker can see in this library. Annotation coverage is partial, so
+        # the gate is not zero — it is "no worse than the last measurement".
+        # Lowering BASELINE when the count drops is a welcome change on its
+        # own; raising it needs a reason in the commit message.
+        env:
+          BASELINE: "1626"
+        run: |
+          set -uo pipefail
+          mypy --no-incremental > mypy.log 2>&1 || true
+          tail -n 1 mypy.log
+          count=$(grep -c '^[^ ].*: error:' mypy.log || true)
+          echo "mypy errors: $count (baseline $BASELINE)"
+          if [ "$count" -gt "$BASELINE" ]; then
+            echo "::error::mypy reports $count errors, up from the baseline of $BASELINE" >&2
+            exit 1
+          fi
+          if [ "$count" -lt "$BASELINE" ]; then
+            echo "::notice::mypy reports $count errors, down from $BASELINE — lower BASELINE in ci.yml"
+          fi
+
   package:
     name: build, inventory and SBOM
     needs: test
@@ -124,6 +168,13 @@ jobs:
               "/tests/conftest.py",
               "/tests/conformance/harness.py",
               "/tests/test_data/lotus.png",
+              # The README links to these four. A source distribution that
+              # carries the README and not the files it points at ships broken
+              # links and no policy documents.
+              "/CHANGELOG.md",
+              "/CONTRIBUTING.md",
+              "/SECURITY.md",
+              "/CODE_OF_CONDUCT.md",
           ):
               if not any(m.endswith(suffix) for m in members):
                   failures.append(f"sdist is missing */{suffix.lstrip('/')}")

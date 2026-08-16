@@ -50,9 +50,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Test-only. python-pptx is an independent reader used by the conformance
-# tests: it reads the produced package without going through this library, so
-# a writer bug cannot be hidden by a matching reader bug.
+# Test-only. What stops a writer bug from being hidden by a matching reader bug
+# is the conformance harness itself: it unzips the produced package and reads
+# the XML with XPath, never asking this library to read its own output back.
+# python-pptx is a second, independent reader the harness can call where one
+# states a failure most clearly; one conformance test uses it, and that test
+# skips if it is absent.
 test = [
     "pytest>=7",
     "python-pptx>=1.0",
@@ -75,6 +78,22 @@ namespaces = true
 "*" = ["py.typed"]
 "aspose.slides_foss._internal.pptx" = ["*.pptx"]
 "aspose.slides_foss._internal.xlsx" = ["*.xlsx"]
+
+[tool.mypy]
+# The package ships a py.typed marker, so what mypy reports here is close to
+# what a consumer's own checker reports about this library. Annotation coverage
+# is partial, so this is not a clean-tree gate: CI records the error count and
+# fails if it rises, which makes the number a ratchet rather than a wish.
+#
+# Both settings below exist so a local `mypy` and the CI run reach the same
+# count. `ignore_missing_imports` keeps third-party stubs out of the total —
+# they are not this project's errors. `python_version` is pinned because the
+# count varies with the interpreter mypy analyses for, and a baseline that
+# moves when the runner's default Python changes cannot be a ratchet. It does
+# not narrow what the library supports; the test matrix is what states that.
+packages = ["aspose.slides_foss"]
+ignore_missing_imports = true
+python_version = "3.12"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
