@@ -25,7 +25,9 @@ raise, and files this version writes are not byte-identical to the ones the last
   still declared as a *presentation*, so the file contradicted its own extension and PowerPoint
   reported "PowerPoint can't open this file because its file extension has changed". Each of `PPTX`,
   `PPTM`, `PPSX`, `PPSM`, `POTX` and `POTM` now declares its own main-part content type. An ordinary
-  `.pptx` save is byte-for-byte unchanged.
+  `.pptx` save is unaffected *by this change* — `PPTX` declares the content type it always did. It is
+  not byte-for-byte identical to what the previous version wrote, because two of the changes below
+  rewrite `docProps/core.xml` and `docProps/app.xml` on every save.
 - **A refused save says what to ask for instead.** Saving to one of the fourteen `SaveFormat` values
   this library does not write still raises `ValueError`, as it always has, but the message now names
   the seven that do work: `Export format 'Pdf' is not supported; this library writes Md, Potm, Potx,
@@ -61,23 +63,36 @@ raise, and files this version writes are not byte-identical to the ones the last
 
 - **Hyperlinks on text portions and on whole shapes**, on click and on mouse over. The properties
   existed and stored a value; nothing wrote it, so the link was simply absent from the file. A link
-  is now written as `a:hlinkClick` or `a:hlinkMouseOver` inside `a:rPr` for a portion and inside
-  `p:cNvPr` for a shape, each with an `r:id` resolving to an external relationship in the owning
-  part's `.rels`. Assigning `None` removes the element and the relationship together.
+  is now written inside `a:rPr` for a portion — `a:hlinkClick` or `a:hlinkMouseOver` — and inside
+  `p:cNvPr` for a shape, where `CT_NonVisualDrawingProps` names the mouse-over element
+  `a:hlinkHover`. Each carries an `r:id` resolving to an external relationship in the owning part's
+  `.rels`. Assigning `None` removes the element and the relationship together.
 - **A conformance test suite** — 82 tests that write a file through the public API, open it as a ZIP
   archive and assert on the XML inside, never asking the library to read its own output back. See
   `tests/conformance/README.md`.
 - **A `py.typed` marker.** The package declared `Typing :: Typed` and shipped no marker, so every
   type checker read it as untyped and inferred `Any` throughout — `mypy` reported "module is
-  installed, but missing library stubs or py.typed marker". The annotations were always there; only
-  the one-byte file that makes them visible was missing.
+  installed, but missing library stubs or py.typed marker". The marker now ships, so the annotations
+  that are there reach a consumer's type checker. **Coverage is partial**: roughly two thirds of the
+  parameters and of the return types carry an annotation, and some of the most-used entry points do
+  not — `Presentation.save` is `(*args, **kwargs) -> None`, `IImageCollection.add_image` and
+  `ShapeCollection.add_picture_frame` take unannotated parameters. An unannotated parameter degrades
+  to `Any` rather than to an error, so the marker does not make a consumer's checker fail; it does
+  mean "no annotation" now reads as `Any` rather than as "this package has no type information".
+  CI runs `mypy` over the package and fails if the error count grows, so the gap closes and does not
+  widen.
 - **A source distribution whose tests can actually be run.** setuptools collected `tests/test_*.py`
   by itself but not `conftest.py`, not the conformance suite and not the binary fixtures, so the
   sdist shipped a suite that could not even be collected.
 - **Continuous integration** — the full suite on Linux, Windows and macOS across Python 3.10 to 3.14,
-  then a build of both distributions, `twine check --strict`, an assertion that the wheel and sdist
-  contain the data files the metadata implies, a second run of the suite against the *installed*
-  wheel, and a CycloneDX SBOM.
+  a `mypy` run that fails if the error count rises above the recorded baseline, then a build of both
+  distributions, `twine check --strict`, an assertion that the wheel and sdist contain the data files
+  and the documents the metadata and the README imply, a second run of the suite against the
+  *installed* wheel, and a CycloneDX SBOM.
+- **A floor under the conformance suite.** Deleting `tests/conformance/test_*.py` used to leave every
+  job green: the rest of the suite passed, the exit code was 0, and nothing said the tests that read
+  the produced package were gone. `tests/test_conformance_suite_is_present.py` now collects that
+  directory and fails if the count has dropped.
 - **A release workflow** using PyPI Trusted Publishing with PEP 740 attestations rather than a
   long-lived API token. See `PUBLISHING.md`.
 - **Community documentation** — this changelog, `CONTRIBUTING.md`, `SECURITY.md`,
