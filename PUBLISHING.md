@@ -54,8 +54,8 @@ workflow.**
 
 The workflow now says so itself rather than letting you find out at the end.
 Its first job asks PyPI whether the version in `pyproject.toml` exists and
-refuses to go on if it does, which takes seconds; the fifteen-job build only
-starts after that passes. The same job compares the release tag against
+refuses to go on if it does, which takes seconds; the whole build only starts
+after that passes. The same job compares the release tag against
 `pyproject.toml`, so a mismatched tag also fails before the build rather than
 after it.
 

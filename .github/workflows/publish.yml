@@ -42,7 +42,7 @@ permissions:
   contents: read
 
 jobs:
-  # Five seconds of checking, before fifteen jobs of building. Everything here
+  # Five seconds of checking, before the whole build. Everything here
   # is knowable from the ref alone, and every one of these failures used to
   # happen at the upload step instead — after the whole matrix had run.
   #
