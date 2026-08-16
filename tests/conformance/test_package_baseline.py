@@ -53,7 +53,8 @@ def test_added_and_removed_slides_stay_registered(produced):
 def test_an_embedded_image_resolves_from_the_slide(produced, test_data_dir):
     """`<a:blip r:embed>` must name a relationship that names a part that exists."""
     pres = Presentation()
-    image = pres.images.add_image(open(os.path.join(test_data_dir, "lotus.png"), "rb").read())
+    with open(os.path.join(test_data_dir, "lotus.png"), "rb") as fh:
+        image = pres.images.add_image(fh.read())
     pres.slides[0].shapes.add_picture_frame(
         ShapeType.RECTANGLE, 50.0, 50.0, 200.0, 150.0, image
     )
