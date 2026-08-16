@@ -29,9 +29,13 @@ assertion in `tests/conformance/`, where it opens the file as a ZIP archive and 
 Python 3.10 or later, and nothing else. The library is pure Python with one runtime dependency,
 `lxml`; there is no compilation step and no build to run before the tests.
 
-The test extra adds `pytest` and [`python-pptx`](https://python-pptx.readthedocs.io/). The second is
-deliberate: it is an independent implementation used by the conformance suite to read the package
-this library wrote, so a writer bug cannot be concealed by a matching reader bug in our own code.
+The test extra adds `pytest` and [`python-pptx`](https://python-pptx.readthedocs.io/).
+
+What keeps a writer bug from being concealed by a matching reader bug is not `python-pptx` — it is
+that the conformance harness unzips the produced file and reads its XML with XPath, never asking this
+library to read its own output back. `python-pptx` is a second opinion available where an independent
+reader states a failure most clearly, and one conformance test uses it today. Uninstall it and the
+suite still passes; that test skips.
 
 ## A virtual environment is not optional here
 
@@ -109,7 +113,7 @@ Two things about the packaging are easy to break and worth knowing:
 python -m pytest -q
 ```
 
-Expect **665 passed, 5 skipped**. The five skips are chart tests that need a `Charts.pptx` fixture
+Expect **666 passed, 5 skipped**. The five skips are chart tests that need a `Charts.pptx` fixture
 which is not in the repository; they report `Charts.pptx not available` and are not a failure.
 
 The conformance suite is **82 of those tests** and can be run on its own:
@@ -117,6 +121,13 @@ The conformance suite is **82 of those tests** and can be run on its own:
 ```bash
 python -m pytest tests/conformance -q
 ```
+
+That 82 is asserted, not just expected. `tests/test_conformance_suite_is_present.py` collects the
+conformance directory in a child process and fails if the count has dropped, because the tests that
+open the produced package are exactly the ones whose absence nothing else can see: delete them and
+every remaining test passes, the exit code is 0, and the build is green with the instrument removed.
+If you delete a conformance test on purpose, lower the floor in that file in the same commit and say
+why.
 
 **Warnings are errors.** `filterwarnings = ["error"]` is set in `pyproject.toml` rather than passed
 on the command line, so a local run and a CI run reach the same verdict. The suite is clean under it,
@@ -194,8 +205,12 @@ linter configuration in this repository, so tooling will not decide it for you.
 Public API names follow Python convention — `snake_case` methods and properties on `PascalCase`
 classes — while mirroring the shared cross-edition API. That is why you see `add_auto_shape` rather
 than `AddAutoShape`, and why the interface classes are named `IShape`, `IPresentation` and so on.
-Keep the type annotations complete: the package ships a `py.typed` marker, so every annotation you
-write is what a consumer's type checker sees.
+Annotate what you write. The package ships a `py.typed` marker, so every annotation in it is what a
+consumer's type checker sees — and every parameter without one is an `Any` that checker will not
+question. Coverage today is partial, roughly two thirds of parameters and return types, so a new or
+edited signature is the cheapest place to close the gap. CI runs `mypy` over the package and fails if
+the error count rises above the recorded baseline, which is what stops the gap widening; lowering
+that number is welcome in its own pull request.
 
 ### Behaviour that is deliberate, not a bug
 
@@ -227,9 +242,13 @@ of what the packaging metadata claims. `requires-python` is `>=3.10` and the cla
 five versions; anything dropped from the matrix has to be dropped from those claims at the same time.
 
 A second job then builds the sdist and the wheel, runs `twine check --strict`, asserts that the
-distributions contain the data files the metadata implies, **installs the wheel into a throwaway
-environment and runs the suite again against it**, and emits a CycloneDX SBOM. The matrix tests the
-checkout; that job tests what a user actually gets.
+distributions contain the data files and the documents the metadata and the README imply, **installs
+the wheel into a throwaway environment and runs the suite again against it**, and emits a CycloneDX
+SBOM. The matrix tests the checkout; that job tests what a user actually gets.
+
+A third job runs `mypy` over the package with a pinned version, and fails if the error count is
+higher than the baseline recorded in the workflow. It is not a clean-tree gate — the count is not
+zero — it is a ratchet, so the number can only go down.
 
 If CI is red the pull request is not ready, including when the failure is on a platform or an
 interpreter you did not use.

@@ -46,8 +46,8 @@ pip install -e ".[test]"
 | `content_types()`, `content_type_of(part)` | what a consumer resolves for a part |
 | `open_with_python_pptx()` | third-party read-back |
 
-**Three package-level rules**, each of which has caught a real defect, and all
-three together as `assert_package_is_consistent()`:
+**Four package-level rules**, each of which has caught a real defect, and all
+four together as `assert_package_is_consistent()`:
 
 1. `assert_relationship_ids_resolve()` — every `r:id`, `r:embed` and `r:link` in
    every part resolves to a `Relationship` in *that part's* `.rels`. A dangling
@@ -63,6 +63,14 @@ three together as `assert_package_is_consistent()`:
    content type the part's *identity*: a slide part that falls through to
    `<Default Extension="xml"/>` is an `application/xml` part, and a strict
    consumer will not treat it as a slide.
+4. `assert_every_part_is_reachable()` — every part in the ZIP is reached by
+   walking relationships out from `_rels/.rels`. This is the only one of the
+   four that can see an *orphan*: a part nothing points at, carrying its own
+   content-type `Override` so that nothing dangles, no relationship target is
+   missing and no content type fails to resolve. It is what caught a slide's
+   threaded-comment part being written afresh on every save — four saves, four
+   parts, three of them unreferenced, and deleted comment text still in the
+   shipped file in full.
 
 **Child order.** OOXML complex types are `xsd:sequence`, so `<a:rPr>` written
 with its children in a different order is invalid even though every child is
