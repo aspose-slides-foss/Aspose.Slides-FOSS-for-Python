@@ -1,0 +1,15 @@
+# What goes into the source distribution.
+#
+# setuptools picks up tests/test_*.py on its own, but not tests/conftest.py,
+# not tests/conformance/ and not the binary fixtures in tests/test_data/.
+# Without those three the tests in the sdist cannot even be collected, so the
+# sdist ships a test suite that does not run. Graft the whole directory.
+
+graft tests
+
+# Byte-compiled leftovers are not source. `graft` would otherwise pull in
+# whatever __pycache__ happens to be lying around in the working tree.
+# Building from an already-clean sdist prints "no previously-included files
+# matching '*.py[cod]' found anywhere in distribution"; that notice means the
+# rule had nothing to remove, which is the desired state.
+global-exclude *.py[cod]
