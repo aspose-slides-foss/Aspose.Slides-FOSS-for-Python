@@ -70,11 +70,22 @@ reporting form:
 
 **<https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/security/advisories/new>**
 
-That form is GitHub's private vulnerability reporting channel, and it is the only
-private channel this repository currently has. It is read by the maintainers and
-by nobody else. Begin your report with the words "Code of Conduct" so that it is
-not triaged as a security issue. If you would prefer a public report, open a
-normal issue.
+Begin your report with the words "Code of Conduct" so that it is triaged as a
+conduct report rather than as a security issue.
+
+Be aware of what that form is, so that you can decide whether it suits your
+report. It is GitHub's private vulnerability reporting channel, borrowed here
+because it is the private, attachment-capable channel GitHub gives a repository:
+a submission is visible to this repository's maintainers and to the owners of
+the `aspose-slides-foss` organization, and it is not public.
+
+**If your report concerns a maintainer of this repository, or you would rather
+it did not reach the maintainers at all, do not use that form.** Report it to
+GitHub instead, at **<https://github.com/contact/report-abuse>**. That route goes
+to GitHub Support, which can act on accounts and content independently of anyone
+here, and it is available whatever this repository's own settings are.
+
+If you would prefer a public report, open a normal issue.
 
 All complaints will be reviewed and investigated promptly and fairly. All
 community leaders are obligated to respect the privacy and security of the

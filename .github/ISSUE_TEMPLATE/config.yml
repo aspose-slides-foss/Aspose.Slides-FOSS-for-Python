@@ -1,8 +1,14 @@
 blank_issues_enabled: false
 contact_links:
+  - name: A question, an idea, or anything that is not a defect
+    url: https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/discussions
+    about: Discussions. The bug form below asks for a minimal reproduction, which a question does not have.
   - name: Security vulnerability
     url: https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/security/advisories/new
     about: Report privately. Never open a public issue for a security problem.
+  - name: Code of conduct concern
+    url: https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/blob/main/CODE_OF_CONDUCT.md#enforcement
+    about: How to report conduct privately, including when the report concerns a maintainer.
   - name: How do I do X? — the usage examples
     url: https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python#usage-examples
     about: A runnable sample for every major capability, and the Limitations section says what is absent.

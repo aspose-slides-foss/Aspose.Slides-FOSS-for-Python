@@ -103,8 +103,9 @@ body:
             documented as absent.
           required: true
         - label: >
-            I installed this library into a virtual environment that does not also contain the
-            commercial `aspose` package.
+            The environment I reproduced this in does not also contain the commercial `aspose`
+            package. (Any isolated environment will do — venv, conda, a container. What matters is
+            that the two are not installed together, because the commercial package hides this one.)
           required: true
         - label: >
             I reproduced this against the current default branch, not only against the release on
