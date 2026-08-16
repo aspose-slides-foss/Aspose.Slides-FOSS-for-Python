@@ -1,12 +1,16 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+# setuptools 77 is the first release that understands PEP 639 — the SPDX
+# `license` expression and the `license-files` key used below. Earlier
+# versions fail on them, so the floor is 77, not the historical 42.
+# `wheel` is not listed: setuptools has built wheels without it since 70.1.
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "aspose-slides-foss"
 version = "26.8.0"
 description = "Official open-source Python library by Aspose.Slides for creating, reading, and editing PowerPoint (.pptx) presentations. Designed for developers and AI agents."
-readme = "README.md"
+readme = { file = "README.md", content-type = "text/markdown" }
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
@@ -22,7 +26,12 @@ keywords = [
     "office",
     "openxml",
 ]
+# No `License :: OSI Approved :: MIT License` classifier: PEP 639 replaced the
+# license classifiers with the `license` expression above, and setuptools >= 77
+# rejects a build that carries both. The expression is the machine-readable
+# statement of the licence; the classifier would be a duplicate of it.
 classifiers = [
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
@@ -51,6 +60,7 @@ test = [
 
 [project.urls]
 Homepage = "https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python"
+Documentation = "https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python#readme"
 Repository = "https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python"
 Issues = "https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/issues"
 
@@ -60,6 +70,17 @@ exclude = ["tests*", "examples*"]
 namespaces = true
 
 [tool.setuptools.package-data]
+# `aspose` is a PEP 420 namespace package with no __init__.py, so the PEP 561
+# marker belongs in the first regular package, aspose.slides_foss.
 "*" = ["py.typed"]
 "aspose.slides_foss._internal.pptx" = ["*.pptx"]
 "aspose.slides_foss._internal.xlsx" = ["*.xlsx"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Warnings are errors. The suite is clean under this setting, so anything new
+# — a DeprecationWarning from a future runtime, a ResourceWarning from a file
+# a test forgot to close — fails the build instead of scrolling past. If a
+# third-party dependency starts warning about its own internals, add a
+# narrowly targeted `ignore:...` line here rather than deleting the rule.
+filterwarnings = ["error"]
