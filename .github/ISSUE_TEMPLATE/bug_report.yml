@@ -1,0 +1,112 @@
+name: Bug report
+description: Something this library does is wrong, or the .pptx it writes is wrong.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for the report. The single most useful thing you can give us is a **minimal script
+        that reproduces it** — twenty lines that write a file we can open ourselves.
+
+        If this is a security issue, do not file it here. See
+        [SECURITY.md](https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/blob/main/SECURITY.md).
+
+        **If your problem is `ModuleNotFoundError: No module named 'aspose.slides_foss'`**, the
+        commercial `aspose` package is almost certainly installed in the same environment. It sets
+        `aspose.__path__ = []`, which hides this library. Install this one into its own virtual
+        environment — [CONTRIBUTING.md](https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/blob/main/CONTRIBUTING.md#a-virtual-environment-is-not-optional-here)
+        has the detail. That is a packaging incompatibility rather than a bug in either library.
+
+  - type: dropdown
+    id: edition
+    attributes:
+      label: Edition
+      description: >
+        There are four editions of this library and their capabilities genuinely differ. This
+        repository is the Python one; pick another only if you are certain the report belongs here
+        anyway.
+      options:
+        - Python (this repository)
+        - .NET
+        - Java
+        - C++
+        - More than one edition
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: >
+        The output of `python -m pip show aspose-slides-foss`, or the commit SHA if you installed
+        from a checkout (`git rev-parse HEAD`).
+      placeholder: "e.g. 26.8.0, or 1623a59"
+    validations:
+      required: true
+
+  - type: input
+    id: runtime
+    attributes:
+      label: Python version and operating system
+      description: The output of `python -VV`, plus your platform.
+      placeholder: "e.g. Python 3.12.2 on Windows 11 x64, or 3.10.14 on Ubuntu 24.04"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: >
+        A complete script we can run. Include the input file if one is needed — attach it, or give
+        the code that generates it. Please reduce it as far as it will go.
+      render: python
+      placeholder: |
+        import aspose.slides_foss as slides
+        from aspose.slides_foss.export import SaveFormat
+
+        with slides.Presentation() as prs:
+            # ...
+            prs.save("out.pptx", SaveFormat.PPTX)
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+      description: >
+        If the complaint is about the file rather than the API, say which part of the package and
+        which element — for example "ppt/slides/slide1.xml should contain an `<a:blip r:embed>`".
+        Unzipping the `.pptx` and looking is often faster than describing the symptom.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead
+      description: >
+        The full traceback, or the XML that was written, or what the application that opened the
+        file did. Paste text rather than a screenshot where you can.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you file
+      options:
+        - label: >
+            I read the README's Limitations section, and this is not one of the capabilities
+            documented as absent.
+          required: true
+        - label: >
+            I installed this library into a virtual environment that does not also contain the
+            commercial `aspose` package.
+          required: true
+        - label: >
+            I reproduced this against the current default branch, not only against the release on
+            PyPI.
+          required: false

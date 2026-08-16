@@ -1,0 +1,17 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/security/advisories/new
+    about: Report privately. Never open a public issue for a security problem.
+  - name: How do I do X? — the usage examples
+    url: https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python#usage-examples
+    about: A runnable sample for every major capability, and the Limitations section says what is absent.
+  - name: "ModuleNotFoundError: No module named 'aspose.slides_foss'"
+    url: https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/blob/main/CONTRIBUTING.md#a-virtual-environment-is-not-optional-here
+    about: The commercial aspose package hides this one. Use a separate virtual environment.
+  - name: A different edition of this library
+    url: https://github.com/aspose-slides-foss
+    about: The .NET, Java and C++ editions have their own repositories and their own issue trackers.
+  - name: The commercial Aspose.Slides product
+    url: https://forum.aspose.com/c/slides/11
+    about: Different software. Rendering, conversion and licensing questions belong there.
