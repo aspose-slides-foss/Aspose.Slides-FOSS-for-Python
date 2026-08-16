@@ -10,7 +10,15 @@ The official open-source Python library by Aspose.Slides for creating, reading, 
 pip install aspose-slides-foss
 ```
 
-**Requires:** Python 3.10+ and `lxml` (installed automatically as a dependency).
+**Requires:** Python 3.10 or later, and `lxml` (installed automatically as a
+dependency). Every release is tested on Python 3.10, 3.11, 3.12, 3.13 and 3.14,
+on Linux, Windows and macOS. Pure Python — there is nothing to compile.
+
+> The `aspose` name is a shared namespace package. If the **commercial**
+> `aspose` package is installed in the same environment it takes the name over
+> and this library becomes unimportable, with a bare
+> `ModuleNotFoundError: No module named 'aspose.slides_foss'`. Install this one
+> into its own virtual environment.
 
 ---
 
@@ -35,23 +43,23 @@ with slides.Presentation() as prs:
 
 ## Features
 
-- **Presentation I/O** — Open, create, and save `.pptx` files with full round-trip fidelity
-- **Slides** — Add, remove, clone, reorder, and iterate slides
-- **Shapes** — AutoShapes, PictureFrames, Tables, Connectors, GroupShapes
+- **Presentation I/O** — Open, create, and save `.pptx` files. A deck PowerPoint authored re-saves with every part preserved; parts this library does not yet understand are carried through verbatim rather than dropped
+- **Slides** — Add, remove, clone, hide, and iterate slides
+- **Shapes** — AutoShapes, PictureFrames, Tables, Connectors, GroupShapes, and reordering within a slide
 - **Text** — TextFrame, Paragraph, Portion with character, paragraph, and text frame formatting (including bullets)
-- **Charts** — 70+ chart types, series, categories, axes, trendlines, error bars, legend, titles, data labels, markers, series groups, 3D
+- **Charts** — 73 chart types, series, categories, axes, trendlines, error bars, legend, titles, data labels, markers, series groups, 3D, each backed by a real embedded XLSX workbook
 - **Animations** — Shape and text-level animations with sequences, effects, triggers, and motion paths
-- **Slide transitions** — 60+ transition types with per-slide timing, advance settings, and morph support
+- **Slide transitions** — 57 transition types with per-slide timing, advance settings, and morph support
 - **Themes** — Color schemes, font schemes, format schemes, master/override themes
 - **Backgrounds** — Per-slide and master slide backgrounds with solid/gradient/pattern/picture fills
 - **Fill** — Solid, gradient, pattern, and picture fills
 - **Lines** — Width, dash style, arrows, join and alignment
-- **Effects** — Outer shadow, glow, soft edge, blur, reflection, inner shadow
+- **Effects** — Outer shadow, inner shadow, glow, soft edge, reflection, blur, preset shadow, fill overlay
 - **3D** — Bevel, camera, light rig, material, extrusion depth
 - **Document properties** — Core, app, and custom properties
 - **Notes slides** — Per-slide notes with header/footer management
-- **Comments** — Threaded comments with authors, timestamps, and positions
-- **Images** — Embed from file, bytes, or stream
+- **Comments** — Classic and modern threaded comments with authors, timestamps, replies, and positions
+- **Images** — Embed from bytes or any file-like object
 - **Hyperlinks** — External links on a text portion or on a whole shape, on click or on mouse over
 - **Markdown export** — Save presentation text as Markdown in 24 flavor dialects, with tables, lists, headings, comments, and chart data
 
@@ -156,6 +164,24 @@ with slides.Presentation() as prs:
     shape.fill_format.fill_type = FillType.SOLID
     shape.fill_format.solid_fill_color.color = Color.from_argb(255, 30, 120, 200)
     prs.save("fill.pptx", SaveFormat.PPTX)
+```
+
+### Image
+
+`add_image` takes the image **bytes**, or any object with a `.read()` method. It does not take a
+file path — open the file yourself, which keeps the library out of the business of guessing
+encodings and leaving handles open:
+
+```python
+import aspose.slides_foss as slides
+from aspose.slides_foss import ShapeType
+from aspose.slides_foss.export import SaveFormat
+
+with slides.Presentation() as prs:
+    with open("picture.png", "rb") as fh:
+        image = prs.images.add_image(fh)      # or add_image(fh.read())
+    prs.slides[0].shapes.add_picture_frame(ShapeType.RECTANGLE, 50, 50, 300, 200, image)
+    prs.save("picture.pptx", SaveFormat.PPTX)
 ```
 
 ### Notes
@@ -310,18 +336,31 @@ data are exported; the export is text-only, so images, media, and SmartArt are s
 
 ## Limitations
 
-Saving to a format this library does not write raises `ValueError`, naming the
-formats it does write. The written formats are `.pptx`, `.ppsx`, `.potx`,
-`.pptm`, `.ppsm`, `.potm` and Markdown; asking for any other member of
-`SaveFormat` — PDF, HTML, XPS, TIFF, GIF, SWF, ODP, or the binary `.ppt`
-family — raises rather than writing a mislabelled package.
+`SaveFormat` declares 21 values. **Seven are written.** The six PowerPoint
+formats — `PPTX`, `PPTM`, `PPSX`, `PPSM`, `POTX` and `POTM` — each produce a
+distinct package declaring its own main-part content type, rather than one
+presentation package under six names; `MD` writes Markdown text.
 
-The following areas are not yet implemented:
+The other **fourteen raise `ValueError`**, naming the seven that work, rather
+than writing a mislabelled file: `PPT`, `PPS`, `POT` (the binary PowerPoint
+family), `PDF`, `XPS`, `HTML`, `HTML5`, `SWF`, `TIFF`, `GIF` (rendering and
+conversion), `ODP`, `OTP`, `FODP` (OpenDocument) and `XML`.
 
+The following are not implemented, and the API member is absent rather than
+present and inert:
+
+- **Rendering and conversion of any kind** — no PDF, HTML, XPS or image export.
+  This is a design boundary, not a gap: the library writes OOXML, it does not
+  lay out or rasterize.
+- **Presentation sections** — `Presentation.sections` does not exist.
+- **Slide size** — there is no public API to read or change it, so a new deck
+  is whatever the bundled template says (16:9, 12192000 × 6858000 EMU).
 - SmartArt, OLE objects, mathematical text
-- Export to PDF, HTML, and image formats
-- VBA macros, digital signatures
+- VBA macros, digital signatures, encryption
 - Action settings other than external hyperlinks
+
+`add_image` accepts image bytes or a file-like object, not a file path. Open
+the file and pass the handle or its bytes.
 
 `SaveFormat` and the file name are independent: `save("deck.pptx",
 SaveFormat.POTX)` writes a genuine template under a `.pptx` name, and
@@ -348,6 +387,10 @@ opening and re-saving a file will never strip content this library does not yet 
 
 - [GitHub Repository](https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python)
 - [Issue Tracker](https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/issues)
+- [Changelog](CHANGELOG.md) — what changed, and what changed in a way you will notice
+- [Contributing](CONTRIBUTING.md) — how to build, how to run the tests, and how to report a fix
+- [Security policy](SECURITY.md) — how to report a vulnerability privately
+- [Code of conduct](CODE_OF_CONDUCT.md)
 
 ---
 
