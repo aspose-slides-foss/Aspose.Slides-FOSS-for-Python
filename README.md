@@ -1,6 +1,50 @@
-# Aspose.Slides FOSS
+# Aspose.Slides FOSS for Python
+
+[![PyPI version](https://img.shields.io/pypi/v/aspose-slides-foss.svg)](https://pypi.org/project/aspose-slides-foss/) [![Python versions](https://img.shields.io/pypi/pyversions/aspose-slides-foss.svg)](https://pypi.org/project/aspose-slides-foss/) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Contributors](https://img.shields.io/github/contributors/aspose-slides-foss/Aspose.Slides-FOSS-for-Python.svg)](https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/graphs/contributors)
 
 The official open-source Python library by Aspose.Slides for creating, reading, and editing PowerPoint (`.pptx`) presentations.
+
+---
+
+## At a Glance
+
+```mermaid
+flowchart TD
+  subgraph StartingPoints["Starting Points"]
+    direction TB
+    i1["An existing .pptx presentation"]
+    i2["A new, empty presentation"]
+  end
+  PRODUCT["Aspose.Slides FOSS for Python"]
+  subgraph Capabilities["Core Capabilities"]
+    direction LR
+    subgraph capl[" "]
+      direction TB
+      c1["Presentation, slide, layout, and master management"]
+      c2["Shape creation, including group shapes"]
+      c3["Text formatting (TextFrame, Paragraph, Portion)"]
+      c4["Charts with 73 chart types"]
+      c5["Animations and slide transitions"]
+      c6["Presentation theming (color, font, and format schemes)"]
+    end
+    subgraph capr[" "]
+      direction TB
+      c7["Fill, line, and 3D shape styling"]
+      c8["Visual effects (shadow, glow, blur, reflection)"]
+      c9["Document properties"]
+      c10["Speaker notes and comments"]
+      c11["Image embedding"]
+      c12["Hyperlinks on text portions and shapes"]
+      c13["Markdown export (24 flavor dialects)"]
+    end
+  end
+  subgraph Outputs["Outputs"]
+    direction TB
+    o1["A PowerPoint package — .pptx, .pptm, .ppsx, .ppsm, .potx or .potm (path or stream)"]
+    o2["Markdown text"]
+  end
+  StartingPoints --> PRODUCT --> Capabilities --> Outputs
+```
 
 ---
 

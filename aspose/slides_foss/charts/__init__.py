@@ -8,8 +8,6 @@ from .ChartDataWorksheet import ChartDataWorksheet
 from .ChartSeries import ChartSeries
 from .ChartSeriesCollection import ChartSeriesCollection
 from .ChartSeriesGroup import ChartSeriesGroup
-from .ChartSeriesGroupCollection import ChartSeriesGroupCollection
-from .ChartSeriesReadonlyCollection import ChartSeriesReadonlyCollection
 from .ChartDataPoint import ChartDataPoint
 from .ChartDataPointCollection import ChartDataPointCollection
 from .ChartCategory import ChartCategory
@@ -64,6 +62,55 @@ from .TickLabelPositionType import TickLabelPositionType
 from .TickMarkType import TickMarkType
 from .TimeUnitType import TimeUnitType
 
+from .IActualLayout import IActualLayout
+from .IAxesManager import IAxesManager
+from .IAxis import IAxis
+from .IBaseChartValue import IBaseChartValue
+from .IChart import IChart
+from .IChartCategory import IChartCategory
+from .IChartCategoryCollection import IChartCategoryCollection
+from .IChartComponent import IChartComponent
+from .IChartData import IChartData
+from .IChartDataCell import IChartDataCell
+from .IChartDataPoint import IChartDataPoint
+from .IChartDataPointCollection import IChartDataPointCollection
+from .IChartDataWorkbook import IChartDataWorkbook
+from .IChartDataWorksheet import IChartDataWorksheet
+from .IChartLinesFormat import IChartLinesFormat
+from .IChartPlotArea import IChartPlotArea
+from .IChartPortionFormat import IChartPortionFormat
+from .IChartSeries import IChartSeries
+from .IChartSeriesCollection import IChartSeriesCollection
+from .IChartSeriesGroup import IChartSeriesGroup
+from .IChartSeriesGroupCollection import IChartSeriesGroupCollection
+from .IChartSeriesReadonlyCollection import IChartSeriesReadonlyCollection
+from .IChartTextFormat import IChartTextFormat
+from .IChartTitle import IChartTitle
+from .IChartWall import IChartWall
+from .IDataLabel import IDataLabel
+from .IDataLabelCollection import IDataLabelCollection
+from .IDataLabelFormat import IDataLabelFormat
+from .IDataSourceTypeForErrorBarsCustomValues import IDataSourceTypeForErrorBarsCustomValues
+from .IDataTable import IDataTable
+from .IDoubleChartValue import IDoubleChartValue
+from .IErrorBarsCustomValues import IErrorBarsCustomValues
+from .IErrorBarsFormat import IErrorBarsFormat
+from .IFormat import IFormat
+from .IFormattedTextContainer import IFormattedTextContainer
+from .ILayoutable import ILayoutable
+from .ILegend import ILegend
+from .ILegendEntryCollection import ILegendEntryCollection
+from .ILegendEntryProperties import ILegendEntryProperties
+from .IMarker import IMarker
+from .IMultipleCellChartValue import IMultipleCellChartValue
+from .IOverridableText import IOverridableText
+from .IRotation3D import IRotation3D
+from .ISingleCellChartValue import ISingleCellChartValue
+from .IStringChartValue import IStringChartValue
+from .IStringOrDoubleChartValue import IStringOrDoubleChartValue
+from .ITrendline import ITrendline
+from .ITrendlineCollection import ITrendlineCollection
+
 __all__ = [
     'AxesManager',
     'Axis',
@@ -87,8 +134,6 @@ __all__ = [
     'ChartSeries',
     'ChartSeriesCollection',
     'ChartSeriesGroup',
-    'ChartSeriesGroupCollection',
-    'ChartSeriesReadonlyCollection',
     'ChartTextFormat',
     'ChartTitle',
     'ChartType',
@@ -109,6 +154,54 @@ __all__ = [
     'ErrorBarsCustomValues',
     'ErrorBarsFormat',
     'Format',
+    'IActualLayout',
+    'IAxesManager',
+    'IAxis',
+    'IBaseChartValue',
+    'IChart',
+    'IChartCategory',
+    'IChartCategoryCollection',
+    'IChartComponent',
+    'IChartData',
+    'IChartDataCell',
+    'IChartDataPoint',
+    'IChartDataPointCollection',
+    'IChartDataWorkbook',
+    'IChartDataWorksheet',
+    'IChartLinesFormat',
+    'IChartPlotArea',
+    'IChartPortionFormat',
+    'IChartSeries',
+    'IChartSeriesCollection',
+    'IChartSeriesGroup',
+    'IChartSeriesGroupCollection',
+    'IChartSeriesReadonlyCollection',
+    'IChartTextFormat',
+    'IChartTitle',
+    'IChartWall',
+    'IDataLabel',
+    'IDataLabelCollection',
+    'IDataLabelFormat',
+    'IDataSourceTypeForErrorBarsCustomValues',
+    'IDataTable',
+    'IDoubleChartValue',
+    'IErrorBarsCustomValues',
+    'IErrorBarsFormat',
+    'IFormat',
+    'IFormattedTextContainer',
+    'ILayoutable',
+    'ILegend',
+    'ILegendEntryCollection',
+    'ILegendEntryProperties',
+    'IMarker',
+    'IMultipleCellChartValue',
+    'IOverridableText',
+    'IRotation3D',
+    'ISingleCellChartValue',
+    'IStringChartValue',
+    'IStringOrDoubleChartValue',
+    'ITrendline',
+    'ITrendlineCollection',
     'LayoutTargetType',
     'Legend',
     'LegendDataLabelPosition',
