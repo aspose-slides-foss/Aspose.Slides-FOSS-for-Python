@@ -27,19 +27,19 @@ class SlideShowTransition(ISlideShowTransition):
             self._parse_value()
 
     def _ensure_transition_elem(self) -> ET._Element:
-        """Get or create the <p:transition> element on the slide."""
+        """Get or create the <p:transition> element on the slide.
+
+        CT_Slide is the sequence cSld, clrMapOvr?, transition?, timing?,
+        extLst?, so the transition goes after the colour map override when the
+        slide has one and after cSld when it does not.
+        """
         if self._transition_elem is not None:
             return self._transition_elem
-        from .._internal.pptx.constants import Elements, NS
-        # Insert <p:transition> after <p:cSld> (before <p:clrMapOvr> or <p:timing>)
-        root = self._slide_part._root
-        csld = root.find(Elements.C_SLD)
-        if csld is not None:
-            idx = list(root).index(csld) + 1
-        else:
-            idx = 0
-        self._transition_elem = ET.Element(Elements.P_TRANSITION)
-        root.insert(idx, self._transition_elem)
+        from .._internal.pptx.constants import Elements
+        from .._internal.pptx.child_order import insert_in_order
+        self._transition_elem = insert_in_order(
+            self._slide_part._root, ET.Element(Elements.P_TRANSITION)
+        )
         return self._transition_elem
 
     def _parse_value(self):

@@ -7,6 +7,7 @@ from .IPresentationComponent import IPresentationComponent
 from .IFillFormat import IFillFormat
 from .IFillParamSource import IFillParamSource
 from ._internal.pptx.constants import NS, Elements
+from ._internal.pptx.child_order import insert_in_order
 
 if TYPE_CHECKING:
     from .FillType import FillType
@@ -55,25 +56,13 @@ class FillFormat(PVIObject, ISlideComponent, IPresentationComponent, IFillFormat
                 self._parent_element.remove(child)
 
     def _insert_fill_element(self, tag: str) -> ET._Element:
-        """Insert a fill element at the correct position in the parent.
+        """Insert a fill element where its container's schema sequence puts it.
 
-        OOXML requires spPr children in order: xfrm, geometry, fill, ln, effects.
-        Fill elements must be inserted before <a:ln> and after geometry.
+        The position differs by container: a fill precedes <a:ln> in
+        CT_ShapeProperties and follows it in CT_TextCharacterProperties, so the
+        container decides rather than one fixed rule.
         """
-        el = ET.Element(tag)
-        # Find the insertion point: before <a:ln> or other post-fill elements
-        insert_before = None
-        for child in self._parent_element:
-            if child.tag in (Elements.A_LN, f"{NS.A}effectLst", f"{NS.A}effectDag",
-                             f"{NS.A}scene3d", f"{NS.A}sp3d", f"{NS.A}extLst"):
-                insert_before = child
-                break
-        if insert_before is not None:
-            idx = list(self._parent_element).index(insert_before)
-            self._parent_element.insert(idx, el)
-        else:
-            self._parent_element.append(el)
-        return el
+        return insert_in_order(self._parent_element, ET.Element(tag))
 
     def _save(self) -> None:
         if hasattr(self, '_slide_part') and self._slide_part:

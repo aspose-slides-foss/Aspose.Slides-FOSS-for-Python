@@ -1,5 +1,5 @@
 from __future__ import annotations
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import overload, TYPE_CHECKING, Any, BinaryIO, Optional, Union
 from .IPresentation import IPresentation
 from .IPresentationComponent import IPresentationComponent
@@ -354,6 +354,24 @@ class Presentation(IPresentation, IPresentationComponent):
 
 
 
+    def _live_slide_rels(self) -> dict:
+        """``{slide part name: the relationships manager that will be saved}``.
+
+        A slide part loads its relationships once and writes that set back on
+        every save, so anything that needs to add a relationship to a slide
+        during a save has to add it to this object rather than to a second
+        manager reading the same part.
+        """
+        managers = {}
+        if self._slides is None:
+            return managers
+        for slide in self._slides:
+            slide_part = getattr(slide, '_slide_part', None)
+            rels = getattr(slide_part, '_rels_manager', None)
+            if rels is not None:
+                managers[slide_part.part_name] = rels
+        return managers
+
     def save(self, *args, **kwargs) -> None:
         """
         Save the presentation to a file or stream.
@@ -369,10 +387,12 @@ class Presentation(IPresentation, IPresentationComponent):
         - save(stream, slides, format): Save specific slides to stream
         - save(stream, slides, format, options): Save specific slides with options
         """
-        # Save document properties (auto-update last_saved_time)
-        if self._document_properties is not None:
-            self._document_properties.last_saved_time = datetime.utcnow()
-            self._document_properties._save()
+        # Stamp the modification time on every save, not only when the caller
+        # happened to touch the document properties first: otherwise the file
+        # keeps saying it was last modified whenever the template was built.
+        properties = self.document_properties
+        properties.last_saved_time = datetime.now(timezone.utc).replace(tzinfo=None)
+        properties._save()
 
         # Save all modified slide parts and their associated notes slides
         if self._slides is not None:
@@ -404,6 +424,13 @@ class Presentation(IPresentation, IPresentationComponent):
                 if part_name.startswith('ppt/comments/') and part_name.endswith('.xml'):
                     cp = CommentsPart(self._opc_package, part_name)
                     cp.save()
+            # Replies are only replies in the modern parts; the classic list
+            # has no way to express one.  The slide parts' own relationship
+            # managers are handed over, because a slide part rewrites its
+            # relationships from the set it loaded and would otherwise erase
+            # the one added here on the next save.
+            from ._internal.pptx.threaded_comments import write_threaded_comments
+            write_threaded_comments(self._opc_package, self._live_slide_rels())
 
         # Save theme if it was loaded/modified
         if self._theme_part is not None:
@@ -412,6 +439,13 @@ class Presentation(IPresentation, IPresentationComponent):
         # Update the presentation.xml part before saving
         if self._presentation_part:
             self._presentation_part.save()
+
+        # The document summary describes the parts that were just written, so
+        # it is recomputed last of all; otherwise docProps/app.xml keeps
+        # whatever the template said.
+        if self._opc_package is not None:
+            from ._internal.pptx.document_summary import refresh_document_summary
+            refresh_document_summary(self._opc_package)
 
         # Parse arguments to determine which overload was called
         destination: Optional[Union[str, BinaryIO]] = None
@@ -463,7 +497,16 @@ class Presentation(IPresentation, IPresentationComponent):
         # Get the appropriate exporter from the registry
         exporter = ExporterRegistry.get_exporter(format_value)
         if exporter is None:
-            raise ValueError(f"Export format '{format_value}' is not supported")
+            # Naming the formats that do work turns "no" into an answer: the
+            # caller sees at once whether the format is misspelt or simply not
+            # written by this library.
+            supported = sorted(
+                set(ExporterRegistry.get_supported_formats()) | {SaveFormat.MD.value}
+            )
+            raise ValueError(
+                f"Export format '{format_value}' is not supported; "
+                f"this library writes {', '.join(supported)}"
+            )
 
         # TODO: Handle slides parameter for partial export
         if slides is not None:

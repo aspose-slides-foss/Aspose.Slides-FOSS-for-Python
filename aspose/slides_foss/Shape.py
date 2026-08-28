@@ -7,11 +7,13 @@ from .ISlideComponent import ISlideComponent
 from .IPresentationComponent import IPresentationComponent
 from .IHyperlinkContainer import IHyperlinkContainer
 from ._internal.pptx.constants import NS, Elements, EMU_PER_POINT, ROTATION_UNIT
+from ._internal.strict_attributes import StrictAttributes
 
 if TYPE_CHECKING:
     from .IBaseSlide import IBaseSlide
     from .IEffectFormat import IEffectFormat
     from .IFillFormat import IFillFormat
+    from .IHyperlink import IHyperlink
     from .IImage import IImage
     from .ILineFormat import ILineFormat
     from .IPresentation import IPresentation
@@ -19,7 +21,7 @@ if TYPE_CHECKING:
     from .IThreeDFormat import IThreeDFormat
     from ._internal.pptx.slide_part import SlidePart
 
-class Shape(IShape, ISlideComponent, IPresentationComponent, IHyperlinkContainer, ABC):
+class Shape(StrictAttributes, IShape, ISlideComponent, IPresentationComponent, IHyperlinkContainer, ABC):
     """Represents a shape on a slide. This is an abstract base class."""
 
     def __init__(self):
@@ -123,6 +125,17 @@ class Shape(IShape, ISlideComponent, IPresentationComponent, IHyperlinkContainer
             raise RuntimeError("Shape has no XML element")
         return ET.SubElement(self._xml_element, f"{NS.P}spPr")
 
+    def _is_group_properties(self, sp_pr: ET._Element) -> bool:
+        """True when the properties element is `p:grpSpPr`.
+
+        `CT_GroupShapeProperties` (ECMA-376 §19.3.1.23) is a shorter sequence
+        than `CT_ShapeProperties` and is not a superset of it: it has no
+        `a:ln` and no `a:sp3d`. Writing either into a group's properties
+        produces a package the Open XML SDK rejects outright and PowerPoint
+        will not open, from a call that reported success.
+        """
+        return sp_pr is not None and sp_pr.tag == f"{NS.P}grpSpPr"
+
     @property
     def line_format(self) -> ILineFormat:
         """Returns the LineFormat object that contains line formatting properties for a shape. Note: can return null for certain types of shapes which don't have line properties. Read-only ."""
@@ -130,6 +143,9 @@ class Shape(IShape, ISlideComponent, IPresentationComponent, IHyperlinkContainer
             return None
         from .LineFormat import LineFormat
         sp_pr = self._ensure_sp_pr()
+        if self._is_group_properties(sp_pr):
+            # A group is a container and has no outline of its own.
+            return None
         lf = LineFormat()
         lf._init_internal(sp_pr, self._slide_part, self._parent_slide)
         return lf
@@ -141,6 +157,10 @@ class Shape(IShape, ISlideComponent, IPresentationComponent, IHyperlinkContainer
             return None
         from .ThreeDFormat import ThreeDFormat
         sp_pr = self._ensure_sp_pr()
+        if self._is_group_properties(sp_pr):
+            # A group has no extrusion of its own; `a:sp3d` is not a child
+            # `CT_GroupShapeProperties` has.
+            return None
         tdf = ThreeDFormat()
         tdf._init_internal(sp_pr, self._slide_part, self._parent_slide)
         return tdf
@@ -522,6 +542,32 @@ class Shape(IShape, ISlideComponent, IPresentationComponent, IHyperlinkContainer
             c_nv_pr.set('title', value)
             if self._slide_part:
                 self._slide_part.save()
+
+    @property
+    def hyperlink_click(self) -> IHyperlink:
+        """Returns or sets the hyperlink followed when the shape is clicked. Read/write ."""
+        from ._internal.pptx.hyperlinks import get_hyperlink
+        return get_hyperlink(self._get_c_nv_pr(), self._slide_part, Elements.A_HLINK_CLICK)
+
+    @hyperlink_click.setter
+    def hyperlink_click(self, value):
+        from ._internal.pptx.hyperlinks import set_hyperlink
+        set_hyperlink(self._get_c_nv_pr(), self._slide_part, Elements.A_HLINK_CLICK, value)
+        if self._slide_part:
+            self._slide_part.save()
+
+    @property
+    def hyperlink_mouse_over(self) -> IHyperlink:
+        """Returns or sets the hyperlink followed when the pointer rests on the shape. Read/write ."""
+        from ._internal.pptx.hyperlinks import get_hyperlink
+        return get_hyperlink(self._get_c_nv_pr(), self._slide_part, Elements.A_HLINK_HOVER)
+
+    @hyperlink_mouse_over.setter
+    def hyperlink_mouse_over(self, value):
+        from ._internal.pptx.hyperlinks import set_hyperlink
+        set_hyperlink(self._get_c_nv_pr(), self._slide_part, Elements.A_HLINK_HOVER, value)
+        if self._slide_part:
+            self._slide_part.save()
 
     @property
     def name(self) -> str:

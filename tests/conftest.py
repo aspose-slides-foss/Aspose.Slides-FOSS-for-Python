@@ -17,6 +17,31 @@ else:
     if SRC_DIR not in sys.path:
         sys.path.insert(0, SRC_DIR)
 
+# `aspose` is a namespace package, so another distribution installed under the
+# same name can capture it and hide this library. Diagnose that here rather
+# than letting the import fail with a bare ModuleNotFoundError.
+#
+# The guard is loaded from its file rather than imported as `conformance.
+# harness`: putting tests/ on sys.path would claim the top-level name
+# `conformance` for anything else running in the same interpreter, and would
+# give the harness two module objects — this one and the `.harness` that
+# tests/conformance/conftest.py imports relatively — with two copies of every
+# table in it.
+_TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def _load_harness():
+    import importlib.util
+
+    path = os.path.join(_TESTS_DIR, "conformance", "harness.py")
+    spec = importlib.util.spec_from_file_location("_conformance_harness", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+_load_harness().verify_library_not_shadowed()
+
 from aspose.slides_foss import Presentation
 from aspose.slides_foss.export import SaveFormat
 

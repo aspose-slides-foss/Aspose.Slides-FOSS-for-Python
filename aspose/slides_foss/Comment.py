@@ -74,11 +74,10 @@ class Comment(IComment):
     @property
     def parent_comment(self) -> Optional['IComment']:
         """Gets or sets parent comment. Read/write IComment."""
-        parent_id = self._data.parent_cm_id
-        if parent_id is None:
+        parent_ref = self._data.parent_ref
+        if parent_ref is None:
             return None
-        # parentCmId references idx globally across all authors in the slide
-        cd = self._comments_part.find_comment_by_idx_all(parent_id)
+        cd = self._comments_part.find_comment_by_idx(parent_ref[0], parent_ref[1])
         if cd is None:
             return None
         author_data = self._authors_part.find_author_by_id(cd.author_id)
@@ -102,9 +101,12 @@ class Comment(IComment):
     @parent_comment.setter
     def parent_comment(self, value: Optional['IComment']):
         if value is None:
-            self._data.parent_cm_id = None
+            self._data.parent_ref = None
         else:
-            self._data.parent_cm_id = value._data.idx
+            self._data.parent_ref = (value._data.author_id, value._data.idx)
+        # Persist immediately: the comments part is re-read from the package on
+        # save, so a change left only in this element would be discarded.
+        self._comments_part.save()
 
     def remove(self) -> None:
         """Removes comment and all its replies from the parent collection."""
@@ -112,8 +114,8 @@ class Comment(IComment):
         my_author_id = self._data.author_id
         # Remove all replies that have this comment as their parent
         to_remove = []
-        for cd in self._comments_part.get_comments_by_author(my_author_id):
-            if cd.parent_cm_id == my_idx:
+        for cd in self._comments_part.get_comments():
+            if cd.parent_ref == (my_author_id, my_idx):
                 to_remove.append(cd._elem)
         for elem in to_remove:
             self._comments_part.remove_comment_elem(elem)

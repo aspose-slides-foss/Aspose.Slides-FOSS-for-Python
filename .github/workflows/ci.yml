@@ -1,0 +1,231 @@
+# Continuous integration: run the whole test suite everywhere the package
+# claims to run, then build the distributions and prove they are complete.
+#
+# Every `uses:` below is pinned to a commit SHA rather than a tag. A tag is a
+# mutable pointer: whoever can push to the action's repository can move `v7`
+# to different code, and every workflow that references `@v7` runs that code
+# on the next build, with access to this job's token and secrets. A commit SHA
+# is the content, not a name for it, so it cannot be repointed. The human-
+# readable version is kept in the trailing comment; when bumping one, resolve
+# the new tag to its commit and update both together.
+
+name: CI
+
+on:
+  push:
+  pull_request:
+  # Lets the publish workflow run this one and refuse to release if it fails.
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test:
+    name: tests / Python ${{ matrix.python-version }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      # The full cross product of what pyproject.toml claims: requires-python
+      # is >=3.10, the classifiers name 3.10 through 3.14, and
+      # "Operating System :: OS Independent" is a claim about all three
+      # runner platforms. Anything dropped from this matrix has to be dropped
+      # from those claims at the same time.
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Installing the project itself (rather than just `lxml` and `pytest`)
+      # makes every job also a check that the declared dependencies resolve on
+      # that interpreter and platform. The suite still runs against the
+      # checkout: tests/conftest.py puts the repository root at the front of
+      # sys.path. The built artefact is exercised separately, in `package`.
+      - name: Install the project and its test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install ".[test]"
+
+      # Warnings are errors. That is configured in pyproject.toml
+      # (`filterwarnings = ["error"]`) rather than passed here, so a developer
+      # running pytest locally gets the same verdict as CI. There is no
+      # compiler step to harden — this is a pure-Python package — so warnings
+      # from the interpreter and from pytest are the whole of it.
+      - name: Run the full test suite
+        run: python -m pytest -q
+
+  types:
+    name: mypy ratchet
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          # Must match `python_version` under [tool.mypy] in pyproject.toml.
+          # The baseline below is a count, and a count is only comparable
+          # against the same analysis.
+          python-version: "3.12"
+
+      - name: Install mypy
+        # Pinned exactly. A new mypy release adds checks, the count moves, and
+        # a ratchet whose baseline moves on its own is not a ratchet. Bump this
+        # and the baseline below in the same commit.
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install mypy==1.19.0 lxml
+
+      - name: Type-check, and fail if the error count has grown
+        # The package ships py.typed, so these are the errors a consumer's own
+        # checker can see in this library. Annotation coverage is partial, so
+        # the gate is not zero — it is "no worse than the last measurement".
+        # Lowering BASELINE when the count drops is a welcome change on its
+        # own; raising it needs a reason in the commit message.
+        env:
+          BASELINE: "1626"
+        run: |
+          set -uo pipefail
+          mypy --no-incremental > mypy.log 2>&1 || true
+          tail -n 1 mypy.log
+          count=$(grep -c '^[^ ].*: error:' mypy.log || true)
+          echo "mypy errors: $count (baseline $BASELINE)"
+          if [ "$count" -gt "$BASELINE" ]; then
+            echo "::error::mypy reports $count errors, up from the baseline of $BASELINE" >&2
+            exit 1
+          fi
+          if [ "$count" -lt "$BASELINE" ]; then
+            echo "::notice::mypy reports $count errors, down from $BASELINE — lower BASELINE in ci.yml"
+          fi
+
+  package:
+    name: build, inventory and SBOM
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          # The wheel is py3-none-any, so the interpreter that builds it does
+          # not end up in the artefact. Pinned only so the job is reproducible.
+          python-version: "3.12"
+
+      - name: Install the build tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build twine cyclonedx-bom
+
+      - name: Build the sdist and the wheel
+        run: python -m build
+
+      - name: Check the distribution metadata
+        # --strict turns a long description that will not render on PyPI into
+        # a failure here instead of a broken project page after the upload.
+        run: python -m twine check --strict dist/*
+
+      - name: Verify what the distributions actually contain
+        # The metadata makes promises the file list has to keep. `Typing ::
+        # Typed` is a lie without a PEP 561 marker, and the library cannot
+        # create a presentation without the two templates it reads at run
+        # time — all three are data files, which is exactly the category a
+        # packaging change drops silently.
+        run: |
+          python - <<'PY'
+          import glob, sys, tarfile, zipfile
+
+          failures = []
+
+          wheel = glob.glob("dist/*.whl")[0]
+          names = zipfile.ZipFile(wheel).namelist()
+          for required in (
+              "aspose/slides_foss/py.typed",
+              "aspose/slides_foss/_internal/pptx/Template.pptx",
+              "aspose/slides_foss/_internal/xlsx/template.xlsx",
+          ):
+              if required not in names:
+                  failures.append(f"wheel is missing {required}")
+          print(f"wheel {wheel}: {len(names)} entries")
+
+          sdist = glob.glob("dist/*.tar.gz")[0]
+          members = tarfile.open(sdist).getnames()
+          # The sdist has to carry a test suite that can actually be
+          # collected: the fixtures and conftest.py, not just the test
+          # modules. Without them a downstream packager cannot verify the
+          # build they are shipping.
+          for suffix in (
+              "/tests/conftest.py",
+              "/tests/conformance/harness.py",
+              "/tests/test_data/lotus.png",
+              # The README links to these four. A source distribution that
+              # carries the README and not the files it points at ships broken
+              # links and no policy documents.
+              "/CHANGELOG.md",
+              "/CONTRIBUTING.md",
+              "/SECURITY.md",
+              "/CODE_OF_CONDUCT.md",
+          ):
+              if not any(m.endswith(suffix) for m in members):
+                  failures.append(f"sdist is missing */{suffix.lstrip('/')}")
+          print(f"sdist {sdist}: {len(members)} entries")
+
+          for f in failures:
+              print(f"FAIL: {f}", file=sys.stderr)
+          sys.exit(1 if failures else 0)
+          PY
+
+      - name: Run the suite against the installed wheel
+        # The matrix above tests the checkout. This tests what a user gets:
+        # the wheel, installed, imported from site-packages. The suite is
+        # copied out of the repository first because tests/conftest.py puts
+        # the repository root on sys.path, and the source tree there would
+        # shadow the installed package and quietly test the wrong thing.
+        run: |
+          python -m venv /tmp/wheelenv
+          /tmp/wheelenv/bin/python -m pip install --upgrade pip
+          /tmp/wheelenv/bin/python -m pip install dist/*.whl pytest "python-pptx>=1.0"
+          mkdir -p /tmp/wheeltests
+          cp -r tests pyproject.toml /tmp/wheeltests/
+          cd /tmp/wheeltests && /tmp/wheelenv/bin/python -m pytest -q
+
+      - name: Generate a CycloneDX SBOM of the runtime dependency closure
+        # Built from an environment holding the wheel and nothing else, so the
+        # SBOM lists what installing this package pulls in — not the test
+        # tools, and not pip, which is why the environment is created without
+        # it.
+        run: |
+          python -m venv --without-pip /tmp/sbomenv
+          python -m pip --python /tmp/sbomenv/bin/python install dist/*.whl
+          python -m cyclonedx_py environment /tmp/sbomenv/bin/python \
+            --of JSON --sv 1.6 --mc-type library \
+            --pyproject pyproject.toml \
+            -o sbom.cdx.json
+          python -c "import json;d=json.load(open('sbom.cdx.json'));print([c['name']+' '+c['version'] for c in d['components']])"
+
+      - name: Upload the distributions
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          # This artefact is what the publish workflow uploads to PyPI, so it
+          # holds the distributions and nothing else — the publisher rejects
+          # unexpected files in the directory it is given.
+          name: distributions
+          path: dist/*
+          if-no-files-found: error
+
+      - name: Upload the SBOM
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: sbom
+          path: sbom.cdx.json
+          if-no-files-found: error

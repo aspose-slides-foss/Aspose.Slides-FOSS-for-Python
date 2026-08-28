@@ -31,6 +31,48 @@ _EFFECT_LST_ORDER = [
     Elements.A_SOFT_EDGE,
 ]
 
+# ECMA-376 Part 1 §20.1.8 makes some attributes and children mandatory on the
+# effect elements.  An element written without them is incomplete: PowerPoint
+# refuses the whole file rather than ignoring the effect, so a newly created
+# element is given the schema-required minimum here.  <a:blur> and
+# <a:reflection> are complete when empty and are absent from both tables.
+_EFFECT_DEFAULT_ATTRS = {
+    Elements.A_GLOW: {'rad': '63500'},          # 5 pt
+    Elements.A_PRST_SHDW: {'prst': 'shdw1'},
+    Elements.A_SOFT_EDGE: {'rad': '63500'},
+    Elements.A_FILL_OVERLAY: {'blend': 'over'},
+}
+
+# Effects requiring one EG_ColorChoice child.
+_EFFECTS_REQUIRING_COLOR = (
+    Elements.A_GLOW,
+    Elements.A_INNER_SHDW,
+    Elements.A_OUTER_SHDW,
+    Elements.A_PRST_SHDW,
+)
+
+# Effects requiring one EG_FillProperties child.
+_EFFECTS_REQUIRING_FILL = (Elements.A_FILL_OVERLAY,)
+
+# Black at 40% opacity: PowerPoint's own default shadow colour.
+_DEFAULT_EFFECT_COLOR = '000000'
+_DEFAULT_EFFECT_ALPHA = '40000'
+
+
+def _apply_effect_defaults(el: ET._Element) -> None:
+    """Give a freshly created effect element the values its type requires."""
+    for name, value in _EFFECT_DEFAULT_ATTRS.get(el.tag, {}).items():
+        el.set(name, value)
+
+    if el.tag in _EFFECTS_REQUIRING_COLOR:
+        color = ET.SubElement(el, Elements.A_SRGB_CLR)
+        color.set('val', _DEFAULT_EFFECT_COLOR)
+        alpha = ET.SubElement(color, f"{NS.A}alpha")
+        alpha.set('val', _DEFAULT_EFFECT_ALPHA)
+
+    if el.tag in _EFFECTS_REQUIRING_FILL:
+        ET.SubElement(el, Elements.A_NO_FILL)
+
 
 class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFormat, IEffectParamSource):
     """Represents effect properties of shape."""
@@ -89,6 +131,7 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
         if existing is not None:
             return existing
         el = ET.Element(tag)
+        _apply_effect_defaults(el)
         try:
             new_rank = _EFFECT_LST_ORDER.index(tag)
         except ValueError:

@@ -74,7 +74,10 @@ class ExporterRegistry:
         """
         exporter_class = cls._exporters.get(format_value)
         if exporter_class:
-            return exporter_class()
+            # One exporter class can serve several formats, so it is told
+            # which one was asked for; without this every format collapses
+            # onto the class default.
+            return exporter_class.create_for_format(format_value)
         return None
 
     @classmethod

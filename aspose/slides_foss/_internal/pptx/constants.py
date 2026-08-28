@@ -52,6 +52,7 @@ NAMESPACES = {
     # Microsoft Office extensions (2010+)
     'p14': 'http://schemas.microsoft.com/office/powerpoint/2010/main',
     'p15': 'http://schemas.microsoft.com/office/powerpoint/2012/main',
+    'p188': 'http://schemas.microsoft.com/office/powerpoint/2018/8/main',
     'a14': 'http://schemas.microsoft.com/office/drawing/2010/main',
 
     # Markup Compatibility namespace
@@ -186,6 +187,12 @@ class Elements:
     A_CS = f"{NS.A}cs"
     A_SYM = f"{NS.A}sym"
 
+    # Hyperlink elements.  CT_TextCharacterProperties names the mouse-over
+    # link hlinkMouseOver; CT_NonVisualDrawingProps names it hlinkHover.
+    A_HLINK_CLICK = f"{NS.A}hlinkClick"
+    A_HLINK_MOUSE_OVER = f"{NS.A}hlinkMouseOver"
+    A_HLINK_HOVER = f"{NS.A}hlinkHover"
+
     # Autofit elements
     A_NO_AUTOFIT = f"{NS.A}noAutofit"
     A_SP_AUTO_FIT = f"{NS.A}spAutoFit"
@@ -298,7 +305,7 @@ class Elements:
     P_GRAPHIC_FRAME = f"{NS.P}graphicFrame"
     P_NV_GRAPHIC_FRAME_PR = f"{NS.P}nvGraphicFramePr"
     P_C_NV_GRAPHIC_FRAME_PR = f"{NS.P}cNvGraphicFramePr"
-    A_GRAPHIC_FRAME_LOCKING = f"{NS.A}graphicFrameLocking"
+    A_GRAPHIC_FRAME_LOCKS = f"{NS.A}graphicFrameLocks"
     P_NV_PR = f"{NS.P}nvPr"
     P_XFRM = f"{NS.P}xfrm"
 

@@ -67,7 +67,12 @@ class Camera(PVIObject, ISlideComponent, IPresentationComponent, ICamera):
         cam = self._get_camera()
         if cam is not None:
             return cam
-        return ET.SubElement(self._scene3d, Elements.A_CAMERA, prst='orthographicFront')
+        # CT_Scene3D is the sequence camera, lightRig, backdrop?, extLst?, so
+        # a camera added to an existing scene belongs at the front.
+        cam = ET.Element(Elements.A_CAMERA)
+        cam.set('prst', 'orthographicFront')
+        self._scene3d.insert(0, cam)
+        return cam
 
     def _save(self) -> None:
         if hasattr(self, '_slide_part') and self._slide_part:

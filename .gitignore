@@ -5,6 +5,15 @@ dist/
 build/
 *.egg
 
+# CONTRIBUTING.md tells you to create the virtual environment inside the
+# checkout, so the checkout has to know to ignore it.
+.venv/
+venv/
+
+# Tool caches, written by any local run.
+.pytest_cache/
+.mypy_cache/
+
 .vscode/
 .idea/
 

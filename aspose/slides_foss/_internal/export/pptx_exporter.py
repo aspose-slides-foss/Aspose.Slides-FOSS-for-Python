@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, BinaryIO, Optional, Any
 
 from .exporter_base import ExporterBase
 from .exporter_registry import ExporterRegistry
+from ..opc.content_types import ContentTypesManager
 
 if TYPE_CHECKING:
     from ..opc import OpcPackage
@@ -41,14 +42,30 @@ class PptxExporter(ExporterBase):
         'Potm': 'application/vnd.ms-powerpoint.template.macroEnabled.main+xml',
     }
 
+    #: The part whose content type identifies the package format.
+    MAIN_PART_NAME = '/ppt/presentation.xml'
+
     def __init__(self, target_format: str = 'Pptx'):
         """
         Initialize the PPTX exporter.
 
         Args:
             target_format: The specific format to export to.
+
+        Raises:
+            ValueError: If the format is not one of the OPC presentation formats.
         """
+        if target_format not in self._CONTENT_TYPES:
+            raise ValueError(
+                f"Export format '{target_format}' is not supported by this "
+                f"exporter; it writes {', '.join(sorted(self._CONTENT_TYPES))}"
+            )
         self._target_format = target_format
+
+    @classmethod
+    def create_for_format(cls, format_value: str) -> PptxExporter:
+        """Create an exporter bound to a specific target format."""
+        return cls(target_format=format_value)
 
     def export_to_path(
         self,
@@ -86,32 +103,27 @@ class PptxExporter(ExporterBase):
 
     def _update_content_type_if_needed(self, package: OpcPackage) -> None:
         """
-        Update the content type of the main presentation part if converting.
+        Declare the target format in ``[Content_Types].xml``.
 
-        This is needed when saving as a different format than the source
-        (e.g., saving a PPTX as POTX).
+        The six OPC presentation formats share one package shape and differ
+        only in the content type of ``/ppt/presentation.xml``.  Without this
+        the package always claims to be an ordinary presentation, so a file
+        saved as ``.potx`` or ``.ppsx`` contradicts its own extension and
+        PowerPoint refuses to open it.
         """
-        # TODO: Implement content type update when format conversion is needed
-        # For now, we preserve the original content type
-        pass
+        content_type = self._CONTENT_TYPES[self._target_format]
+
+        content_types = ContentTypesManager(package)
+        if content_types.get_content_type(self.MAIN_PART_NAME) == content_type:
+            # Already correct; leave the part byte-for-byte alone.
+            return
+        content_types.add_override(self.MAIN_PART_NAME, content_type)
+        content_types.save()
 
     @classmethod
     def get_supported_formats(cls) -> list[str]:
         """Get all OPC-based presentation formats."""
         return list(cls._CONTENT_TYPES.keys())
-
-
-class PptxExporterFactory:
-    """
-    Factory for creating PPTX exporters with specific target formats.
-
-    This allows the registry to create format-specific exporter instances.
-    """
-
-    @staticmethod
-    def create_for_format(format_value: str) -> PptxExporter:
-        """Create a PPTX exporter for a specific format."""
-        return PptxExporter(target_format=format_value)
 
 
 # Register the PPTX exporter for all supported formats

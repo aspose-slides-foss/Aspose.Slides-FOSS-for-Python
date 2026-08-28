@@ -2,12 +2,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from .ISlideComponent import ISlideComponent
 from .IPresentationComponent import IPresentationComponent
+from ._internal.strict_attributes import StrictAttributes
 
 if TYPE_CHECKING:
     from .IBaseSlide import IBaseSlide
     from .IPresentation import IPresentation
 
-class PVIObject(ISlideComponent, IPresentationComponent):
+class PVIObject(StrictAttributes, ISlideComponent, IPresentationComponent):
     """Encapsulates basic service infrastructure for objects can be a subject of property value inheritance."""
     @property
     def as_i_presentation_component(self) -> IPresentationComponent:

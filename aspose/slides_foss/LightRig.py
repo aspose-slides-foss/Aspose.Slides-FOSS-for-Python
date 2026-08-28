@@ -49,7 +49,16 @@ class LightRig(PVIObject, ISlideComponent, IPresentationComponent, ILightRig):
         lr = self._get_light_rig()
         if lr is not None:
             return lr
-        return ET.SubElement(self._scene3d, Elements.A_LIGHT_RIG, rig='threePt', dir='t')
+        # CT_Scene3D is the sequence camera, lightRig, backdrop?, extLst?, so
+        # a light rig added to an existing scene goes directly after the
+        # camera when there is one.
+        lr = ET.Element(Elements.A_LIGHT_RIG)
+        lr.set('rig', 'threePt')
+        lr.set('dir', 't')
+        cam = self._scene3d.find(Elements.A_CAMERA)
+        index = list(self._scene3d).index(cam) + 1 if cam is not None else 0
+        self._scene3d.insert(index, lr)
+        return lr
 
     def _save(self) -> None:
         if hasattr(self, '_slide_part') and self._slide_part:
