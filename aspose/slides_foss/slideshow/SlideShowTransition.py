@@ -59,13 +59,14 @@ class SlideShowTransition(ISlideShowTransition):
         )
         return self._transition_elem
 
-    def _container(self) -> ET._Element:
-        """The slide's child that holds the transition: itself, or its mc:AlternateContent."""
+    @staticmethod
+    def _container(elem: ET._Element) -> ET._Element:
+        """The slide's child that holds ``elem``: itself, or its mc:AlternateContent."""
         from .._internal.pptx.transition_mappings import MC_PREFIX
-        parent = self._transition_elem.getparent()
+        parent = elem.getparent()
         if parent is not None and parent.tag == f'{MC_PREFIX}Choice':
             return parent.getparent()
-        return self._transition_elem
+        return elem
 
     def _place(self, extension_ns: Optional[str]) -> None:
         """Put the transition on the slide bare, or wrapped the way PowerPoint wraps it.
@@ -81,8 +82,8 @@ class SlideShowTransition(ISlideShowTransition):
         from .._internal.pptx.transition_mappings import (
             EXTENSION_PREFIXES, MC_NS, MC_PREFIX, P_PREFIX,
         )
-        elem = self._transition_elem
-        container = self._container()
+        elem = self._ensure_transition_elem()
+        container = self._container(elem)
         slide = container.getparent()
         choice = None
         if extension_ns is None:
