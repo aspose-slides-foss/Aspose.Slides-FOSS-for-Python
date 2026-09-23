@@ -58,6 +58,19 @@ raise, and files this version writes are not byte-identical to the ones the last
   `hyperlink_click` and `hyperlink_mouse_over` as abstract properties. A third-party class inheriting
   from it without defining both no longer instantiates — at construction, not at assignment, which is
   the point: the interface now states what implementing it means.
+- **Transitions introduced in PowerPoint 2010 and later are written inside `mc:AlternateContent`**,
+  as PowerPoint writes them. The 35 transition types whose element is outside the ECMA-376
+  namespace — Vortex, Ripple, Cube, Curtains, Morph and the rest of the `p14`, `p15` and `p159`
+  types — were written bare inside `p:transition`, where a reader that does not know the extension
+  has no fallback and the Open XML SDK rejects Morph outright. Each now goes in an `mc:Choice` that
+  requires its namespace, with a `p:fade` in `mc:Fallback` carrying the same speed and advance
+  settings. The 21 standard transitions are written as before. Code that inspects the slide XML
+  directly will find these transitions one level deeper.
+- **`TransitionType.BOX` writes a different element, and some files read back a different type.**
+  `BOX` was written as `p14:prism isContent="1"`, which is what PowerPoint writes for *Rotate*; it
+  is now `isInverted="1"`, PowerPoint's Box. Reading a file, `p14:prism isContent="1"` — including
+  every Box this library wrote before — now reads as `TransitionType.ROTATE`, which is how PowerPoint
+  itself shows it.
 
 ### Added
 
@@ -155,6 +168,17 @@ raise, and files this version writes are not byte-identical to the ones the last
   typical set of run formatting were invalid, and a shadow enabled after the font was dropped by
   PowerPoint. The effect list now goes where its container's sequence puts it, for run properties,
   shape properties and the others alike.
+- **The Orbit, Rotate and Box transitions are the ones PowerPoint shows.** `TransitionType.ORBIT`
+  and `ROTATE` were written as `p14:orbit` and `p14:rotate`, which the PowerPoint 2010 namespace
+  does not define, so PowerPoint showed no transition at all; `BOX` was written the way PowerPoint
+  writes Rotate. PowerPoint writes all four of Cube, Rotate, Box and Orbit as one `p14:prism`
+  element told apart by `isContent` and `isInverted`, and the library now writes exactly what
+  PowerPoint does for each.
+- **Setting a transition on a slide opened from a PowerPoint file replaces the one it had.**
+  PowerPoint saves every transition inside `mc:AlternateContent`, which the library did not look
+  inside: the slide's transition read as `NONE`, and setting a type added a second `p:transition`
+  beside the existing one, which `CT_Slide` does not allow. The existing transition is now read, and
+  setting a type replaces it, keeping its speed, advance settings and duration.
 
 ### Known limitations
 

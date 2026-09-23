@@ -12,11 +12,19 @@ P_NS = 'http://schemas.openxmlformats.org/presentationml/2006/main'
 P14_NS = 'http://schemas.microsoft.com/office/powerpoint/2010/main'
 P15_NS = 'http://schemas.microsoft.com/office/powerpoint/2012/main'
 P159_NS = 'http://schemas.microsoft.com/office/powerpoint/2015/09/main'
+MC_NS = 'http://schemas.openxmlformats.org/markup-compatibility/2006'
 
 P_PREFIX = f'{{{P_NS}}}'
 P14_PREFIX = f'{{{P14_NS}}}'
 P15_PREFIX = f'{{{P15_NS}}}'
 P159_PREFIX = f'{{{P159_NS}}}'
+MC_PREFIX = f'{{{MC_NS}}}'
+
+# A transition element in one of these namespaces is an extension to
+# ECMA-376.  PowerPoint writes it inside mc:AlternateContent: the element in an
+# mc:Choice whose Requires names this prefix, and a plain fade in mc:Fallback
+# for a reader that does not know the extension.
+EXTENSION_PREFIXES = {P14_NS: 'p14', P15_NS: 'p15', P159_NS: 'p159'}
 
 # ---------------------------------------------------------------
 # TransitionType → (xml_tag, namespace_prefix, value_class_name)
@@ -55,8 +63,8 @@ _P14_TRANSITIONS = {
     'Honeycomb':    ('honeycomb',    P14_PREFIX, 'EmptyTransition'),
     'Cube':         ('prism',        P14_PREFIX, 'SideDirectionTransition'),
     'Box':          ('prism',        P14_PREFIX, 'SideDirectionTransition'),
-    'Rotate':       ('rotate',       P14_PREFIX, 'SideDirectionTransition'),
-    'Orbit':        ('orbit',        P14_PREFIX, 'SideDirectionTransition'),
+    'Rotate':       ('prism',        P14_PREFIX, 'SideDirectionTransition'),
+    'Orbit':        ('prism',        P14_PREFIX, 'SideDirectionTransition'),
     'Doors':        ('doors',        P14_PREFIX, 'OrientationTransition'),
     'Window':       ('window',       P14_PREFIX, 'OrientationTransition'),
     'Ferris':       ('ferris',       P14_PREFIX, 'LeftRightDirectionTransition'),
@@ -70,6 +78,15 @@ _P14_TRANSITIONS = {
     'Shred':        ('shred',        P14_PREFIX, 'ShredTransition'),
     'Reveal':       ('reveal',       P14_PREFIX, 'RevealTransition'),
     'WheelReverse': ('wheelReverse', P14_PREFIX, 'WheelTransition'),
+}
+
+# Cube, Rotate, Box and Orbit are all one p14:prism element, told apart by two
+# flags.  These are the values PowerPoint writes for each.
+_PRISM_FLAGS = {
+    'Cube':   {},
+    'Rotate': {'isContent': '1'},
+    'Box':    {'isInverted': '1'},
+    'Orbit':  {'isContent': '1', 'isInverted': '1'},
 }
 
 # PowerPoint 2013+ preset transitions (p15: namespace)
@@ -116,10 +133,7 @@ def get_transition_info(type_value: str):
     # Check p14 transitions
     if type_value in _P14_TRANSITIONS:
         tag_name, ns_prefix, cls_name = _P14_TRANSITIONS[type_value]
-        extra = {}
-        # BOX uses prism with isContent="1"; CUBE uses prism without
-        if type_value == 'Box':
-            extra['isContent'] = '1'
+        extra = dict(_PRISM_FLAGS.get(type_value, {}))
         return (f'{ns_prefix}{tag_name}', cls_name, extra)
 
     # Check p15 preset transitions
@@ -151,13 +165,15 @@ def get_transition_type_from_element(elem) -> str | None:
     # Check p14 transitions
     for type_val, (tag_name, ns_prefix, _) in _P14_TRANSITIONS.items():
         if tag == f'{ns_prefix}{tag_name}':
-            # Special case: prism maps to CUBE or BOX based on isContent
+            # Special case: prism is Cube, Rotate, Box or Orbit by its flags
             if tag_name == 'prism':
-                is_content = elem.get('isContent', '0')
-                if is_content == '1':
-                    return 'Box'
-                else:
-                    return 'Cube'
+                flags = {
+                    name: '1' for name in ('isContent', 'isInverted')
+                    if elem.get(name) in ('1', 'true')
+                }
+                for prism_type, prism_flags in _PRISM_FLAGS.items():
+                    if prism_flags == flags:
+                        return prism_type
             return type_val
 
     # Check p15 preset transitions

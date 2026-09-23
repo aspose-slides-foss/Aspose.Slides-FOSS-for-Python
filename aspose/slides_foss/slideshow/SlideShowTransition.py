@@ -15,14 +15,31 @@ class SlideShowTransition(ISlideShowTransition):
     def __init__(self):
         self._slide_part = None
         self._transition_elem: Optional[ET._Element] = None
+        self._fallback_elem: Optional[ET._Element] = None
         self._value_obj = None
         self._type_cache = None
 
     def _init_internal(self, slide_part):
-        """Initialize with the slide part. Reads existing <p:transition> if present."""
+        """Initialize with the slide part. Reads existing <p:transition> if present.
+
+        PowerPoint saves a transition inside mc:AlternateContent, with the
+        transition it means in mc:Choice and a plain one in mc:Fallback, so the
+        transition is looked for there as well as directly under the slide.
+        """
         from .._internal.pptx.constants import Elements
+        from .._internal.pptx.transition_mappings import MC_PREFIX
         self._slide_part = slide_part
-        self._transition_elem = slide_part._root.find(Elements.P_TRANSITION)
+        root = slide_part._root
+        self._transition_elem = root.find(Elements.P_TRANSITION)
+        if self._transition_elem is None:
+            for wrapper in root.findall(f'{MC_PREFIX}AlternateContent'):
+                chosen = wrapper.find(f'{MC_PREFIX}Choice/{Elements.P_TRANSITION}')
+                if chosen is not None:
+                    self._transition_elem = chosen
+                    self._fallback_elem = wrapper.find(
+                        f'{MC_PREFIX}Fallback/{Elements.P_TRANSITION}'
+                    )
+                    break
         if self._transition_elem is not None:
             self._parse_value()
 
@@ -41,6 +58,70 @@ class SlideShowTransition(ISlideShowTransition):
             self._slide_part._root, ET.Element(Elements.P_TRANSITION)
         )
         return self._transition_elem
+
+    def _container(self) -> ET._Element:
+        """The slide's child that holds the transition: itself, or its mc:AlternateContent."""
+        from .._internal.pptx.transition_mappings import MC_PREFIX
+        parent = self._transition_elem.getparent()
+        if parent is not None and parent.tag == f'{MC_PREFIX}Choice':
+            return parent.getparent()
+        return self._transition_elem
+
+    def _place(self, extension_ns: Optional[str]) -> None:
+        """Put the transition on the slide bare, or wrapped the way PowerPoint wraps it.
+
+        ``extension_ns`` is the namespace of a transition element that is not
+        in ECMA-376 (p14, p15, p159), or None.  PowerPoint writes such an
+        element in an mc:Choice that requires its namespace, with a fade in
+        mc:Fallback for a reader that does not know it.  The result takes the
+        place of whatever held the transition before, so the slide never
+        carries two.
+        """
+        from .._internal.pptx.constants import Elements
+        from .._internal.pptx.transition_mappings import (
+            EXTENSION_PREFIXES, MC_NS, MC_PREFIX, P_PREFIX,
+        )
+        elem = self._transition_elem
+        container = self._container()
+        slide = container.getparent()
+        choice = None
+        if extension_ns is None:
+            replacement = elem
+            self._fallback_elem = None
+        else:
+            prefix = EXTENSION_PREFIXES[extension_ns]
+            replacement = ET.Element(f'{MC_PREFIX}AlternateContent', nsmap={'mc': MC_NS})
+            choice = ET.SubElement(
+                replacement, f'{MC_PREFIX}Choice', nsmap={prefix: extension_ns}
+            )
+            choice.set('Requires', prefix)
+            fallback = ET.SubElement(
+                ET.SubElement(replacement, f'{MC_PREFIX}Fallback'), Elements.P_TRANSITION
+            )
+            # The fallback is for a reader without the extension, so it gets
+            # the ECMA-376 attributes only, as PowerPoint writes it.
+            for name, value in elem.attrib.items():
+                if not name.startswith('{'):
+                    fallback.set(name, value)
+            ET.SubElement(fallback, f'{P_PREFIX}fade')
+            self._fallback_elem = fallback
+        if container is not elem:
+            elem.getparent().remove(elem)
+        if replacement is not container:
+            slide.replace(container, replacement)
+        if choice is not None:
+            choice.append(elem)
+
+    def _set_attribute(self, name: str, value: Optional[str]) -> None:
+        """Set a transition attribute, or remove it for None, in the fallback too."""
+        elem = self._ensure_transition_elem()
+        for target in (elem, self._fallback_elem):
+            if target is None:
+                continue
+            if value is None:
+                target.attrib.pop(name, None)
+            else:
+                target.set(name, value)
 
     def _parse_value(self):
         """Parse the transition child element to determine type and value object."""
@@ -127,8 +208,7 @@ class SlideShowTransition(ISlideShowTransition):
 
     @advance_on_click.setter
     def advance_on_click(self, value: bool):
-        elem = self._ensure_transition_elem()
-        elem.set('advClick', '1' if value else '0')
+        self._set_attribute('advClick', '1' if value else '0')
 
     @property
     def advance_after(self) -> bool:
@@ -143,10 +223,9 @@ class SlideShowTransition(ISlideShowTransition):
         if value:
             # If no advTm set yet, default to 0
             if 'advTm' not in elem.attrib:
-                elem.set('advTm', '0')
+                self._set_attribute('advTm', '0')
         else:
-            if 'advTm' in elem.attrib:
-                del elem.attrib['advTm']
+            self._set_attribute('advTm', None)
 
     @property
     def advance_after_time(self) -> int:
@@ -159,8 +238,7 @@ class SlideShowTransition(ISlideShowTransition):
 
     @advance_after_time.setter
     def advance_after_time(self, value: int):
-        elem = self._ensure_transition_elem()
-        elem.set('advTm', str(value))
+        self._set_attribute('advTm', str(value))
 
     @property
     def speed(self) -> TransitionSpeed:
@@ -176,9 +254,8 @@ class SlideShowTransition(ISlideShowTransition):
     @speed.setter
     def speed(self, value: TransitionSpeed):
         from .._internal.pptx.transition_mappings import SPEED_TO_XML
-        elem = self._ensure_transition_elem()
         xml_val = SPEED_TO_XML.get(value.value, 'fast')
-        elem.set('spd', xml_val)
+        self._set_attribute('spd', xml_val)
 
     @property
     def value(self) -> ITransitionValueBase:
@@ -197,7 +274,7 @@ class SlideShowTransition(ISlideShowTransition):
     def type(self, value: TransitionType):
         from .TransitionType import TransitionType as TT
         from .._internal.pptx.transition_mappings import (
-            get_transition_info, P14_NS, P15_NS, P159_NS,
+            get_transition_info, EXTENSION_PREFIXES, P14_NS, P15_NS, P159_NS,
         )
 
         self._type_cache = value
@@ -209,16 +286,14 @@ class SlideShowTransition(ISlideShowTransition):
             if isinstance(child.tag, str):
                 elem.remove(child)
 
-        if value == TT.NONE:
-            self._value_obj = None
-            return
-
-        info = get_transition_info(value.value)
+        info = None if value == TT.NONE else get_transition_info(value.value)
         if info is None:
+            self._place(None)
             self._value_obj = None
             return
 
         full_tag, cls_name, extra_attrs = info
+        namespace = full_tag[1:].partition('}')[0]
 
         # Register namespaces before creating elements so prefixes are correct
         if P14_NS in full_tag:
@@ -227,6 +302,8 @@ class SlideShowTransition(ISlideShowTransition):
             ET.register_namespace('p15', P15_NS)
         if P159_NS in full_tag:
             ET.register_namespace('p159', P159_NS)
+
+        self._place(namespace if namespace in EXTENSION_PREFIXES else None)
 
         # Create the transition type child element
         child_elem = ET.SubElement(elem, full_tag)
