@@ -76,7 +76,9 @@ raise, and files this version writes are not byte-identical to the ones the last
   `BOX` was written as `p14:prism isContent="1"`, which is what PowerPoint writes for *Rotate*; it
   is now `isInverted="1"`, PowerPoint's Box. Reading a file, `p14:prism isContent="1"` — including
   every Box this library wrote before — now reads as `TransitionType.ROTATE`, which is how PowerPoint
-  itself shows it.
+  itself shows it. A file an earlier version wrote with `ORBIT` or `ROTATE` — the bare `p14:orbit`
+  or `p14:rotate` element — now reads as `TransitionType.NONE`, matching PowerPoint, which showed no
+  transition for those files.
 
 ### Added
 
@@ -170,8 +172,8 @@ raise, and files this version writes are not byte-identical to the ones the last
 - **A text effect survives formatting set before it.** `portion_format.effect_format` created
   `a:effectLst` by the rule for shape properties — before any 3-D element, otherwise at the end — so
   in run properties it landed after the highlight, underline, fonts or hyperlink already set there.
-  `CT_TextCharacterProperties` puts the effect list before all of those; four orders in five of a
-  typical set of run formatting were invalid, and a shadow enabled after the font was dropped by
+  `CT_TextCharacterProperties` puts the effect list before all of those; 96 of the 120 orders of
+  five common run settings were invalid, and a shadow enabled after the font was dropped by
   PowerPoint. The effect list now goes where its container's sequence puts it, for run properties,
   shape properties and the others alike.
 - **The Orbit, Rotate and Box transitions are the ones PowerPoint shows.** `TransitionType.ORBIT`
@@ -185,7 +187,8 @@ raise, and files this version writes are not byte-identical to the ones the last
   inside: the slide's transition read as `NONE`, and setting a type added a second `p:transition`
   beside the existing one, which `CT_Slide` does not allow — PowerPoint refuses to open the result.
   The existing transition is now read, and setting a type replaces it, keeping its speed, advance
-  settings and duration.
+  settings and duration. The whole transition is replaced, so its sound action (`p:sndAc`) and
+  extension list are not kept — as was already the case for a bare transition.
 
 ### Known limitations
 
@@ -193,5 +196,9 @@ Not defects, and not scheduled: rendering and conversion of any kind (PDF, HTML,
 binary `.ppt` family, OpenDocument, SmartArt, OLE objects, mathematical text, VBA macros, digital
 signatures, encryption, action settings other than external hyperlinks, presentation sections, and a
 public API for the slide size. The README lists these with the detail.
+
+`three_d_format.depth` writes the shape's z position (`a:sp3d/@z`), which PowerPoint does not show
+as extrusion depth. Extrusion depth is a separate setting, `three_d_format.extrusion_height`
+(`@extrusionH`).
 
 [Unreleased]: https://github.com/aspose-slides-foss/Aspose.Slides-FOSS-for-Python/commits/main

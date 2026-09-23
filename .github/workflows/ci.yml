@@ -93,7 +93,7 @@ jobs:
         # Lowering BASELINE when the count drops is a welcome change on its
         # own; raising it needs a reason in the commit message.
         env:
-          BASELINE: "1626"
+          BASELINE: "1625"
         run: |
           set -uo pipefail
           mypy --no-incremental > mypy.log 2>&1 || true
