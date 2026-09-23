@@ -83,6 +83,11 @@ CHILD_SEQUENCES: dict[str, dict[str, int]] = {
     "scene3d": _sequence("camera", "lightRig", "backdrop", "extLst"),
     # CT_Shape3D — 20.1.5.12.
     "sp3d": _sequence("bevelT", "bevelB", "extrusionClr", "contourClr", "extLst"),
+    # CT_TextBodyProperties — 21.1.2.1.1.
+    "bodyPr": _sequence(
+        "prstTxWarp", ("noAutofit", "normAutofit", "spAutoFit"), "scene3d",
+        ("sp3d", "flatTx"), "extLst",
+    ),
     # CT_NonVisualDrawingProps — 20.1.2.2.8.
     "cNvPr": _sequence("hlinkClick", "hlinkHover", "extLst"),
     # CT_Slide — 19.3.1.38.  PresentationML, so these children are p-namespaced.

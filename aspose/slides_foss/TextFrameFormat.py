@@ -6,6 +6,7 @@ from .ISlideComponent import ISlideComponent
 from .IPresentationComponent import IPresentationComponent
 from .ITextFrameFormat import ITextFrameFormat
 from ._internal.pptx.constants import NS, Elements, EMU_PER_POINT, ROTATION_UNIT
+from ._internal.pptx.child_order import sub_element_in_order
 
 if TYPE_CHECKING:
     from .IThreeDFormat import IThreeDFormat
@@ -305,12 +306,12 @@ class TextFrameFormat(PVIObject, ISlideComponent, IPresentationComponent, ITextF
                 body_pr.remove(existing)
         # Add the new one
         if value == TextAutofitType.NONE:
-            ET.SubElement(body_pr, Elements.A_NO_AUTOFIT)
+            sub_element_in_order(body_pr, Elements.A_NO_AUTOFIT)
         elif value == TextAutofitType.SHAPE:
-            ET.SubElement(body_pr, Elements.A_SP_AUTO_FIT)
+            sub_element_in_order(body_pr, Elements.A_SP_AUTO_FIT)
             self._resize_shape_to_fit_text(body_pr)
         elif value == TextAutofitType.NORMAL:
-            ET.SubElement(body_pr, Elements.A_NORM_AUTOFIT)
+            sub_element_in_order(body_pr, Elements.A_NORM_AUTOFIT)
         self._save()
 
     def _resize_shape_to_fit_text(self, body_pr) -> None:
@@ -447,7 +448,7 @@ class TextFrameFormat(PVIObject, ISlideComponent, IPresentationComponent, ITextF
             ooxml_val = _WARP_MAP_REV.get(value.name)
             if ooxml_val:
                 if existing is None:
-                    existing = ET.SubElement(body_pr, Elements.A_PRST_TX_WARP)
+                    existing = sub_element_in_order(body_pr, Elements.A_PRST_TX_WARP)
                 existing.set('prst', ooxml_val)
         self._save()
 

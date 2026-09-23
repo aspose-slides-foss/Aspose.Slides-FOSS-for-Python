@@ -142,6 +142,12 @@ raise, and files this version writes are not byte-identical to the ones the last
   `bevelB`, `extrusionClr`, `contourClr` — and 23 of the 24 possible orders were invalid: setting the
   contour colour before the top bevel gave a shape that PowerPoint shows with no bevels and a white
   extrusion. The four children now go where the schema puts them, whatever the order of the calls.
+- **A text warp survives an autofit set before it.** `text_frame_format.autofit_type` and
+  `.transform` appended their elements to `a:bodyPr`, whose `CT_TextBodyProperties` sequence puts the
+  warp first, then the autofit, then the 3-D text elements. Setting the autofit before the warp — or
+  either of them after `three_d_format` — wrote an out-of-sequence `a:bodyPr`, 20 of the 24 orders
+  of those settings, and PowerPoint kept the autofit and showed the text unwarped. Both elements are
+  now inserted at their schema position.
 
 ### Known limitations
 
