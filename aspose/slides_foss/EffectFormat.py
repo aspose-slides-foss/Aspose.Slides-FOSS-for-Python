@@ -7,6 +7,7 @@ from .IPresentationComponent import IPresentationComponent
 from .IEffectFormat import IEffectFormat
 from .IEffectParamSource import IEffectParamSource
 from ._internal.pptx.constants import NS, Elements, EMU_PER_POINT
+from ._internal.pptx.child_order import insert_in_order
 
 if TYPE_CHECKING:
     from .effects.IBlur import IBlur
@@ -96,26 +97,17 @@ class EffectFormat(PVIObject, ISlideComponent, IPresentationComponent, IEffectFo
         return self._parent_element.find(Elements.A_EFFECT_LST)
 
     def _ensure_effect_lst(self) -> ET._Element:
-        """Get or create the <a:effectLst> element at the correct position in spPr.
+        """Get or create the <a:effectLst> element at its position in the parent.
 
-        OOXML requires spPr children in order: xfrm, geometry, fill, ln, effectLst, ...
+        The parent may be shape properties, run properties, background or
+        group shape properties, or a theme effect style, and each has its own
+        sequence: in spPr the effect list follows the outline, in rPr it
+        precedes the highlight, underline, fonts and hyperlinks.
         """
         el = self._get_effect_lst()
         if el is not None:
             return el
-        el = ET.Element(Elements.A_EFFECT_LST)
-        # Insert after <a:ln>, before scene3d/sp3d/extLst
-        insert_before = None
-        for child in self._parent_element:
-            if child.tag in (Elements.A_SCENE_3D, Elements.A_SP_3D, Elements.A_EXT_LST):
-                insert_before = child
-                break
-        if insert_before is not None:
-            idx = list(self._parent_element).index(insert_before)
-            self._parent_element.insert(idx, el)
-        else:
-            self._parent_element.append(el)
-        return el
+        return insert_in_order(self._parent_element, ET.Element(Elements.A_EFFECT_LST))
 
     def _get_effect_child(self, tag: str) -> ET._Element | None:
         """Get a specific effect child from effectLst."""

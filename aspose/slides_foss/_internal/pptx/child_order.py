@@ -76,6 +76,8 @@ CHILD_SEQUENCES: dict[str, dict[str, int]] = {
     "tblPr": _sequence(_FILL, _EFFECT, ("tableStyle", "tableStyleId"), "extLst"),
     # CT_BackgroundProperties — 19.3.1.2.
     "bgPr": _sequence(_FILL, _EFFECT, "extLst"),
+    # CT_EffectStyleItem — 20.1.4.1.11.
+    "effectStyle": _sequence(_EFFECT, "scene3d", "sp3d", "extLst"),
     # CT_TextUnderlineFillGroupWrapper and CT_FillOverlayEffect: one fill.
     "uFill": _sequence(_FILL),
     "fillOverlay": _sequence(_FILL),

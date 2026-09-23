@@ -62,6 +62,54 @@ def test_run_properties_keep_their_schema_order_however_they_were_set(
     pkg.assert_element(SLIDE, "//a:r/a:rPr", child_order=True)
 
 
+def _apply_with_effect(portion_format, operation):
+    if operation == "effect":
+        portion_format.effect_format.enable_outer_shadow_effect()
+    elif operation == "highlight":
+        portion_format.highlight_color.color = Color.from_argb(255, 255, 255, 0)
+    elif operation == "underline":
+        portion_format.underline_line_format.width = 2.0
+    elif operation == "latin_font":
+        portion_format.latin_font = FontData("Verdana")
+    elif operation == "hyperlink":
+        portion_format.hyperlink_click = "https://example.com/"
+    else:  # pragma: no cover - guards a typo in the parametrisation
+        raise AssertionError("unknown operation %r" % operation)
+
+
+#: A text effect against the four children the schema puts after it.
+EFFECT_OPERATIONS = ("effect", "highlight", "underline", "latin_font", "hyperlink")
+
+
+@pytest.mark.parametrize(
+    "order", list(itertools.permutations(EFFECT_OPERATIONS)), ids=lambda o: "-".join(o)
+)
+def test_a_text_effect_keeps_its_schema_position_however_it_was_set(
+    produced, shape_on_blank_slide, order
+):
+    """`<a:effectLst>` goes before highlight, underline, fonts and links in `<a:rPr>`.
+
+    The effect list used to be appended unless the run already had a 3-D
+    element, which is right for shape properties and wrong for run properties:
+    a shadow enabled after the font was written after `<a:latin>`, and
+    PowerPoint dropped it.
+    """
+    pres, shape = shape_on_blank_slide(with_text="Shadowed")
+    portion_format = shape.text_frame.paragraphs[0].portions[0].portion_format
+    for operation in order:
+        _apply_with_effect(portion_format, operation)
+    pkg = produced(pres)
+
+    rpr = pkg.find_one(SLIDE, "//a:r/a:rPr")
+    assert child_names(rpr) == [
+        "a:effectLst", "a:highlight", "a:uLn", "a:latin", "a:hlinkClick",
+    ], (
+        "<a:rPr> children are not in CT_TextCharacterProperties order "
+        "effectLst, highlight, uLn, latin, hlinkClick; found %r" % child_names(rpr)
+    )
+    pkg.assert_element(SLIDE, "//a:r/a:rPr", child_order=True)
+
+
 def test_run_properties_come_before_the_run_text(produced, shape_on_blank_slide):
     """`CT_RegularTextRun` is `rPr?` then `t`; formatting after the text is discarded."""
     pres, shape = shape_on_blank_slide(with_text="Formatted")

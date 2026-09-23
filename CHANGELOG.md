@@ -148,6 +148,13 @@ raise, and files this version writes are not byte-identical to the ones the last
   either of them after `three_d_format` — wrote an out-of-sequence `a:bodyPr`, 20 of the 24 orders
   of those settings, and PowerPoint kept the autofit and showed the text unwarped. Both elements are
   now inserted at their schema position.
+- **A text effect survives formatting set before it.** `portion_format.effect_format` created
+  `a:effectLst` by the rule for shape properties — before any 3-D element, otherwise at the end — so
+  in run properties it landed after the highlight, underline, fonts or hyperlink already set there.
+  `CT_TextCharacterProperties` puts the effect list before all of those; four orders in five of a
+  typical set of run formatting were invalid, and a shadow enabled after the font was dropped by
+  PowerPoint. The effect list now goes where its container's sequence puts it, for run properties,
+  shape properties and the others alike.
 
 ### Known limitations
 
