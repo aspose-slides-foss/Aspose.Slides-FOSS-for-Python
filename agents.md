@@ -135,6 +135,8 @@ author = prs.comment_authors.add_author("Jane Smith", "JS")
 author.comments.add_comment("Review this", slide, PointF(2.0, 2.0), datetime.now())
 ```
 
+Unlike shapes, a comment's position is in centimetres from the top-left corner of the slide.
+
 ### Document properties
 
 ```python

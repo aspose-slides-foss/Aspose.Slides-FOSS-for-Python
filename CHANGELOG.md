@@ -79,6 +79,13 @@ raise, and files this version writes are not byte-identical to the ones the last
   itself shows it. A file an earlier version wrote with `ORBIT` or `ROTATE` — the bare `p14:orbit`
   or `p14:rotate` element — now reads as `TransitionType.NONE`, matching PowerPoint, which showed no
   transition for those files.
+- **Comment positions saved by earlier versions read back far too large.** Earlier versions wrote a
+  comment's `p:pos` in EMU; it is now read in PowerPoint's unit, so a comment saved by an earlier
+  version of this library reads back from `position` 1587.5 times further from the corner along
+  each axis than it was given — which is where PowerPoint has always shown it. Such a comment can
+  be moved back with `comment.position = PointF(p.x / 1587.5, p.y / 1587.5)`, where `p` is the
+  position it reads back. A comment written by PowerPoint now reads back where PowerPoint placed it.
+  See *Comments are placed on the slide* under Fixed.
 
 ### Added
 
@@ -88,7 +95,7 @@ raise, and files this version writes are not byte-identical to the ones the last
   `p:cNvPr` for a shape, where `CT_NonVisualDrawingProps` names the mouse-over element
   `a:hlinkHover`. Each carries an `r:id` resolving to an external relationship in the owning part's
   `.rels`. Assigning `None` removes the element and the relationship together.
-- **A conformance test suite** — 335 tests that write a file through the public API, open it as a ZIP
+- **A conformance test suite** — 349 tests that write a file through the public API, open it as a ZIP
   archive and assert on the XML inside, never asking the library to read its own output back. See
   `tests/conformance/README.md`.
 - **A `py.typed` marker.** The package declared `Typing :: Typed` and shipped no marker, so every
@@ -189,6 +196,20 @@ raise, and files this version writes are not byte-identical to the ones the last
   The existing transition is now read, and setting a type replaces it, keeping its speed, advance
   settings and duration. The whole transition is replaced, so its sound action (`p:sndAc`) and
   extension list are not kept — as was already the case for a bare transition.
+- **Comments are placed on the slide.** A comment's position was written to `p:pos` in EMU, the
+  unit the schema names, but PowerPoint writes and reads that element in eighths of a point, 576 to
+  the inch — a comment it places 10 pt from the corner is written `x="80" y="80"`. Every comment
+  away from the corner therefore landed 1587.5 times too far from it, far outside the slide: one
+  added at 2 cm by 3 cm was placed 90 000 pt from the left edge. The position passed to
+  `add_comment` and `insert_comment` and read from `position` is, as it always was, in centimetres
+  from the top-left corner of the slide — this is now documented — and it is now written in
+  PowerPoint's unit and read back from it. The position mirrored into the threaded-comment part is
+  still written in EMU; since it is taken from the classic list, it is now rounded to the nearest
+  eighth of a point. Covered by `tests/conformance/test_comment_position.py`.
+- **Assigning a comment's `position` moves it in the saved file.** The setter changed the comment in
+  memory only, and the comment list is read again from the package on save, so the file kept the
+  old position and nothing said so. The new position is now written at once, as a new
+  `parent_comment` already was.
 
 ### Known limitations
 

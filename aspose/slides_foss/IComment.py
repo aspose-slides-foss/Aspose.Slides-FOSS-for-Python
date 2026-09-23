@@ -38,7 +38,7 @@ class IComment(ABC):
 
     @property
     def position(self) -> Any:
-        """Returns or sets the position of a comment on a slide. Read/write ."""
+        """Returns or sets the position of a comment on a slide, in centimetres from the top-left corner of the slide. Read/write ."""
         ...
 
     @position.setter

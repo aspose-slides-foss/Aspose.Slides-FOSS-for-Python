@@ -23,8 +23,24 @@ for prefix, uri in NAMESPACES.items():
 _P_NS = NAMESPACES['p']
 _P = f"{{{_P_NS}}}"
 
-# EMU conversion: 1 cm = 360000 EMU. Comment positions are stored in cm in PointF.
-_CM_TO_EMU = 360000
+#: PowerPoint's unit for a comment's ``p:pos``, per centimetre.
+#:
+#: The schema types ``p:pos`` as ``a:CT_Point2D``, in EMU, but PowerPoint writes
+#: and reads it in eighths of a point, 576 to the inch: a comment it places
+#: 10 pt from the corner of the slide is written ``x="80" y="80"``.  Written in
+#: EMU, a position is 1587.5 times too large and lands far outside the slide.
+#: The API keeps positions in centimetres from the top-left corner of the slide.
+POSITION_UNITS_PER_CM = 576 / 2.54
+
+
+def to_position_units(cm: float) -> int:
+    """A comment coordinate in centimetres, as written in ``p:pos``."""
+    return round(cm * POSITION_UNITS_PER_CM)
+
+
+def from_position_units(units: int) -> float:
+    """A ``p:pos`` coordinate, in centimetres."""
+    return units / POSITION_UNITS_PER_CM
 
 
 def _dt_to_str(dt) -> str:
@@ -110,7 +126,7 @@ class CommentData:
         """Position x in cm."""
         pos = self._elem.find(f"{_P}pos")
         if pos is not None:
-            return int(pos.get('x', '0')) / _CM_TO_EMU
+            return from_position_units(int(pos.get('x', '0')))
         return 0.0
 
     @pos_x.setter
@@ -118,14 +134,14 @@ class CommentData:
         pos = self._elem.find(f"{_P}pos")
         if pos is None:
             pos = ET.SubElement(self._elem, f"{_P}pos")
-        pos.set('x', str(round(value * _CM_TO_EMU)))
+        pos.set('x', str(to_position_units(value)))
 
     @property
     def pos_y(self) -> float:
         """Position y in cm."""
         pos = self._elem.find(f"{_P}pos")
         if pos is not None:
-            return int(pos.get('y', '0')) / _CM_TO_EMU
+            return from_position_units(int(pos.get('y', '0')))
         return 0.0
 
     @pos_y.setter
@@ -133,7 +149,7 @@ class CommentData:
         pos = self._elem.find(f"{_P}pos")
         if pos is None:
             pos = ET.SubElement(self._elem, f"{_P}pos")
-        pos.set('y', str(round(value * _CM_TO_EMU)))
+        pos.set('y', str(to_position_units(value)))
 
 
 class CommentsPart:
@@ -193,8 +209,8 @@ class CommentsPart:
         elem.set('idx', str(idx))
 
         pos = ET.SubElement(elem, f"{_P}pos")
-        pos.set('x', str(round(pos_x * _CM_TO_EMU)))
-        pos.set('y', str(round(pos_y * _CM_TO_EMU)))
+        pos.set('x', str(to_position_units(pos_x)))
+        pos.set('y', str(to_position_units(pos_y)))
 
         text_elem = ET.SubElement(elem, f"{_P}text")
         text_elem.text = text
@@ -214,8 +230,8 @@ class CommentsPart:
         elem.set('idx', str(idx))
 
         pos = ET.SubElement(elem, f"{_P}pos")
-        pos.set('x', str(round(pos_x * _CM_TO_EMU)))
-        pos.set('y', str(round(pos_y * _CM_TO_EMU)))
+        pos.set('x', str(to_position_units(pos_x)))
+        pos.set('y', str(to_position_units(pos_y)))
 
         text_elem = ET.SubElement(elem, f"{_P}text")
         text_elem.text = text

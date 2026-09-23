@@ -134,7 +134,10 @@ class CommentCollection(BaseCollection, ICommentCollection):
         return comments
 
     def add_comment(self, text, slide, position, creation_time) -> 'IComment':
-        """Add a comment to the end of this author's comment collection for the given slide."""
+        """Add a comment to the end of this author's comment collection for the given slide.
+
+        ``position`` is a PointF in centimetres from the top-left corner of the slide.
+        """
         from ._internal.pptx.comments_part import _dt_to_str
         author_id = self._author_data.id
         idx = self._authors_part.next_comment_idx(author_id)
@@ -156,7 +159,10 @@ class CommentCollection(BaseCollection, ICommentCollection):
 
 
     def insert_comment(self, index, text, slide, position, creation_time) -> 'IComment':
-        """Insert a comment at the given position in this author's comment list."""
+        """Insert a comment at the given index in this author's comment list.
+
+        ``position`` is a PointF in centimetres from the top-left corner of the slide.
+        """
         from ._internal.pptx.comments_part import _dt_to_str
         author_id = self._author_data.id
         idx = self._authors_part.next_comment_idx(author_id)

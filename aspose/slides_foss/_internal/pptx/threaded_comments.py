@@ -63,6 +63,9 @@ UNKNOWN_CREATED = '1970-01-01T00:00:00.000'
 #: The `p:ext` uri PowerPoint uses for threading information on a classic comment.
 THREADING_INFO_URI = '{C676402C-5697-4E1C-873F-D02D1690AC5C}'
 
+#: EMU per centimetre, for the thread marker's position.
+_EMU_PER_CM = 360000
+
 #: Namespace for the derived identifiers, so they are stable across saves.
 _ID_NAMESPACE = uuid.UUID('6f9619ff-8b86-d011-b42d-00c04fc964ff')
 
@@ -281,6 +284,12 @@ def _prune_orphaned_threads(package) -> None:
             _remove_part(package, part_name)
 
 
+def _emu(classic_units: str) -> int:
+    """A classic ``p:pos`` coordinate, in eighths of a point, as EMU."""
+    from .comments_part import from_position_units
+    return round(from_position_units(int(classic_units)) * _EMU_PER_CM)
+
+
 def _write_thread(package, slide_part_name: str, comments: list, authors: dict, rels) -> None:
     root = ET.Element(f"{_P188}cmLst", nsmap={'a': _A_NS, 'p188': _P188_NS})
     for comment in comments:
@@ -298,10 +307,12 @@ def _write_thread(package, slide_part_name: str, comments: list, authors: dict, 
 
         position = comment.find(f"{_P}pos")
         if parent is None and position is not None:
-            # Only the comment that starts a thread carries the marker.
+            # Only the comment that starts a thread carries the marker.  It is
+            # written in EMU, as it always has been; the classic list holds
+            # PowerPoint's comment unit, an eighth of a point.
             thread_position = ET.SubElement(element, f"{_P188}pos")
-            thread_position.set('x', position.get('x', '0'))
-            thread_position.set('y', position.get('y', '0'))
+            thread_position.set('x', str(_emu(position.get('x', '0'))))
+            thread_position.set('y', str(_emu(position.get('y', '0'))))
 
         text_element = comment.find(f"{_P}text")
         _text_body(element, text_element.text or '' if text_element is not None else '')

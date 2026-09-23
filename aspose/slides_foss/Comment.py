@@ -62,7 +62,8 @@ class Comment(IComment):
 
     @property
     def position(self) -> Any:
-        """Returns or sets the position of a comment on a slide. Read/write PointF."""
+        """Returns or sets the position of a comment on a slide, in centimetres
+        from the top-left corner of the slide. Read/write PointF."""
         from aspose.slides_foss.drawing import PointF
         return PointF(self._data.pos_x, self._data.pos_y)
 
@@ -70,6 +71,9 @@ class Comment(IComment):
     def position(self, value: Any):
         self._data.pos_x = value.x
         self._data.pos_y = value.y
+        # Persist immediately: the comments part is re-read from the package on
+        # save, so a change left only in this element would be discarded.
+        self._comments_part.save()
 
     @property
     def parent_comment(self) -> Optional['IComment']:

@@ -310,6 +310,7 @@ from aspose.slides_foss.export import SaveFormat
 with slides.Presentation() as prs:
     author = prs.comment_authors.add_author("Jane Smith", "JS")
     slide = prs.slides[0]
+    # A comment's position is in centimetres from the top-left corner of the slide.
     author.comments.add_comment("Review this slide", slide, PointF(2.0, 2.0), datetime.now())
     prs.save("comments.pptx", SaveFormat.PPTX)
 ```
@@ -906,7 +907,8 @@ each exposing its shapes through `Slide.shapes` (a `ShapeCollection`).
 - `CommentAuthor`
   - `comments -> CommentCollection`
 - `CommentCollection`
-  - `add_comment(text, slide, position, creationTime) -> Comment`
+  - `add_comment(text, slide, position, creationTime) -> Comment` — `position` is a `PointF` in
+    centimetres from the top-left corner of the slide
 
 ### Images
 
