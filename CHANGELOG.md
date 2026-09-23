@@ -183,8 +183,9 @@ raise, and files this version writes are not byte-identical to the ones the last
 - **Setting a transition on a slide opened from a PowerPoint file replaces the one it had.**
   PowerPoint saves every transition inside `mc:AlternateContent`, which the library did not look
   inside: the slide's transition read as `NONE`, and setting a type added a second `p:transition`
-  beside the existing one, which `CT_Slide` does not allow. The existing transition is now read, and
-  setting a type replaces it, keeping its speed, advance settings and duration.
+  beside the existing one, which `CT_Slide` does not allow — PowerPoint refuses to open the result.
+  The existing transition is now read, and setting a type replaces it, keeping its speed, advance
+  settings and duration.
 
 ### Known limitations
 
