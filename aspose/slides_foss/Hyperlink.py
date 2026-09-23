@@ -1,8 +1,9 @@
 from __future__ import annotations
 from .IHyperlink import IHyperlink
+from ._internal.strict_attributes import StrictAttributes
 
 
-class Hyperlink(IHyperlink):
+class Hyperlink(StrictAttributes, IHyperlink):
     """Represents a hyperlink to an external target."""
 
     def __init__(self, external_url: str, tooltip: str = None, target_frame: str = None):

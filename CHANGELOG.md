@@ -38,6 +38,12 @@ raise, and files this version writes are not byte-identical to the ones the last
   then silently discarded`. Names beginning with an underscore are unaffected. This is the change
   most likely to surface a latent bug in existing code — an assignment that never did anything now
   says so.
+- **The same check now covers the objects most code touches first.** It was at first applied to
+  shapes and the format objects only, and `Presentation`, `Slide`, `LayoutSlide`, `MasterSlide`,
+  `NotesSlide`, `TextFrame`, `Paragraph`, `Portion`, `Cell`, `SlideShowTransition` and `Hyperlink`
+  still accepted a misspelt name — `portion.txt = "Hello"` succeeded and wrote nothing. Each of
+  them now raises `AttributeError` in the same way. Code that stored its own public attributes on
+  these objects must use a name beginning with an underscore, or keep the data elsewhere.
 - **`line_format` and `three_d_format` on a group shape return `None`.** `CT_GroupShapeProperties`
   has no outline and no 3-D element, and setting either produced a file PowerPoint refuses to open
   from a call that reported success. The assignment now fails where it is made rather than at the far

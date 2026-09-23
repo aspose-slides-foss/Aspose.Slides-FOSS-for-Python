@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import overload, TYPE_CHECKING, Any
 from .IPortion import IPortion
+from ._internal.strict_attributes import StrictAttributes
 from .ISlideComponent import ISlideComponent
 from .IPresentationComponent import IPresentationComponent
 
@@ -9,7 +10,7 @@ if TYPE_CHECKING:
     from .IPortionFormat import IPortionFormat
     from .IPresentation import IPresentation
 
-class Portion(IPortion, ISlideComponent, IPresentationComponent):
+class Portion(StrictAttributes, IPortion, ISlideComponent, IPresentationComponent):
     """Represents a portion of text inside a text paragraph."""
 
 

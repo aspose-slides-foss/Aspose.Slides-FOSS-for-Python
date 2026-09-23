@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from .ICell import ICell
+from ._internal.strict_attributes import StrictAttributes
 from .ISlideComponent import ISlideComponent
 from .IPresentationComponent import IPresentationComponent
 
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
     from .TextAnchorType import TextAnchorType
     from .TextVerticalType import TextVerticalType
 
-class Cell(ICell, ISlideComponent, IPresentationComponent):
+class Cell(StrictAttributes, ICell, ISlideComponent, IPresentationComponent):
     """Represents a cell of a table."""
 
     def _init_internal(self, tc_element, row_index, col_index, slide_part, parent_slide, table):

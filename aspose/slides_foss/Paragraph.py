@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import overload, TYPE_CHECKING, Any
 from .IParagraph import IParagraph
+from ._internal.strict_attributes import StrictAttributes
 from .ISlideComponent import ISlideComponent
 from .IPresentationComponent import IPresentationComponent
 
@@ -11,7 +12,7 @@ if TYPE_CHECKING:
     from .IPortionFormat import IPortionFormat
     from .IPresentation import IPresentation
 
-class Paragraph(IParagraph, ISlideComponent, IPresentationComponent):
+class Paragraph(StrictAttributes, IParagraph, ISlideComponent, IPresentationComponent):
     """Represents a paragraph of text."""
 
 

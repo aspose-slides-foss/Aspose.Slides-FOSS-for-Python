@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import overload, TYPE_CHECKING
 from .ITextFrame import ITextFrame
+from ._internal.strict_attributes import StrictAttributes
 from .ISlideComponent import ISlideComponent
 from .IPresentationComponent import IPresentationComponent
 
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
     from .IShape import IShape
     from .ITextFrameFormat import ITextFrameFormat
 
-class TextFrame(ITextFrame, ISlideComponent, IPresentationComponent):
+class TextFrame(StrictAttributes, ITextFrame, ISlideComponent, IPresentationComponent):
     """Represents a TextFrame."""
 
     def _init_internal(self, txbody_element, slide_part, parent_slide, parent_shape=None):

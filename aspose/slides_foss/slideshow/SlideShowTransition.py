@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Optional
 import lxml.etree as ET
 from ..ISlideShowTransition import ISlideShowTransition
+from .._internal.strict_attributes import StrictAttributes
 
 if TYPE_CHECKING:
     from .ITransitionValueBase import ITransitionValueBase
@@ -9,7 +10,7 @@ if TYPE_CHECKING:
     from .TransitionType import TransitionType
 
 
-class SlideShowTransition(ISlideShowTransition):
+class SlideShowTransition(StrictAttributes, ISlideShowTransition):
     """Represents slide show transition."""
 
     def __init__(self):

@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import overload, TYPE_CHECKING, Optional
 from .IBaseSlide import IBaseSlide
+from ._internal.strict_attributes import StrictAttributes
 from .theme.IThemeable import IThemeable
 from .ISlideComponent import ISlideComponent
 from .IPresentationComponent import IPresentationComponent
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
     from .IShapeCollection import IShapeCollection
     from .ISlideShowTransition import ISlideShowTransition
 
-class BaseSlide(IBaseSlide, IThemeable, ISlideComponent, IPresentationComponent):
+class BaseSlide(StrictAttributes, IBaseSlide, IThemeable, ISlideComponent, IPresentationComponent):
     """Represents common data for all slide types."""
 
     def __init__(self):

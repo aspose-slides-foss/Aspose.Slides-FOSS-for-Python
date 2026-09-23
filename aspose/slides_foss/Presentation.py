@@ -2,6 +2,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import overload, TYPE_CHECKING, Any, BinaryIO, Optional, Union
 from .IPresentation import IPresentation
+from ._internal.strict_attributes import StrictAttributes
 from .IPresentationComponent import IPresentationComponent
 from .ILoadOptions import ILoadOptions
 from .SourceFormat import SourceFormat
@@ -26,7 +27,7 @@ if TYPE_CHECKING:
     from .theme.IMasterTheme import IMasterTheme
 
 
-class Presentation(IPresentation, IPresentationComponent):
+class Presentation(StrictAttributes, IPresentation, IPresentationComponent):
     """Represents a Microsoft PowerPoint presentation."""
 
 
