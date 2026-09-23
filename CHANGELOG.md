@@ -136,6 +136,12 @@ raise, and files this version writes are not byte-identical to the ones the last
   full, in a part nothing points at. Emptying the comment list now removes the part, its `Override`
   and its relationship, and any thread part no relationship names is cleaned up on save — so opening
   and re-saving a package that already carries orphans repairs it.
+- **3-D bevels and colours survive whatever order they are set in.** `bevel_top`, `bevel_bottom`,
+  `extrusion_color` and `contour_color` each create a child of `a:sp3d`, and each was appended, so
+  the file took the order the caller happened to use. `CT_Shape3D` is a sequence — `bevelT`,
+  `bevelB`, `extrusionClr`, `contourClr` — and 23 of the 24 possible orders were invalid: setting the
+  contour colour before the top bevel gave a shape that PowerPoint shows with no bevels and a white
+  extrusion. The four children now go where the schema puts them, whatever the order of the calls.
 
 ### Known limitations
 

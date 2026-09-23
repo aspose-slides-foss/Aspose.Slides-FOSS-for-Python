@@ -38,9 +38,11 @@ NS = {
     "a": "http://schemas.openxmlformats.org/drawingml/2006/main",
     "c": "http://schemas.openxmlformats.org/drawingml/2006/chart",
     "ct": "http://schemas.openxmlformats.org/package/2006/content-types",
+    "mc": "http://schemas.openxmlformats.org/markup-compatibility/2006",
     "p": "http://schemas.openxmlformats.org/presentationml/2006/main",
     "p14": "http://schemas.microsoft.com/office/powerpoint/2010/main",
     "p15": "http://schemas.microsoft.com/office/powerpoint/2012/main",
+    "p159": "http://schemas.microsoft.com/office/powerpoint/2015/09/main",
     "p188": "http://schemas.microsoft.com/office/powerpoint/2018/8/main",
     "pr": "http://schemas.openxmlformats.org/package/2006/relationships",
     "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
@@ -173,6 +175,16 @@ CHILD_ORDER = {
     ],
     # CT_Scene3D (20.1.4.1.26 / a:scene3d)
     "a:scene3d": [["a:camera"], ["a:lightRig"], ["a:backdrop"], ["a:extLst"]],
+    # CT_Shape3D (20.1.5.12 / a:sp3d)
+    "a:sp3d": [["a:bevelT"], ["a:bevelB"], ["a:extrusionClr"], ["a:contourClr"], ["a:extLst"]],
+    # CT_TextBodyProperties (21.1.2.1.1 / a:bodyPr)
+    "a:bodyPr": [
+        ["a:prstTxWarp"],
+        ["a:noAutofit", "a:normAutofit", "a:spAutoFit"],
+        ["a:scene3d"],
+        ["a:sp3d", "a:flatTx"],
+        ["a:extLst"],
+    ],
     # CT_Slide (19.3.1.38 / p:sld)
     "p:sld": [["p:cSld"], ["p:clrMapOvr"], ["p:transition"], ["p:timing"], ["p:extLst"]],
     # CT_RegularTextRun (21.1.2.3.8 / a:r)

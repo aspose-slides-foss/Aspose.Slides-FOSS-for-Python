@@ -10,11 +10,23 @@ The related failure is `<a:scene3d>` written half-populated: `CT_Scene3D`
 *required* `<a:lightRig>`, and touching only the camera leaves the light rig
 out, which makes the element schema-invalid.  `CT_LightRig` in turn requires
 both `@rig` and `@dir`.
+
+The children of `<a:sp3d>` are a sequence too.  `CT_Shape3D` (§20.1.5.12) is
+`bevelT, bevelB, extrusionClr, contourClr, extLst`, and each child is created
+when the caller first touches the property that needs it.  Appending them made
+the file's order the caller's order: setting the contour colour before the top
+bevel wrote an `<a:sp3d>` PowerPoint reads as having no bevels and a white
+extrusion.
 """
 
 from __future__ import annotations
 
-from aspose.slides_foss import CameraPresetType, LightRigPresetType
+import itertools
+
+import pytest
+
+from aspose.slides_foss import BevelPresetType, CameraPresetType, LightRigPresetType
+from aspose.slides_foss.drawing import Color
 
 from .harness import child_names
 
@@ -72,3 +84,44 @@ def test_a_light_rig_carries_its_required_direction(produced, shape_on_blank_sli
     pkg = produced(pres)
 
     pkg.assert_element(SLIDE, "//a:lightRig", attrs={"rig": ..., "dir": ...})
+
+
+def _apply_3d(three_d, operation):
+    if operation == "bevel_top":
+        three_d.bevel_top.bevel_type = BevelPresetType.CIRCLE
+    elif operation == "bevel_bottom":
+        three_d.bevel_bottom.bevel_type = BevelPresetType.ANGLE
+    elif operation == "extrusion_color":
+        three_d.extrusion_height = 12.0
+        three_d.extrusion_color.color = Color.from_argb(255, 0, 0, 255)
+    elif operation == "contour_color":
+        three_d.contour_width = 3.0
+        three_d.contour_color.color = Color.from_argb(255, 255, 0, 0)
+    else:  # pragma: no cover - guards a typo in the parametrisation
+        raise AssertionError("unknown operation %r" % operation)
+
+
+SHAPE_3D_OPERATIONS = ("bevel_top", "bevel_bottom", "extrusion_color", "contour_color")
+
+
+@pytest.mark.parametrize(
+    "order",
+    list(itertools.permutations(SHAPE_3D_OPERATIONS)),
+    ids=lambda o: "-".join(o),
+)
+def test_bevels_and_3d_colours_keep_their_schema_order_however_they_were_set(
+    produced, shape_on_blank_slide, order
+):
+    """`<a:sp3d>` children follow `CT_Shape3D` for every order of the four setters."""
+    pres, shape = shape_on_blank_slide()
+    for operation in order:
+        _apply_3d(shape.three_d_format, operation)
+    pkg = produced(pres)
+
+    sp3d = pkg.find_one(SLIDE, "//p:sp/p:spPr/a:sp3d")
+    assert child_names(sp3d) == ["a:bevelT", "a:bevelB", "a:extrusionClr", "a:contourClr"], (
+        "<a:sp3d> children are not the CT_Shape3D sequence "
+        "bevelT, bevelB, extrusionClr, contourClr; found %r" % child_names(sp3d)
+    )
+    pkg.assert_element(SLIDE, "//p:sp/p:spPr/a:sp3d", child_order=True)
+    pkg.assert_element(SLIDE, "//p:sp/p:spPr", child_order=True)

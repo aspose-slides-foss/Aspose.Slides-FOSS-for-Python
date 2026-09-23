@@ -7,6 +7,7 @@ from .IPresentationComponent import IPresentationComponent
 from .IThreeDFormat import IThreeDFormat
 from .IThreeDParamSource import IThreeDParamSource
 from ._internal.pptx.constants import NS, Elements, EMU_PER_POINT
+from ._internal.pptx.child_order import sub_element_in_order
 
 if TYPE_CHECKING:
     from .ICamera import ICamera
@@ -169,7 +170,7 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
         sp3d = self._ensure_sp3d()
         bevel_t = sp3d.find(Elements.A_BEVEL_T)
         if bevel_t is None:
-            bevel_t = ET.SubElement(sp3d, Elements.A_BEVEL_T)
+            bevel_t = sub_element_in_order(sp3d, Elements.A_BEVEL_T)
         bevel = ShapeBevel(True)
         bevel._init_internal(bevel_t, self._slide_part, self._parent_slide)
         return bevel
@@ -181,7 +182,7 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
         sp3d = self._ensure_sp3d()
         bevel_b = sp3d.find(Elements.A_BEVEL_B)
         if bevel_b is None:
-            bevel_b = ET.SubElement(sp3d, Elements.A_BEVEL_B)
+            bevel_b = sub_element_in_order(sp3d, Elements.A_BEVEL_B)
         bevel = ShapeBevel(False)
         bevel._init_internal(bevel_b, self._slide_part, self._parent_slide)
         return bevel
@@ -193,7 +194,7 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
         sp3d = self._ensure_sp3d()
         contour_clr = sp3d.find(Elements.A_CONTOUR_CLR)
         if contour_clr is None:
-            contour_clr = ET.SubElement(sp3d, Elements.A_CONTOUR_CLR)
+            contour_clr = sub_element_in_order(sp3d, Elements.A_CONTOUR_CLR)
         cf = ColorFormat()
         cf._init_internal(contour_clr, self._slide_part, self._parent_slide)
         return cf
@@ -205,7 +206,7 @@ class ThreeDFormat(PVIObject, ISlideComponent, IPresentationComponent, IThreeDFo
         sp3d = self._ensure_sp3d()
         extrusion_clr = sp3d.find(Elements.A_EXTRUSION_CLR)
         if extrusion_clr is None:
-            extrusion_clr = ET.SubElement(sp3d, Elements.A_EXTRUSION_CLR)
+            extrusion_clr = sub_element_in_order(sp3d, Elements.A_EXTRUSION_CLR)
         cf = ColorFormat()
         cf._init_internal(extrusion_clr, self._slide_part, self._parent_slide)
         return cf
