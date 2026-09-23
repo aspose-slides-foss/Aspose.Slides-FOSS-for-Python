@@ -113,16 +113,16 @@ Two things about the packaging are easy to break and worth knowing:
 python -m pytest -q
 ```
 
-Expect **666 passed, 5 skipped**. The five skips are chart tests that need a `Charts.pptx` fixture
+Expect **919 passed, 5 skipped**. The five skips are chart tests that need a `Charts.pptx` fixture
 which is not in the repository; they report `Charts.pptx not available` and are not a failure.
 
-The conformance suite is **82 of those tests** and can be run on its own:
+The conformance suite is **335 of those tests** and can be run on its own:
 
 ```bash
 python -m pytest tests/conformance -q
 ```
 
-That 82 is asserted, not just expected. `tests/test_conformance_suite_is_present.py` collects the
+That 335 is asserted, not just expected. `tests/test_conformance_suite_is_present.py` collects the
 conformance directory in a child process and fails if the count has dropped, because the tests that
 open the produced package are exactly the ones whose absence nothing else can see: delete them and
 every remaining test passes, the exit code is 0, and the build is green with the instrument removed.

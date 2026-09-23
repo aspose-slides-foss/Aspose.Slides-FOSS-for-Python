@@ -86,7 +86,7 @@ raise, and files this version writes are not byte-identical to the ones the last
   `p:cNvPr` for a shape, where `CT_NonVisualDrawingProps` names the mouse-over element
   `a:hlinkHover`. Each carries an `r:id` resolving to an external relationship in the owning part's
   `.rels`. Assigning `None` removes the element and the relationship together.
-- **A conformance test suite** — 82 tests that write a file through the public API, open it as a ZIP
+- **A conformance test suite** — 335 tests that write a file through the public API, open it as a ZIP
   archive and assert on the XML inside, never asking the library to read its own output back. See
   `tests/conformance/README.md`.
 - **A `py.typed` marker.** The package declared `Typing :: Typed` and shipped no marker, so every
