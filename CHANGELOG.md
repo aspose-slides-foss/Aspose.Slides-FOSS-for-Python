@@ -86,6 +86,10 @@ raise, and files this version writes are not byte-identical to the ones the last
   be moved back with `comment.position = PointF(p.x / 1587.5, p.y / 1587.5)`, where `p` is the
   position it reads back. A comment written by PowerPoint now reads back where PowerPoint placed it.
   See *Comments are placed on the slide* under Fixed.
+- **A comment's `position` reads back to the nearest eighth of a point.** That is what the file can
+  hold, about 0.0044 cm, where earlier versions kept 1/360 000 cm. A comment added at
+  `PointF(2.0, 3.0)` reads back as about `(2.0020, 2.9986)` and no longer compares equal to the
+  point it was given.
 
 ### Added
 
@@ -95,7 +99,7 @@ raise, and files this version writes are not byte-identical to the ones the last
   `p:cNvPr` for a shape, where `CT_NonVisualDrawingProps` names the mouse-over element
   `a:hlinkHover`. Each carries an `r:id` resolving to an external relationship in the owning part's
   `.rels`. Assigning `None` removes the element and the relationship together.
-- **A conformance test suite** — 349 tests that write a file through the public API, open it as a ZIP
+- **A conformance test suite** — 365 tests that write a file through the public API, open it as a ZIP
   archive and assert on the XML inside, never asking the library to read its own output back. See
   `tests/conformance/README.md`.
 - **A `py.typed` marker.** The package declared `Typing :: Typed` and shipped no marker, so every
@@ -203,13 +207,21 @@ raise, and files this version writes are not byte-identical to the ones the last
   added at 2 cm by 3 cm was placed 90 000 pt from the left edge. The position passed to
   `add_comment` and `insert_comment` and read from `position` is, as it always was, in centimetres
   from the top-left corner of the slide — this is now documented — and it is now written in
-  PowerPoint's unit and read back from it. The position mirrored into the threaded-comment part is
-  still written in EMU; since it is taken from the classic list, it is now rounded to the nearest
-  eighth of a point. Covered by `tests/conformance/test_comment_position.py`.
-- **Assigning a comment's `position` moves it in the saved file.** The setter changed the comment in
-  memory only, and the comment list is read again from the package on save, so the file kept the
-  old position and nothing said so. The new position is now written at once, as a new
-  `parent_comment` already was.
+  PowerPoint's unit and read back from it. When a save rewrites the threaded-comment part, the
+  position mirrored into it is now converted from the classic list to EMU instead of copied: for a
+  comment this library wrote it stays in EMU, as before, rounded to the nearest eighth of a point;
+  for a comment PowerPoint wrote, `x="80"` there becomes `x="127000"`. Covered by
+  `tests/conformance/test_comment_position.py`.
+- **Edits to a comment are saved, and no longer undo other edits.** Assigning a comment's
+  `position`, `text` or `created_time` changed it in memory only, and the comment list is read again
+  from the package on save, so the file kept the old value and nothing said so. Each is now written
+  at once. Every way of reaching a comment — `author.comments`, `slide.get_slide_comments`, the
+  comment `add_comment` returns — also held its own copy of the slide's comment list and wrote it
+  back whole. Setting `parent_comment` or calling `remove()` through a comment read before another
+  comment was added to the slide deleted that comment from the file, and adding a comment after a
+  `parent_comment` or `remove()` made through another handle could undo it — a removed comment came
+  back. An edit and an addition now start from the comment list as the package holds it. Covered by
+  `tests/conformance/test_comment_edits.py`.
 
 ### Known limitations
 

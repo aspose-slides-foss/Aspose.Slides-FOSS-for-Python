@@ -277,11 +277,63 @@ def test_a_powerpoint_comment_moved_onto_another_lands_exactly_on_it(produced, t
     assert [(p.get("authorId"), p.get("idx")) for p in parents] == [("1", "1")]
 
 
+def _old_deck(directory):
+    """A deck as an earlier version saved it: "Old" at 2 cm by 3 cm, written in EMU."""
+    fresh = os.path.join(directory, "fresh.pptx")
+    pres = Presentation()
+    author = pres.comment_authors.add_author("Reviewer", "RV")
+    author.comments.add_comment("Old", pres.slides[0], PointF(2.0, 3.0), WHEN)
+    pres.save(fresh, SaveFormat.PPTX)
+    pres.dispose()
+
+    deck = os.path.join(directory, "old.pptx")
+    rewritten = 0
+    with zipfile.ZipFile(fresh) as src, zipfile.ZipFile(deck, "w", zipfile.ZIP_DEFLATED) as dst:
+        for item in src.infolist():
+            data = src.read(item.filename)
+            if item.filename.startswith("ppt/comments/"):
+                text = data.decode("utf-8")
+                assert text.count("<p:pos ") == 1, "fixture: %s" % text
+                start = text.index("<p:pos ")
+                end = text.index("/>", start) + 2
+                data = (text[:start] + '<p:pos x="720000" y="1080000"/>' + text[end:]).encode("utf-8")
+                rewritten += 1
+            dst.writestr(item, data)
+    assert rewritten == 1, "fixture: %d comment parts" % rewritten
+    return deck
+
+
+def test_an_old_comment_moved_back_stays_put_when_comments_are_added_around_it(produced, tmp_path):
+    """The changelog's remedy for a file an earlier version wrote, between two additions.
+
+    An earlier version wrote 2 cm by 3 cm as `x="720000" y="1080000"`.  The
+    remedy divides the position that reads back by 1587.5.  A comment added
+    before the move and one added after it must neither undo it nor be lost.
+    """
+    pres = Presentation(_old_deck(str(tmp_path)))
+    author = pres.comment_authors[0]
+    slide = pres.slides[0]
+    author.comments.add_comment("Before", slide, PointF(1.0, 1.0), WHEN)
+    for comment in author.comments:
+        if comment.text == "Old":
+            p = comment.position
+            comment.position = PointF(p.x / 1587.5, p.y / 1587.5)
+    author.comments.add_comment("After", slide, PointF(1.0, 2.0), WHEN)
+    pkg = produced(pres, name="moved-back.pptx")
+
+    assert _positions(pkg) == {
+        "Old": (454, 680),
+        "Before": (227, 227),
+        "After": (227, 454),
+    }, "\n" + pkg.text(_comment_part(pkg))
+
+
 def test_the_thread_part_keeps_its_position_in_emu(produced):
     """The position mirrored into `ppt/threadedComments/` is unchanged by the fix.
 
-    That part is rebuilt from the classic list on every save and has always
-    carried the position in EMU.  Which unit PowerPoint reads there has not
+    That part is rebuilt from the classic list whenever a save writes the
+    comment authors, as this one does, and has always carried the position in
+    EMU for a comment this library wrote.  Which unit PowerPoint reads there has not
     been measured, so it is left as it was: 2.54 cm is written as 914 400 EMU
     before and after.  Passes on the unfixed code too.
     """

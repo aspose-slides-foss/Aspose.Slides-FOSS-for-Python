@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Callable, Optional
 from .IComment import IComment
 
 if TYPE_CHECKING:
@@ -30,6 +30,34 @@ class Comment(IComment):
         self._package = package
         self._presentation = presentation
 
+    def _current_part(self) -> Optional['CommentsPart']:
+        """This comment's part as the package holds it now, or None if it is gone.
+
+        Every accessor reads its own copy of a comment part, and an edit writes
+        its copy back whole, so a copy read before another edit was saved would
+        undo that edit.  Edits therefore start from the package, not the copy.
+        """
+        from ._internal.pptx.comments_part import CommentsPart
+        package = self._comments_part._package
+        part_name = self._comments_part.part_name
+        if not package.has_part(part_name):
+            return None
+        return CommentsPart(package, part_name)
+
+    def _edit(self, change: Callable[['CommentData'], None]) -> None:
+        """Apply ``change`` to this comment as the package holds it now, and save the part."""
+        current = self._current_part()
+        data = None
+        if current is not None:
+            data = current.find_comment_by_idx(self._data.author_id, self._data.idx)
+        if current is None or data is None:
+            # Removed since this handle was made: nothing in the file to change.
+            change(self._data)
+            return
+        change(data)
+        current.save()
+        self._comments_part, self._data = current, data
+
     @property
     def text(self) -> str:
         """Returns or sets the plain text of a slide comment. Read/write str."""
@@ -37,7 +65,9 @@ class Comment(IComment):
 
     @text.setter
     def text(self, value: str):
-        self._data.text = value
+        def change(data: 'CommentData') -> None:
+            data.text = value
+        self._edit(change)
 
     @property
     def created_time(self) -> Any:
@@ -48,7 +78,11 @@ class Comment(IComment):
     @created_time.setter
     def created_time(self, value: Any):
         from ._internal.pptx.comments_part import _dt_to_str
-        self._data.dt_str = _dt_to_str(value) if value is not None else ''
+        dt_str = _dt_to_str(value) if value is not None else ''
+
+        def change(data: 'CommentData') -> None:
+            data.dt_str = dt_str
+        self._edit(change)
 
     @property
     def slide(self) -> 'ISlide':
@@ -69,11 +103,10 @@ class Comment(IComment):
 
     @position.setter
     def position(self, value: Any):
-        self._data.pos_x = value.x
-        self._data.pos_y = value.y
-        # Persist immediately: the comments part is re-read from the package on
-        # save, so a change left only in this element would be discarded.
-        self._comments_part.save()
+        def change(data: 'CommentData') -> None:
+            data.pos_x = value.x
+            data.pos_y = value.y
+        self._edit(change)
 
     @property
     def parent_comment(self) -> Optional['IComment']:
@@ -104,26 +137,21 @@ class Comment(IComment):
 
     @parent_comment.setter
     def parent_comment(self, value: Optional['IComment']):
-        if value is None:
-            self._data.parent_ref = None
-        else:
-            self._data.parent_ref = (value._data.author_id, value._data.idx)
-        # Persist immediately: the comments part is re-read from the package on
-        # save, so a change left only in this element would be discarded.
-        self._comments_part.save()
+        parent_ref = None if value is None else (value._data.author_id, value._data.idx)
+
+        def change(data: 'CommentData') -> None:
+            data.parent_ref = parent_ref
+        self._edit(change)
 
     def remove(self) -> None:
         """Removes comment and all its replies from the parent collection."""
-        my_idx = self._data.idx
-        my_author_id = self._data.author_id
-        # Remove all replies that have this comment as their parent
-        to_remove = []
-        for cd in self._comments_part.get_comments():
-            if cd.parent_ref == (my_author_id, my_idx):
-                to_remove.append(cd._elem)
-        for elem in to_remove:
-            self._comments_part.remove_comment_elem(elem)
-        # Remove this comment itself
-        self._comments_part.remove_comment_elem(self._data._elem)
-        # Persist to package so subsequent loads see the change
-        self._comments_part.save()
+        me = (self._data.author_id, self._data.idx)
+        current = self._current_part()
+        if current is None:
+            return
+        # This comment and every comment that replies to it, as the package holds them now.
+        for cd in current.get_comments():
+            if (cd.author_id, cd.idx) == me or cd.parent_ref == me:
+                current.remove_comment_elem(cd._elem)
+        current.save()
+        self._comments_part = current

@@ -29,7 +29,7 @@ CONFORMANCE = pathlib.Path(__file__).parent / "conformance"
 
 #: The number of conformance tests that must be collectable.  Also stated in
 #: CONTRIBUTING.md, where it is an expectation; here it is the assertion.
-FLOOR = 349
+FLOOR = 365
 
 
 def test_the_conformance_suite_still_collects_every_test_it_had():

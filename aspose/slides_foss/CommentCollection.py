@@ -68,21 +68,19 @@ class CommentCollection(BaseCollection, ICommentCollection):
         return result
 
     def _get_or_create_comments_part(self, slide_part_name: str, slide=None) -> 'CommentsPart':
+        """The slide's comment part as the package holds it now, created if there is none.
+
+        Read again on every call: a copy kept from an earlier call misses what
+        other handles have saved since, and saving it back would undo that.
+        """
         from ._internal.pptx.comments_part import CommentsPart
-        # Use a cache on the authors_part to share CommentsPart instances
-        cache = getattr(self._authors_part, '_cp_cache', None)
-        if cache is None:
-            self._authors_part._cp_cache = {}
-            cache = self._authors_part._cp_cache
-        if slide_part_name not in cache:
-            cp = CommentsPart.load_for_slide(self._package, slide_part_name)
-            if cp is None:
-                cp = CommentsPart.create_for_slide(
-                    self._package, slide_part_name,
-                    slide_rels_manager=getattr(getattr(slide, '_slide_part', None), '_rels_manager', None)
-                )
-            cache[slide_part_name] = cp
-        return cache[slide_part_name]
+        cp = CommentsPart.load_for_slide(self._package, slide_part_name)
+        if cp is None:
+            cp = CommentsPart.create_for_slide(
+                self._package, slide_part_name,
+                slide_rels_manager=getattr(getattr(slide, '_slide_part', None), '_rels_manager', None)
+            )
+        return cp
 
     def _build_comment(self, data, cp, slide_obj) -> 'Comment':
         from .Comment import Comment
